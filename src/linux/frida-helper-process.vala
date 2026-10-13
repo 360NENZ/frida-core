@@ -338,7 +338,7 @@ namespace Frida {
 			TimeoutSource? timeout_source = null;
 
 			try {
-				string socket_path = "/frida-" + Uuid.string_random ();
+				string socket_path = "/" + Uuid.string_random ();
 				string socket_address = "unix:abstract=" + socket_path;
 
 				service = new SocketService ();
@@ -653,11 +653,11 @@ namespace Frida {
 #if HAVE_EMBEDDED_ASSETS
 			var blob32 = Frida.Data.Helper.get_frida_helper_32_blob ();
 			if (blob32.data.length > 0)
-				helper32 = make_temporary_helper ("frida-helper-32", blob32.data);
+				helper32 = make_temporary_helper ("runtime-helper-32", blob32.data);
 
 			var blob64 = Frida.Data.Helper.get_frida_helper_64_blob ();
 			if (blob64.data.length > 0)
-				helper64 = make_temporary_helper ("frida-helper-64", blob64.data);
+				helper64 = make_temporary_helper ("runtime-helper-64", blob64.data);
 #else
 			var tpl = PathTemplate (Frida.helper_path);
 			string path = tpl.expand ((sizeof (void *) == 8) ? "32" : "64");

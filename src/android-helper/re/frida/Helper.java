@@ -26,11 +26,11 @@ public class Helper {
 
 		String instanceId = args[0];
 
-		new File("/data/local/tmp/frida-helper-" + instanceId + ".dex").delete();
+		new File("/data/local/tmp/runtime-helper-" + instanceId + ".dex").delete();
 
 		LocalServerSocket socket;
 		try {
-			socket = new LocalServerSocket("/frida-helper-" + instanceId);
+			socket = new LocalServerSocket("/runtime-helper-" + instanceId);
 		} catch (IOException e) {
 			System.err.println(e);
 			System.exit(2);

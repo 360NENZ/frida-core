@@ -1261,7 +1261,7 @@ namespace Frida {
 		}
 
 		private static string make_fallback_address () {
-			return "/frida-" + Uuid.string_random ();
+			return "/" + Uuid.string_random ();
 		}
 
 		private Future<RemoteAgent> establish_connection (LoaderLaunch launch, InjectSpec spec, BootstrapResult bres,
