@@ -1298,8 +1298,8 @@ namespace Frida {
 			throw (IOError) e;
 
 		if (e is DBusError.UNKNOWN_METHOD) {
-			throw new Frida.Error.PROTOCOL ("Unable to communicate with remote frida-server; " +
-				"please ensure that major versions match and that the remote Frida has the " +
+			throw new Frida.Error.PROTOCOL ("Unable to communicate with the remote service; " +
+				"please ensure that major versions match and that the remote service has the " +
 				"feature you are trying to use");
 		}
 

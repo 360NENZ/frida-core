@@ -877,7 +877,7 @@ namespace Frida {
 				}
 
 				if (connection.closed)
-					throw new Error.SERVER_NOT_RUNNING ("Unable to connect to remote frida-server");
+					throw new Error.SERVER_NOT_RUNNING ("Unable to connect to the remote service");
 
 				var server = new RemoteServer (session, connection, flavor, transport_broker);
 				attach_remote_server (server);
@@ -898,11 +898,11 @@ namespace Frida {
 					last_server_check_error = null;
 				} else {
 					if (e is Error.SERVER_NOT_RUNNING) {
-						api_error = new Error.SERVER_NOT_RUNNING ("Unable to connect to remote frida-server");
+						api_error = new Error.SERVER_NOT_RUNNING ("Unable to connect to the remote service");
 					} else if (connection != null) {
-						api_error = new Error.PROTOCOL ("Incompatible frida-server version");
+						api_error = new Error.PROTOCOL ("Incompatible remote service version");
 					} else {
-						api_error = new Error.SERVER_NOT_RUNNING ("Unable to connect to remote frida-server: %s",
+						api_error = new Error.SERVER_NOT_RUNNING ("Unable to connect to the remote service: %s",
 							e.message);
 					}
 
