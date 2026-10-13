@@ -275,7 +275,7 @@ namespace Frida {
 			var opts = SessionOptions._deserialize (options);
 
 			if (opts.realm == EMULATED)
-				throw new Error.NOT_SUPPORTED ("Emulated realm is not supported by frida-gadget");
+				throw new Error.NOT_SUPPORTED ("Emulated realm is not supported by the embedded runtime");
 
 			AgentMessageSink sink;
 			try {
@@ -307,12 +307,12 @@ namespace Frida {
 
 #if !WINDOWS
 		private async void migrate (AgentSessionId id, Socket to_socket, Cancellable? cancellable) throws Error, IOError {
-			throw new Error.NOT_SUPPORTED ("Session migration is not supported with frida-portal");
+			throw new Error.NOT_SUPPORTED ("Session migration is not supported in portal mode");
 		}
 #endif
 
 		private async void unload (Cancellable? cancellable) throws Error, IOError {
-			throw new Error.INVALID_OPERATION ("Unload is not allowed with frida-portal");
+			throw new Error.INVALID_OPERATION ("Unload is not allowed in portal mode");
 		}
 
 		private void on_resume () {

@@ -851,8 +851,7 @@ namespace Frida {
 			Variant? gadget_value = aux["gadget"];
 			if (gadget_value != null) {
 				if (!gadget_value.is_of_type (VariantType.STRING)) {
-					throw new Error.INVALID_ARGUMENT ("The 'gadget' option must be a string pointing at the " +
-						"frida-gadget.dylib to use");
+					throw new Error.INVALID_ARGUMENT ("The 'gadget' option must be a shared library path");
 				}
 				gadget_path = gadget_value.get_string ();
 			}

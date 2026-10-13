@@ -569,8 +569,7 @@ namespace Frida {
 			Variant? user_gadget_value = aux["gadget"];
 			if (user_gadget_value != null) {
 				if (!user_gadget_value.is_of_type (VariantType.STRING)) {
-					throw new Error.INVALID_ARGUMENT ("The 'gadget' option must be a string pointing at the " +
-						"frida-gadget.so to use");
+					throw new Error.INVALID_ARGUMENT ("The 'gadget' option must be a shared library path");
 				}
 				user_gadget_path = user_gadget_value.get_string ();
 			}
