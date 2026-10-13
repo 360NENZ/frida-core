@@ -159,7 +159,7 @@ namespace Frida.Barebone {
 				Cancellable? cancellable) throws Error, IOError {
 			string path;
 			try {
-				FileUtils.close (FileUtils.open_tmp ("frida-barebone-XXXXXX", out path));
+				FileUtils.close (FileUtils.open_tmp ("runtime-XXXXXX", out path));
 				FileUtils.set_data (path, data);
 			} catch (FileError e) {
 				throw new Error.NOT_SUPPORTED ("Unable to stage a guest memory write: %s", e.message);

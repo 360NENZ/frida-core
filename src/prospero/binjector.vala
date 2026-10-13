@@ -676,7 +676,7 @@ namespace Frida {
 					throw new Error.NOT_SUPPORTED ("Unable to launch '%s'", identifier);
 
 				var request = new AppLauncher (identifier, argv);
-				new Thread<void> ("frida-app-launch", request.run);
+				new Thread<void> ("app-launch", request.run);
 
 				var event = FreeBSD.KEvent ();
 				var timeout = Posix.timespec ();
@@ -1447,7 +1447,7 @@ namespace Frida {
 	private const uint32 LIB_KERNEL = 0x2001;
 	private const uint32 MAIN_MODULE_HANDLE = 0;
 	private const int IPV6_2292PKTOPTIONS = 25;
-	private const string AGENT_THREAD_NAME = "frida-agent";
+	private const string AGENT_THREAD_NAME = "agent-worker";
 	private const string SIGNED_HOST_PATH = "/system/vsh/app/NPXS40112/eboot.bin";
 	private const string APP_LAUNCHER_NAME = "SceSysCore.elf";
 	private const int APP_LAUNCH_TIMEOUT = 15;

@@ -2568,7 +2568,7 @@ namespace Frida {
 				try {
 					string name_used;
 					{
-						var fd = new FileDescriptor (FileUtils.open_tmp ("frida-compiler-backend-XXXXXX.so", out name_used));
+						var fd = new FileDescriptor (FileUtils.open_tmp ("compiler-backend-XXXXXX.so", out name_used));
 						fd.pwrite_all (backend_so, 0);
 					}
 
@@ -2867,7 +2867,7 @@ namespace Frida {
 
 				string path;
 				{
-					var fd = new FileDescriptor (FileUtils.open_tmp ("frida-compiler-backend-XXXXXX", out path));
+					var fd = new FileDescriptor (FileUtils.open_tmp ("compiler-backend-XXXXXX", out path));
 					fd.pwrite_all (blob, 0);
 				}
 

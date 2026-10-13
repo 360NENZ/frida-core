@@ -663,7 +663,7 @@ frida_kmod_spawn_thread (FridaThreadEntry entry,
   ctx->entry = entry;
   ctx->parameter = parameter;
 
-  task = kthread_run (frida_thread_trampoline, ctx, "frida-agent");
+  task = kthread_run (frida_thread_trampoline, ctx, "agent-worker");
   if (IS_ERR (task))
     {
       kfree (ctx);
@@ -1182,7 +1182,7 @@ frida_adopt_target_context (struct task_struct * leader)
 void
 frida_kmod_install_hooks (void)
 {
-  frida_op_worker = kthread_run (frida_op_worker_fn, NULL, "frida-op");
+  frida_op_worker = kthread_run (frida_op_worker_fn, NULL, "op-worker");
 
   frida_interceptor = gum_interceptor_obtain ();
 
