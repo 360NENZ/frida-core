@@ -25,7 +25,7 @@ namespace Frida {
 			binjector.uninjected.connect (on_uninjected);
 			injector = binjector;
 
-			var blob = Frida.Data.Agent.get_frida_agent_so_blob ();
+			var blob = Frida.Data.Agent.get_runtime_agent_so_blob ();
 			agent_desc = new AgentDescriptor (blob.name, new MemoryInputStream.from_data (blob.data, null));
 		}
 

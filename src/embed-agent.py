@@ -33,7 +33,7 @@ def main(argv):
             if agent is None:
                 continue
             arch = detect_pefile_arch(agent)
-            embedded_agent = priv_dir / f"frida-agent-{arch}.dll"
+            embedded_agent = priv_dir / f"runtime-{arch}.dll"
             embedded_dbghelp = priv_dir / f"dbghelp-{arch}.dll"
             embedded_symsrv = priv_dir / f"symsrv-{arch}.dll"
 
@@ -52,14 +52,14 @@ def main(argv):
             embedded_assets += [embedded_agent, embedded_dbghelp, embedded_symsrv]
             pending_archs.remove(arch)
         for missing_arch in pending_archs:
-            embedded_agent = priv_dir / f"frida-agent-{missing_arch}.dll"
+            embedded_agent = priv_dir / f"runtime-{missing_arch}.dll"
             embedded_dbghelp = priv_dir / f"dbghelp-{missing_arch}.dll"
             embedded_symsrv = priv_dir / f"symsrv-{missing_arch}.dll"
             for asset in {embedded_agent, embedded_dbghelp, embedded_symsrv}:
                 asset.write_bytes(b"")
                 embedded_assets += [asset]
     elif host_os in {"macos", "ios", "watchos", "tvos", "xros"}:
-        embedded_agent = priv_dir / "frida-agent.dylib"
+        embedded_agent = priv_dir / "runtime-agent.dylib"
         if agent_modern is not None and agent_legacy is not None:
             subprocess.run(lipo + [agent_modern, agent_legacy, "-create", "-output", embedded_agent],
                            check=True)
@@ -73,14 +73,14 @@ def main(argv):
                               (agent_legacy, "32"),
                               (agent_emulated_modern, "arm64"),
                               (agent_emulated_legacy, "arm")]:
-            embedded_agent = priv_dir / f"frida-agent-{flavor}.so"
+            embedded_agent = priv_dir / f"runtime-{flavor}.so"
             if agent is not None:
                 shutil.copy(agent, embedded_agent)
             else:
                 embedded_agent.write_bytes(b"")
             embedded_assets += [embedded_agent]
     elif host_os in {"freebsd", "qnx"}:
-        embedded_agent = priv_dir / "frida-agent.so"
+        embedded_agent = priv_dir / "runtime-agent.so"
         agent = agent_modern if agent_modern is not None else agent_legacy
         shutil.copy(agent, embedded_agent)
         embedded_assets += [embedded_agent]

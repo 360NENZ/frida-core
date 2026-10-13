@@ -75,7 +75,7 @@ namespace Frida {
 			injector.uninjected.connect (on_uninjected);
 
 #if HAVE_EMBEDDED_ASSETS
-			var blob = Frida.Data.Agent.get_frida_agent_dylib_blob ();
+			var blob = Frida.Data.Agent.get_runtime_agent_dylib_blob ();
 			agent = new AgentResource (blob.name, copy_to_aligned_pages (blob.data), tempdir);
 #endif
 

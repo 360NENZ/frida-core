@@ -48,9 +48,9 @@ namespace Frida {
 
 #if HAVE_EMBEDDED_ASSETS
 			agent = new AgentDescriptor (PathTemplate ("<arch>\\frida-agent.dll"),
-				new Bytes.static (Frida.Data.Agent.get_frida_agent_arm64_dll_blob ().data),
-				new Bytes.static (Frida.Data.Agent.get_frida_agent_x86_64_dll_blob ().data),
-				new Bytes.static (Frida.Data.Agent.get_frida_agent_x86_dll_blob ().data),
+				new Bytes.static (Frida.Data.Agent.get_runtime_arm64_dll_blob ().data),
+				new Bytes.static (Frida.Data.Agent.get_runtime_x86_64_dll_blob ().data),
+				new Bytes.static (Frida.Data.Agent.get_runtime_x86_dll_blob ().data),
 				new AgentResource[] {
 					new AgentResource ("arm64\\dbghelp.dll",
 						new Bytes.static (Frida.Data.Agent.get_dbghelp_arm64_dll_blob ().data), tempdir),
