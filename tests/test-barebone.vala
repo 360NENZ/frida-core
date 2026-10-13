@@ -4886,7 +4886,7 @@ FAIL: %s
 			string? received = null;
 			bool waiting = false;
 			var handler = script.message.connect ((json, data) => {
-				if (!json.contains ("frida:rpc"))
+				if (!json.contains ("meshlink:rpc"))
 					return;
 				received = json;
 				if (waiting) {
@@ -4896,7 +4896,7 @@ FAIL: %s
 			});
 			yield script.load (null);
 
-			script.post ("""["frida:rpc",1,"call","evaluate",["1 + 1",{"raw":false}]]""");
+			script.post ("""["meshlink:rpc",1,"call","evaluate",["1 + 1",{"raw":false}]]""");
 
 			if (received == null) {
 				waiting = true;
@@ -6758,7 +6758,7 @@ FAIL: %s
 			string? received = null;
 			bool waiting = false;
 			var handler = script.message.connect ((json, data) => {
-				if (!json.contains ("frida:rpc"))
+				if (!json.contains ("meshlink:rpc"))
 					return;
 				received = json;
 				if (waiting) {
@@ -6768,7 +6768,7 @@ FAIL: %s
 			});
 			yield script.load (null);
 
-			script.post ("""["frida:rpc",1,"call","evaluate",["1 + 1"]]""");
+			script.post ("""["meshlink:rpc",1,"call","evaluate",["1 + 1"]]""");
 
 			if (received == null) {
 				waiting = true;

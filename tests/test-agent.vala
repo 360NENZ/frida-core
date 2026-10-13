@@ -219,7 +219,7 @@ Interceptor.attach(Process.getModuleByName('/usr/lib/system/libsystem_kernel.dyl
 
 					var request = new Json.Builder ()
 						.begin_array ()
-						.add_string_value ("frida:rpc")
+						.add_string_value ("meshlink:rpc")
 						.add_int_value (id)
 						.add_string_value ("call")
 						.add_string_value ("prepareForLaunch")
@@ -250,7 +250,7 @@ Interceptor.attach(Process.getModuleByName('/usr/lib/system/libsystem_kernel.dyl
 						}
 
 						reader.read_element (0);
-						assert_true (reader.get_string_value () == "frida:rpc");
+						assert_true (reader.get_string_value () == "meshlink:rpc");
 						reader.end_element ();
 
 						reader.read_element (1);
