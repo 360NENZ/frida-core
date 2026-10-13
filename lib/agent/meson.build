@@ -58,7 +58,7 @@ if build_agent
 
   extra_link_args += prospero_crt_link_args
 
-  raw_agent = shared_library('frida-agent-raw', agent_sources,
+  raw_agent = shared_library('ml-agent', agent_sources,
     name_prefix: 'lib',
     c_args: frida_component_cflags,
     vala_header: 'frida-agent.h',
