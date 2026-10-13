@@ -159,7 +159,7 @@ namespace Frida {
 
 				stream_request = Pipe.open (transport.local_address, cancellable);
 
-				new Thread<bool> ("frida-helper-factory", obtain_worker);
+				new Thread<bool> ("helper-factory", obtain_worker);
 			}
 
 			return yield obtain_request.future.wait_async (cancellable);
@@ -418,7 +418,7 @@ namespace Frida {
 
 #if HAVE_EMBEDDED_ASSETS
 		private TemporaryFile add_helper (string name, Frida.Data.Helper.Blob blob, TemporaryDirectory tempdir) throws Error {
-			var file = new TemporaryFile.from_stream (@"frida-helper-$name.exe",
+			var file = new TemporaryFile.from_stream (@"runtime-$name.exe",
 				new MemoryInputStream.from_data (blob.data, null),
 				tempdir);
 			helpers.add (file);

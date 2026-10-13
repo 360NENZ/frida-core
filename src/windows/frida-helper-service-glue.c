@@ -112,7 +112,7 @@ frida_helper_manager_stop_services (void * context)
 char *
 frida_helper_service_make_svcname_base (void)
 {
-  return g_strdup_printf ("frida-%lu-", GetCurrentProcessId ());
+  return g_strdup_printf ("runtime-%lu-", GetCurrentProcessId ());
 }
 
 char *
@@ -541,7 +541,7 @@ frida_unregister_stale_services (FridaServiceContext * self)
     {
       ENUM_SERVICE_STATUS_PROCESSW * service = &services[i];
 
-      if (wcsncmp (service->lpServiceName, L"frida-", 6) == 0 && wcslen (service->lpServiceName) == 41)
+      if (wcsncmp (service->lpServiceName, L"runtime-", 8) == 0 && wcslen (service->lpServiceName) == 43)
       {
         SC_HANDLE handle = OpenServiceW (self->scm, service->lpServiceName, SERVICE_QUERY_CONFIG | DELETE);
         if (handle != NULL)

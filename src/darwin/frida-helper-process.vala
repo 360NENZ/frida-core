@@ -516,7 +516,7 @@ namespace Frida {
 
 			var blob = Frida.Data.Helper.get_frida_helper_blob ();
 			helper = new TemporaryHelperFile (
-				new TemporaryFile.from_stream ("frida-helper",
+				new TemporaryFile.from_stream ("runtime-helper",
 					new MemoryInputStream.from_data (blob.data, null),
 					tempdir));
 			FileUtils.chmod (helper.path, 0700);
@@ -573,7 +573,7 @@ namespace Frida {
 				if (arm64e_offset == 0 || arm64_offset == 0)
 					return false;
 
-				var thin_file = new TemporaryFile.from_stream ("frida-helper-arm64",
+				var thin_file = new TemporaryFile.from_stream ("runtime-helper-arm64",
 					new MemoryInputStream.from_data (universal_data[arm64_offset:arm64_offset + arm64_size], null),
 					tempdir);
 				FileUtils.chmod (thin_file.path, 0700);

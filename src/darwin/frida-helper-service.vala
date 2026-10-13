@@ -5,7 +5,7 @@ namespace Frida {
 		Gum.init ();
 
 		var parent_address = args[1];
-		var worker = new Thread<int> ("frida-helper-main-loop", () => {
+		var worker = new Thread<int> ("helper-worker", () => {
 			var service = new DarwinHelperService (parent_address);
 
 			var exit_code = service.run ();

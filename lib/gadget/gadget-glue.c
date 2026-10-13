@@ -112,7 +112,7 @@ frida_gadget_environment_init (void)
 
   worker_context = g_main_context_ref (g_main_context_default ());
   worker_loop = g_main_loop_new (worker_context, FALSE);
-  worker_thread = g_thread_new ("frida-gadget", run_worker_loop, NULL);
+  worker_thread = g_thread_new ("rpc-worker", run_worker_loop, NULL);
 }
 
 void

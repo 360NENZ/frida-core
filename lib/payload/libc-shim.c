@@ -1519,7 +1519,7 @@ tmpfile (void)
   gchar * path;
   FridaFile * impl;
 
-  fd = g_file_open_tmp ("frida-XXXXXX", &path, NULL);
+  fd = g_file_open_tmp ("runtime-XXXXXX", &path, NULL);
   if (fd == -1)
     return NULL;
 

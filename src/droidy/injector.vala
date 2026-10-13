@@ -77,11 +77,11 @@ namespace Frida.Droidy.Injector {
 
 		private async GadgetDetails inject_gadget (Cancellable? cancellable) throws Error, IOError {
 			string instance_id = Uuid.string_random ().replace ("-", "");
-			string so_path_shared = "/data/local/tmp/frida-gadget-" + instance_id + ".so";
+			string so_path_shared = "/data/local/tmp/runtime-gadget-" + instance_id + ".so";
 			string so_path_app = "/data/data/" + package + "/gadget.so";
-			string config_path_shared = "/data/local/tmp/frida-gadget-" + instance_id + ".config";
+			string config_path_shared = "/data/local/tmp/runtime-gadget-" + instance_id + ".config";
 			string config_path_app = "/data/data/" + package + "/gadget.config";
-			string unix_socket_path = "frida:" + package;
+			string unix_socket_path = "runtime:" + package;
 
 			bool waiting = false;
 			uint target_pid = 0;

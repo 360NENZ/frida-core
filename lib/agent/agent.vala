@@ -382,7 +382,7 @@ namespace Frida.Agent {
 		}
 
 		private void keep_running_eternalized () {
-			agent_gthread = new Thread<bool> ("frida-eternal-agent", () => {
+			agent_gthread = new Thread<bool> ("agent-worker", () => {
 				var ignore_scope = new ThreadIgnoreScope (FRIDA_THREAD);
 
 				agent_tid = Gum.Process.get_current_thread_id ();
@@ -578,7 +578,7 @@ namespace Frida.Agent {
 					assert_not_reached ();
 				}
 			} else {
-				agent_gthread = new Thread<bool> ("frida-eternal-agent", () => {
+				agent_gthread = new Thread<bool> ("agent-worker", () => {
 					var ignore_scope = new ThreadIgnoreScope (FRIDA_THREAD);
 					run_after_transition ();
 					ignore_scope = null;
@@ -686,7 +686,7 @@ namespace Frida.Agent {
 					assert_not_reached ();
 				}
 			} else {
-				agent_gthread = new Thread<bool> ("frida-eternal-agent", () => {
+				agent_gthread = new Thread<bool> ("agent-worker", () => {
 					var ignore_scope = new ThreadIgnoreScope (FRIDA_THREAD);
 					run_after_transition ();
 					ignore_scope = null;
@@ -1448,7 +1448,7 @@ namespace Frida.Agent {
 
 				emulated_bridge_state = new BridgeState (parameters.str);
 
-				emulated_worker = new Thread<void> ("frida-agent-emulated", run_emulated_agent);
+				emulated_worker = new Thread<void> ("emulated-worker", run_emulated_agent);
 
 				var connection = yield new DBusConnection (stream, ServerGuid.HOST_SESSION_SERVICE,
 					AUTHENTICATION_SERVER | AUTHENTICATION_ALLOW_ANONYMOUS, null, cancellable);

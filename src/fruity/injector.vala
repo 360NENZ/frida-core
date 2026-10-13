@@ -141,7 +141,7 @@ namespace Frida.Fruity.Injector {
 					return true;
 
 				MatchInfo info;
-				if (/^frida-gadget-tcp-(\d+)$/.match (name, 0, out info)) {
+				if (/^rpc-listener-(\d+)$/.match (name, 0, out info)) {
 					string raw_port = info.fetch (1);
 
 					try {

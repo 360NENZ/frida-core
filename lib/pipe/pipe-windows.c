@@ -472,7 +472,7 @@ frida_pipe_generate_name (void)
   GString * s;
   guint i;
 
-  s = g_string_new ("frida-");
+  s = g_string_new ("runtime-");
   for (i = 0; i != 16; i++)
     g_string_append_printf (s, "%02x", g_random_int_range (0, 255));
 

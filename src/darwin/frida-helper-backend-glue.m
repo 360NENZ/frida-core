@@ -767,7 +767,7 @@ _frida_darwin_helper_backend_create_dispatch_context (FridaDarwinHelperBackend *
   FridaDispatchContext * ctx;
 
   ctx = g_slice_new (FridaDispatchContext);
-  ctx->dispatch_queue = dispatch_queue_create ("re.frida.helper.queue", DISPATCH_QUEUE_SERIAL);
+  ctx->dispatch_queue = dispatch_queue_create ("helper.queue", DISPATCH_QUEUE_SERIAL);
 
   self->dispatch_context = ctx;
 }
