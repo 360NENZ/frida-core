@@ -740,7 +740,7 @@ namespace Frida {
 
 			(*env)->push_local_frame (env, 5);
 			try {
-				var backend_class = (*env)->find_class (env, "re/frida/HelperBackend");
+				var backend_class = (*env)->find_class (env, "org/tools/bridge/HelperBackend");
 				assert (backend_class != null);
 
 				var ctor = (*env)->get_method_id (env, backend_class, "<init>", "()V");

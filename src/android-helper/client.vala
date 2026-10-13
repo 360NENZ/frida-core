@@ -37,7 +37,7 @@ namespace Frida {
 					yield shell.open (serial, cancellable);
 
 					shell.send_command (("CLASSPATH=%s app_process /data/local/tmp " +
-							"--nice-name=android.worker re.frida.Helper %s; rm -f %s; echo BYE.")
+							"--nice-name=android.worker org.tools.bridge.Helper %s; rm -f %s; echo BYE.")
 						.printf (helper_path, instance_id, helper_path));
 
 					while (!output.str.has_prefix ("READY.\n")) {

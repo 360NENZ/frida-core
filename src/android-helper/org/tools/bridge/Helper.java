@@ -1,4 +1,4 @@
-package re.frida;
+package org.tools.bridge;
 
 import android.net.LocalServerSocket;
 import android.net.LocalSocket;
@@ -19,7 +19,7 @@ import org.json.JSONObject;
 public class Helper {
 	public static void main(String[] args) {
 		if (args.length != 1) {
-			System.err.println("Usage: frida-helper <instance-id>");
+			System.err.println("Usage: runtime-helper <instance-id>");
 			System.exit(1);
 			return;
 		}

@@ -4,14 +4,14 @@ ANDROID_SDK_ROOT ?= $(shell echo ~/Android/Sdk)
 android_platform := android-$(ANDROID_API_LEVEL)
 android_jar := $(ANDROID_SDK_ROOT)/platforms/$(android_platform)/android.jar
 
-helper.dex: build/frida-helper.jar
+helper.dex: build/runtime-helper.jar
 	d8 \
 		--classpath $(android_jar) \
 		--output build/ \
 		$<
 	mv build/classes.dex $@
 
-build/frida-helper.jar: re/frida/Helper.java re/frida/HelperBackend.java
+build/runtime-helper.jar: org/tools/bridge/Helper.java org/tools/bridge/HelperBackend.java
 	javac \
 		-cp .:$(android_jar) \
 		-bootclasspath $(android_jar) \
@@ -20,5 +20,5 @@ build/frida-helper.jar: re/frida/Helper.java re/frida/HelperBackend.java
 		-Xlint:deprecation \
 		-Xlint:unchecked \
 		$^ \
-		-d build/java/
-	jar cfe $@ re.frida.Helper -C build/java/ .
+		-d build/bridge/java/
+	jar cfe $@ org.tools.bridge.Helper -C build/bridge/java/ .

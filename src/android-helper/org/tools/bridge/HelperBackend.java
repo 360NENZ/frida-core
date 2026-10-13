@@ -1,4 +1,4 @@
-package re.frida;
+package org.tools.bridge;
 
 import android.app.ActivityManager;
 import android.app.ActivityManager.RunningAppProcessInfo;
