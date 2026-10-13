@@ -47,7 +47,7 @@ need_universal_server = assets_mode == 'installed' and server_compat != ''
 server = custom_target('frida-server',
   input: [raw_server, 'frida-server.xcent'],
   output: need_universal_server ? f'@server_name@-@host_abi@' : server_name,
-  command: post_process + ['executable', 're.frida.Server', '@INPUT1@'],
+  command: post_process + ['executable', 'io.meshlink.Server', '@INPUT1@'],
   install: true,
   install_dir: get_option('bindir'),
 )

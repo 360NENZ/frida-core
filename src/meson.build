@@ -68,7 +68,7 @@ if host_os == 'android' or have_droidy_backend or have_barebone_backend
 endif
 
 if have_local_backend
-  post_process_helper = post_process + ['executable', 're.frida.Helper']
+  post_process_helper = post_process + ['executable', 'io.meshlink.Helper']
 
   embed_helper = [
     python,
