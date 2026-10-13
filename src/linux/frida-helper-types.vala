@@ -43,7 +43,7 @@ namespace Frida {
 		CONTROL_CHANNEL,
 	}
 
-	[DBus (name = "re.frida.Helper")]
+	[DBus (name = "io.meshlink.Helper")]
 	public interface LinuxRemoteHelper : Object {
 		public signal void output (uint pid, int fd, uint8[] data);
 		public signal void uninjected (uint id);
@@ -91,6 +91,6 @@ namespace Frida {
 	}
 
 	namespace ObjectPath {
-		public const string HELPER = "/re/frida/Helper";
+		public const string HELPER = "/io/meshlink/Helper";
 	}
 }

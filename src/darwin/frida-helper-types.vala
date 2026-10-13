@@ -48,7 +48,7 @@ namespace Frida {
 		public abstract async MappedLibraryBlob? try_mmap (Bytes blob, Cancellable? cancellable) throws Error, IOError;
 	}
 
-	[DBus (name = "re.frida.Helper")]
+	[DBus (name = "io.meshlink.Helper")]
 	public interface DarwinRemoteHelper : Object {
 		public signal void output (uint pid, int fd, uint8[] data);
 		public signal void gating_cancelled ();
@@ -131,7 +131,7 @@ namespace Frida {
 	}
 
 	namespace ObjectPath {
-		public const string HELPER = "/re/frida/Helper";
-		public const string SYSTEM_SESSION_PROVIDER = "/re/frida/SystemSessionProvider";
+		public const string HELPER = "/io/meshlink/Helper";
+		public const string SYSTEM_SESSION_PROVIDER = "/io/meshlink/SystemSessionProvider";
 	}
 }

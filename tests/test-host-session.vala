@@ -1222,7 +1222,7 @@ namespace Frida.HostSessionTest {
 				bool waiting = false;
 
 				ControlService control_service;
-				uint16 control_port = 27042;
+				uint16 control_port = DEFAULT_CONTROL_PORT;
 				while (true) {
 					var ep = new EndpointParameters ("127.0.0.1", control_port);
 					control_service = new ControlService (ep);
@@ -1518,7 +1518,7 @@ namespace Frida.HostSessionTest {
 
 			try {
 				ControlService control_service;
-				uint16 control_port = 27042;
+				uint16 control_port = DEFAULT_CONTROL_PORT;
 				while (true) {
 					var ep = new EndpointParameters ("127.0.0.1", control_port);
 					control_service = new ControlService (ep);
