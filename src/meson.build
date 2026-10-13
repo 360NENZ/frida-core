@@ -37,16 +37,20 @@ if host_os == 'android' or have_droidy_backend or have_barebone_backend
   subdir('android-helper')
 
   helpers_native_prefix = 'linux' / 'helpers' / 'artifacts' / 'native'
-  fs = import('fs')
+  zymbiote_payloads = []
+  foreach arch : ['x86', 'x86_64', 'arm', 'arm64']
+    zymbiote_payloads += custom_target('zymbiote-' + arch,
+      input: helpers_native_prefix / arch / 'zymbiote.elf',
+      output: 'zymbiote-' + arch + '.elf',
+      command: [python, files('patch-zymbiote.py'), '@INPUT@', '@OUTPUT@'],
+    )
+  endforeach
+
   android_data = custom_target('frida-data-android',
     input: [
       'android.resources',
       android_helper_dex,
-      fs.copyfile(helpers_native_prefix / 'x86' / 'zymbiote.elf', 'zymbiote-x86.elf'),
-      fs.copyfile(helpers_native_prefix / 'x86_64' / 'zymbiote.elf', 'zymbiote-x86_64.elf'),
-      fs.copyfile(helpers_native_prefix / 'arm' / 'zymbiote.elf', 'zymbiote-arm.elf'),
-      fs.copyfile(helpers_native_prefix / 'arm64' / 'zymbiote.elf', 'zymbiote-arm64.elf'),
-    ],
+    ] + zymbiote_payloads,
     output: [
       'frida-data-android.vapi',
       'frida-data-android.h',
