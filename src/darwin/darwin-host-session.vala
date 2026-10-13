@@ -320,7 +320,7 @@ namespace Frida {
 		private async uint inject_agent (uint pid, string agent_parameters, Cancellable? cancellable) throws Error, IOError {
 			uint id;
 
-			unowned string entrypoint = "frida_agent_main";
+			unowned string entrypoint = "ml_dispatch_entry";
 #if HAVE_EMBEDDED_ASSETS
 			id = yield fruitjector.inject_library_resource (pid, agent, entrypoint, agent_parameters, cancellable);
 #else

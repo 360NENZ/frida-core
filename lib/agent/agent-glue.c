@@ -39,7 +39,7 @@ main (int argc, char * argv[], char * envp[])
 
   write (injector_state.fifo_fd, &hello_byte, sizeof (hello_byte));
 
-  frida_agent_main (GSIZE_TO_POINTER (args->agent_parameters), &unload_policy, &injector_state);
+  ml_dispatch_entry (GSIZE_TO_POINTER (args->agent_parameters), &unload_policy, &injector_state);
 
   policy_byte = unload_policy;
   worker_id = gum_process_get_current_thread_id ();
@@ -116,7 +116,7 @@ JNI_OnLoad (JavaVM * vm, void * reserved)
 {
   FridaAgentBridgeState * state = reserved;
 
-  frida_agent_main (state->agent_parameters, &state->unload_policy, state->injector_state);
+  ml_dispatch_entry (state->agent_parameters, &state->unload_policy, state->injector_state);
 
   return JNI_VERSION_1_6;
 }

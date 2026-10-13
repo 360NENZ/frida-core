@@ -1,6 +1,6 @@
 {
   global:
-    frida_agent_main;
+    ml_dispatch_entry;
     frida_prospero_agent_args;
 
   local:
