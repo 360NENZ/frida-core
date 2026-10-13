@@ -28,16 +28,16 @@ def main(argv):
             if helper is None:
                 continue
             arch = detect_pefile_arch(helper)
-            embedded_helper = priv_dir / f"frida-helper-{arch}.exe"
+            embedded_helper = priv_dir / f"runtime-helper-{arch}.exe"
             shutil.copy(helper, embedded_helper)
             embedded_assets += [embedded_helper]
             pending_archs.remove(arch)
         for missing_arch in pending_archs:
-            embedded_helper = priv_dir / f"frida-helper-{missing_arch}.exe"
+            embedded_helper = priv_dir / f"runtime-helper-{missing_arch}.exe"
             embedded_helper.write_bytes(b"")
             embedded_assets += [embedded_helper]
     elif host_os in {"macos", "ios", "watchos", "tvos", "xros"}:
-        embedded_helper = priv_dir / "frida-helper"
+        embedded_helper = priv_dir / "runtime-helper"
 
         if helper_modern is not None and helper_legacy is not None:
             subprocess.run(lipo + [helper_modern, helper_legacy, "-create", "-output", embedded_helper],
@@ -51,8 +51,8 @@ def main(argv):
 
         embedded_assets += [embedded_helper]
     else:
-        embedded_helper_modern = priv_dir / f"frida-helper-64"
-        embedded_helper_legacy = priv_dir / f"frida-helper-32"
+        embedded_helper_modern = priv_dir / "runtime-helper-64"
+        embedded_helper_legacy = priv_dir / "runtime-helper-32"
 
         if helper_modern is not None:
             shutil.copy(helper_modern, embedded_helper_modern)

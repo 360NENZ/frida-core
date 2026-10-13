@@ -380,9 +380,9 @@ namespace Frida {
 
 		public ResourceStore (TemporaryDirectory tempdir) throws Error {
 #if HAVE_EMBEDDED_ASSETS
-			var helper_arm64 = add_helper ("arm64", Frida.Data.Helper.get_frida_helper_arm64_exe_blob (), tempdir);
-			var helper_x86_64 = add_helper ("x86_64", Frida.Data.Helper.get_frida_helper_x86_64_exe_blob (), tempdir);
-			var helper_x86 = add_helper ("x86", Frida.Data.Helper.get_frida_helper_x86_exe_blob (), tempdir);
+			var helper_arm64 = add_helper ("arm64", Frida.Data.Helper.get_runtime_helper_arm64_exe_blob (), tempdir);
+			var helper_x86_64 = add_helper ("x86_64", Frida.Data.Helper.get_runtime_helper_x86_64_exe_blob (), tempdir);
+			var helper_x86 = add_helper ("x86", Frida.Data.Helper.get_runtime_helper_x86_exe_blob (), tempdir);
 
 			switch (Gum.Windows.query_native_cpu_type ()) {
 				case ARM64:

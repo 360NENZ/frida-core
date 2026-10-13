@@ -514,7 +514,7 @@ namespace Frida {
 #if HAVE_EMBEDDED_ASSETS
 			FileUtils.chmod (tempdir.path, 0755);
 
-			var blob = Frida.Data.Helper.get_frida_helper_blob ();
+			var blob = Frida.Data.Helper.get_runtime_helper_blob ();
 			helper = new TemporaryHelperFile (
 				new TemporaryFile.from_stream ("runtime-helper",
 					new MemoryInputStream.from_data (blob.data, null),
