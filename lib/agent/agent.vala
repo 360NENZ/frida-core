@@ -1,3 +1,4 @@
+[CCode (cprefix = "RelayAgent", lower_case_cprefix = "relay_agent_")]
 namespace Frida.Agent {
 	[CCode (cname = "ml_dispatch_entry")]
 	public void main (string agent_parameters, ref Frida.UnloadPolicy unload_policy, void * injector_state) {
