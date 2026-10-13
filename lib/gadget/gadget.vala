@@ -1,3 +1,4 @@
+[CCode (cprefix = "RelayGadget", lower_case_cprefix = "relay_gadget_")]
 namespace Frida.Gadget {
 	private sealed class Config : Object, Json.Serializable {
 		public Object interaction {

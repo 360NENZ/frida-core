@@ -35,13 +35,13 @@ DllMain (HINSTANCE instance, DWORD reason, LPVOID reserved)
   switch (reason)
   {
     case DLL_PROCESS_ATTACH:
-      frida_gadget_load (NULL, NULL, NULL);
+      relay_gadget_load (NULL, NULL, NULL);
       break;
     case DLL_PROCESS_DETACH:
     {
       gboolean is_dynamic_unload = reserved == NULL;
       if (is_dynamic_unload)
-        frida_gadget_unload ();
+        relay_gadget_unload ();
       break;
     }
     default:
@@ -62,7 +62,7 @@ frida_on_load (int argc, const char * argv[], const char * envp[], const char * 
 
   frida_parse_apple_parameters (apple, &found_range, &range, &config_data);
 
-  frida_gadget_load (found_range ? &range : NULL, config_data, (config_data != NULL) ? result : NULL);
+  relay_gadget_load (found_range ? &range : NULL, config_data, (config_data != NULL) ? result : NULL);
 
   g_free (config_data);
 }
@@ -72,26 +72,26 @@ frida_on_load (int argc, const char * argv[], const char * envp[], const char * 
 __attribute__ ((constructor)) static void
 frida_on_load (void)
 {
-  frida_gadget_load (NULL, NULL, NULL);
+  relay_gadget_load (NULL, NULL, NULL);
 }
 
 __attribute__ ((destructor)) static void
 frida_on_unload (void)
 {
-  frida_gadget_unload ();
+  relay_gadget_unload ();
 }
 
 #endif
 
 void
-frida_gadget_environment_init (void)
+relay_gadget_environment_init (void)
 {
 #ifdef _MSC_VER
   frida_libc_shim_init ();
 #endif
   gio_init ();
 
-  g_thread_set_garbage_handler (_frida_gadget_on_pending_thread_garbage, NULL);
+  g_thread_set_garbage_handler (_relay_gadget_on_pending_thread_garbage, NULL);
 
 #if defined (HAVE_GIOAPPLE)
   g_io_module_apple_register ();
@@ -116,7 +116,7 @@ frida_gadget_environment_init (void)
 }
 
 void
-frida_gadget_environment_deinit (void)
+relay_gadget_environment_deinit (void)
 {
   GSource * source;
 
@@ -153,7 +153,7 @@ frida_gadget_environment_deinit (void)
 }
 
 gboolean
-frida_gadget_environment_can_block_at_load_time (void)
+relay_gadget_environment_can_block_at_load_time (void)
 {
 #ifdef HAVE_WINDOWS
   return FALSE;
@@ -163,13 +163,13 @@ frida_gadget_environment_can_block_at_load_time (void)
 }
 
 GumThreadId
-frida_gadget_environment_get_worker_tid (void)
+relay_gadget_environment_get_worker_tid (void)
 {
   return worker_tid;
 }
 
 GMainContext *
-frida_gadget_environment_get_worker_context (void)
+relay_gadget_environment_get_worker_context (void)
 {
   return worker_context;
 }
@@ -177,31 +177,31 @@ frida_gadget_environment_get_worker_context (void)
 #ifndef HAVE_DARWIN
 
 gchar *
-frida_gadget_environment_detect_bundle_id (void)
+relay_gadget_environment_detect_bundle_id (void)
 {
   return NULL;
 }
 
 gchar *
-frida_gadget_environment_detect_bundle_name (void)
+relay_gadget_environment_detect_bundle_name (void)
 {
   return NULL;
 }
 
 gchar *
-frida_gadget_environment_detect_documents_dir (void)
+relay_gadget_environment_detect_documents_dir (void)
 {
   return NULL;
 }
 
 gboolean
-frida_gadget_environment_has_objc_class (const gchar * name)
+relay_gadget_environment_has_objc_class (const gchar * name)
 {
   return FALSE;
 }
 
 void
-frida_gadget_environment_set_thread_name (const gchar * name)
+relay_gadget_environment_set_thread_name (const gchar * name)
 {
   /* For now only implemented on i/macOS as Fruity.Injector relies on it there. */
 }
@@ -229,13 +229,13 @@ stop_worker_loop (gpointer data)
 }
 
 void
-frida_gadget_log_info (const gchar * message)
+relay_gadget_log_info (const gchar * message)
 {
   g_info ("%s", message);
 }
 
 void
-frida_gadget_log_warning (const gchar * message)
+relay_gadget_log_warning (const gchar * message)
 {
   g_warning ("%s", message);
 }
