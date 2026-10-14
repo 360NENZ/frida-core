@@ -568,6 +568,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkSctpConnection", lower_case_cprefix = "meshlink_sctp_connection_")]
 	public sealed class SctpConnection : VirtualStream {
 		public DatagramBased transport_socket {
 			get;

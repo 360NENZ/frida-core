@@ -499,7 +499,7 @@ frida_steal_bio_to_string (BIO ** bio)
 #endif
 
 void
-_frida_sctp_connection_initialize_sctp_backend (void)
+_meshlink_sctp_connection_initialize_sctp_backend (void)
 {
   const int msec_per_sec = 1000;
 
@@ -538,9 +538,9 @@ _frida_sctp_connection_initialize_sctp_backend (void)
 static int
 frida_on_connection_output (void * addr, void * buffer, size_t length, uint8_t tos, uint8_t set_df)
 {
-  FridaSctpConnection * connection = addr;
+  MeshlinkSctpConnection * connection = addr;
 
-  _frida_sctp_connection_emit_transport_packet (connection, buffer, (gint) length);
+  _meshlink_sctp_connection_emit_transport_packet (connection, buffer, (gint) length);
 
   return 0;
 }
@@ -552,7 +552,7 @@ frida_on_debug_printf (const char * format, ...)
 }
 
 void *
-_frida_sctp_connection_create_sctp_socket (FridaSctpConnection * self)
+_meshlink_sctp_connection_create_sctp_socket (MeshlinkSctpConnection * self)
 {
   struct socket * sock;
   struct linger linger;
@@ -605,7 +605,7 @@ _frida_sctp_connection_create_sctp_socket (FridaSctpConnection * self)
 }
 
 void
-_frida_sctp_connection_connect_sctp_socket (FridaSctpConnection * self, void * sock, guint16 port)
+_meshlink_sctp_connection_connect_sctp_socket (MeshlinkSctpConnection * self, void * sock, guint16 port)
 {
   struct sockaddr_conn addr;
 
@@ -624,19 +624,19 @@ _frida_sctp_connection_connect_sctp_socket (FridaSctpConnection * self, void * s
 static void
 frida_on_upcall (struct socket * sock, void * user_data, int flags)
 {
-  FridaSctpConnection * connection = user_data;
+  MeshlinkSctpConnection * connection = user_data;
 
-  _frida_sctp_connection_on_sctp_socket_events_changed (connection);
+  _meshlink_sctp_connection_on_sctp_socket_events_changed (connection);
 }
 
 void
-_frida_sctp_connection_close (void * sock)
+_meshlink_sctp_connection_close (void * sock)
 {
   usrsctp_close (sock);
 }
 
 void
-_frida_sctp_connection_shutdown (void * sock, FridaSctpShutdownType type, GError ** error)
+_meshlink_sctp_connection_shutdown (void * sock, FridaSctpShutdownType type, GError ** error)
 {
   if (usrsctp_shutdown (sock, type) == -1)
   {
@@ -645,7 +645,7 @@ _frida_sctp_connection_shutdown (void * sock, FridaSctpShutdownType type, GError
 }
 
 GIOCondition
-_frida_sctp_connection_query_sctp_socket_events (void * sock)
+_meshlink_sctp_connection_query_sctp_socket_events (void * sock)
 {
   GIOCondition condition = 0;
   int events;
@@ -665,13 +665,13 @@ _frida_sctp_connection_query_sctp_socket_events (void * sock)
 }
 
 void
-_frida_sctp_connection_handle_transport_packet (FridaSctpConnection * self, guint8 * data, gint data_length)
+_meshlink_sctp_connection_handle_transport_packet (MeshlinkSctpConnection * self, guint8 * data, gint data_length)
 {
   usrsctp_conninput (self, data, data_length, 0);
 }
 
 gssize
-_frida_sctp_connection_recv (void * sock, guint8 * buffer, gint buffer_length, guint16 * stream_id, FridaPayloadProtocolId * protocol_id,
+_meshlink_sctp_connection_recv (void * sock, guint8 * buffer, gint buffer_length, guint16 * stream_id, FridaPayloadProtocolId * protocol_id,
     FridaSctpMessageFlags * message_flags, GError ** error)
 {
   gssize n;
@@ -720,7 +720,7 @@ propagate_usrsctp_error:
 }
 
 gssize
-_frida_sctp_connection_send (void * sock, guint16 stream_id, FridaPayloadProtocolId protocol_id, guint8 * data, gint data_length,
+_meshlink_sctp_connection_send (void * sock, guint16 stream_id, FridaPayloadProtocolId protocol_id, guint8 * data, gint data_length,
       GError ** error)
 {
   gssize n;
