@@ -1725,8 +1725,14 @@ namespace Frida.Gadget {
 				}
 
 				uint pid = get_process_id ();
-				string identifier = "org.tools.bridge.Gadget";
-				string name = "Gadget";
+				string identifier = parent.location.bundle_id;
+				if (identifier == null)
+					identifier = get_executable_path ();
+
+				string name = parent.location.bundle_name;
+				if (name == null)
+					name = Path.get_basename (get_executable_path ());
+
 				var no_parameters = make_parameters_dict ();
 				this_app = HostApplicationInfo (identifier, name, pid, no_parameters);
 				this_process = HostProcessInfo (pid, name, no_parameters);
