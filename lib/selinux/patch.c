@@ -53,7 +53,7 @@ static const FridaSELinuxRule frida_selinux_rules[] =
   { { "system_server", NULL, }, "?apex_art_data_file", "file", { "execute", NULL } },
 };
 
-G_DEFINE_QUARK (frida-selinux-error-quark, frida_selinux_error)
+G_DEFINE_QUARK (meshlink-selinux-error-quark, frida_selinux_error)
 
 void
 frida_selinux_patch_policy (void)
