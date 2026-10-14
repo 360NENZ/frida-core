@@ -760,6 +760,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkGadgetSession", lower_case_cprefix = "meshlink_gadget_session_")]
 	[DBus (name = "io.meshlink.GadgetSession17")]
 	public interface GadgetSession : Object {
 		public abstract async void break_and_resume (Cancellable? cancellable) throws GLib.Error;
@@ -788,6 +789,7 @@ namespace Frida {
 		PAGE_PLAN,
 	}
 
+	[CCode (cname = "MeshlinkChannel", lower_case_cprefix = "meshlink_channel_")]
 	[DBus (name = "io.meshlink.Channel17")]
 	public interface Channel : Object {
 		public abstract async void close (Cancellable? cancellable) throws GLib.Error;
@@ -795,6 +797,7 @@ namespace Frida {
 		public signal void output (uint8[] data);
 	}
 
+	[CCode (cname = "MeshlinkServiceSession", lower_case_cprefix = "meshlink_service_session_")]
 	[DBus (name = "io.meshlink.ServiceSession17")]
 	public interface ServiceSession : Object {
 		public signal void close ();
@@ -805,12 +808,14 @@ namespace Frida {
 		public abstract async Variant request (Variant parameters, Cancellable? cancellable) throws GLib.Error;
 	}
 
+	[CCode (cname = "MeshlinkTransportBroker", lower_case_cprefix = "meshlink_transport_broker_")]
 	[DBus (name = "io.meshlink.TransportBroker17")]
 	public interface TransportBroker : Object {
 		public abstract async void open_tcp_transport (AgentSessionId id, Cancellable? cancellable, out uint16 port,
 			out string token) throws GLib.Error;
 	}
 
+	[CCode (cname = "MeshlinkPortalSession", lower_case_cprefix = "meshlink_portal_session_")]
 	[DBus (name = "io.meshlink.PortalSession17")]
 	public interface PortalSession : Object {
 		public abstract async void join (HostApplicationInfo app, SpawnStartState current_state,
@@ -820,6 +825,7 @@ namespace Frida {
 		public signal void kill ();
 	}
 
+	[CCode (cname = "MeshlinkBusSession", lower_case_cprefix = "meshlink_bus_session_")]
 	[DBus (name = "io.meshlink.BusSession17")]
 	public interface BusSession : Object {
 		public abstract async void attach (Cancellable? cancellable) throws GLib.Error;
@@ -827,6 +833,7 @@ namespace Frida {
 		public signal void message (string json, bool has_data, uint8[] data);
 	}
 
+	[CCode (cname = "MeshlinkAuthenticationService", lower_case_cprefix = "meshlink_authentication_service_")]
 	[DBus (name = "io.meshlink.AuthenticationService17")]
 	/**
 	 * Authenticates clients connecting to a {@link PortalService} or
@@ -845,6 +852,7 @@ namespace Frida {
 	/**
 	 * An {@link AuthenticationService} that accepts a single fixed token.
 	 */
+	[CCode (cname = "MeshlinkStaticAuthenticationService", lower_case_cprefix = "meshlink_static_authentication_service_")]
 	public sealed class StaticAuthenticationService : Object, AuthenticationService {
 		/**
 		 * The SHA-256 hash of the accepted token.
@@ -878,12 +886,14 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkNullAuthenticationService", lower_case_cprefix = "meshlink_null_authentication_service_")]
 	public sealed class NullAuthenticationService : Object, AuthenticationService {
 		public async string authenticate (string token, Cancellable? cancellable) throws Error, IOError {
 			throw new Error.INVALID_OPERATION ("Authentication not expected");
 		}
 	}
 
+	[CCode (cname = "MeshlinkUnauthorizedHostSession", lower_case_cprefix = "meshlink_unauthorized_host_session_")]
 	public sealed class UnauthorizedHostSession : Object, HostSession {
 		public async void ping (uint interval_seconds, Cancellable? cancellable) throws Error, IOError {
 			throw_not_authorized ();
