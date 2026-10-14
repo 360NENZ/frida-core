@@ -1049,7 +1049,7 @@ namespace Frida {
 				WebServiceTransport transport = PLAIN;
 				string? origin = null;
 
-				stream = yield negotiate_connection (stream, transport, "lolcathost", origin, cancellable);
+				stream = yield negotiate_connection (stream, transport, "localhost", origin, cancellable);
 
 				var connection = yield new DBusConnection (stream, null, DBusConnectionFlags.NONE, null, cancellable);
 
@@ -1322,7 +1322,7 @@ namespace Frida {
 				WebServiceTransport transport = PLAIN;
 				string? origin = null;
 
-				stream = yield negotiate_connection (stream, transport, "lolcathost", origin, cancellable);
+				stream = yield negotiate_connection (stream, transport, "localhost", origin, cancellable);
 
 				connection = yield new DBusConnection (stream, null, DBusConnectionFlags.NONE, null, cancellable);
 

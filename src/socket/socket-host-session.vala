@@ -130,7 +130,7 @@ namespace Frida {
 			}
 
 			var transport = (certificate != null) ? WebServiceTransport.TLS : WebServiceTransport.PLAIN;
-			string host = (raw_address != null) ? raw_address : "lolcathost";
+			string host = (raw_address != null) ? raw_address : "localhost";
 
 			connecting ("Negotiating the connection", 0.5);
 			stream = yield negotiate_connection (stream, transport, host, origin, cancellable);
