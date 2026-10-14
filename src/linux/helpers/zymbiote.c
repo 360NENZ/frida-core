@@ -40,24 +40,24 @@ ZymbioteContext zymbiote =
   .socket_path = "/runtime-worker-00000000000000000000000000000000",
 };
 
-int frida_zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name);
-int frida_zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * seinfo, const char * name);
+int zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name);
+int zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * seinfo, const char * name);
 
-static void frida_wait_for_permission_to_resume (const char * process_name, bool * revert_now);
+static void zymbiote_wait_for_permission_to_resume (const char * process_name, bool * revert_now);
 
-static int frida_stop_and_return_from_setargv0 (JNIEnv * env, jobject clazz, jstring name);
+static int zymbiote_stop_and_return_from_setargv0 (JNIEnv * env, jobject clazz, jstring name);
 
-static int frida_get_errno (void);
+static int zymbiote_get_errno (void);
 
-static int frida_connect (int sockfd, const struct sockaddr * addr, socklen_t addrlen);
-static ssize_t frida_sendmsg (int sockfd, const struct msghdr * msg, int flags);
-static bool frida_sendmsg_all (int sockfd, struct iovec * iov, size_t iovlen, int flags);
-static ssize_t frida_recv (int sockfd, void * buf, size_t len, int flags);
+static int zymbiote_connect (int sockfd, const struct sockaddr * addr, socklen_t addrlen);
+static ssize_t zymbiote_sendmsg (int sockfd, const struct msghdr * msg, int flags);
+static bool zymbiote_sendmsg_all (int sockfd, struct iovec * iov, size_t iovlen, int flags);
+static ssize_t zymbiote_recv (int sockfd, void * buf, size_t len, int flags);
 
 __attribute__ ((section (".text.entrypoint")))
 __attribute__ ((visibility ("default")))
 int
-frida_zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * seinfo, const char * name)
+zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * seinfo, const char * name)
 {
   int res;
 
@@ -77,7 +77,7 @@ frida_zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const c
 __attribute__ ((section (".text.entrypoint")))
 __attribute__ ((visibility ("default")))
 int
-frida_zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name)
+zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name)
 {
   const char * name_utf8;
   bool revert_now;
@@ -89,7 +89,7 @@ frida_zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name)
   else
     name_utf8 = (*env)->GetStringUTFChars (env, name, NULL);
 
-  frida_wait_for_permission_to_resume (name_utf8, &revert_now);
+  zymbiote_wait_for_permission_to_resume (name_utf8, &revert_now);
 
   if (zymbiote.process_name != NULL)
   {
@@ -105,14 +105,14 @@ frida_zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name)
   if (revert_now)
   {
     __attribute__ ((musttail))
-    return frida_stop_and_return_from_setargv0 (env, clazz, name);
+    return zymbiote_stop_and_return_from_setargv0 (env, clazz, name);
   }
 
   return 0;
 }
 
 static void
-frida_wait_for_permission_to_resume (const char * process_name, bool * revert_now)
+zymbiote_wait_for_permission_to_resume (const char * process_name, bool * revert_now)
 {
   int fd;
   struct sockaddr_un addr;
@@ -143,7 +143,7 @@ frida_wait_for_permission_to_resume (const char * process_name, bool * revert_no
 
   addrlen = (socklen_t) (offsetof (struct sockaddr_un, sun_path) + 1u + name_len);
 
-  if (frida_connect (fd, (const struct sockaddr *) &addr, addrlen) == -1)
+  if (zymbiote_connect (fd, (const struct sockaddr *) &addr, addrlen) == -1)
     goto beach;
 
   {
@@ -168,14 +168,14 @@ frida_wait_for_permission_to_resume (const char * process_name, bool * revert_no
     iov[1].iov_base = (void *) process_name;
     iov[1].iov_len = header.process_name_len;
 
-    if (!frida_sendmsg_all (fd, iov, 2, MSG_NOSIGNAL))
+    if (!zymbiote_sendmsg_all (fd, iov, 2, MSG_NOSIGNAL))
       goto beach;
   }
 
   {
     uint8_t rx;
 
-    if (frida_recv (fd, &rx, 1, 0) != 1)
+    if (zymbiote_recv (fd, &rx, 1, 0) != 1)
       goto beach;
   }
 
@@ -260,26 +260,26 @@ beach:
 
 __attribute__ ((naked, noinline))
 static int
-frida_stop_and_return_from_setargv0 (JNIEnv * env, jobject clazz, jstring name)
+zymbiote_stop_and_return_from_setargv0 (JNIEnv * env, jobject clazz, jstring name)
 {
   FRIDA_TAILCALL_TO_RAISE_SIGSTOP ();
 }
 
 static int
-frida_get_errno (void)
+zymbiote_get_errno (void)
 {
   return *zymbiote.__errno ();
 }
 
 static int
-frida_connect (int sockfd, const struct sockaddr * addr, socklen_t addrlen)
+zymbiote_connect (int sockfd, const struct sockaddr * addr, socklen_t addrlen)
 {
   for (;;)
   {
     if (zymbiote.connect (sockfd, addr, addrlen) == 0)
       return 0;
 
-    if (frida_get_errno () == EINTR)
+    if (zymbiote_get_errno () == EINTR)
       continue;
 
     return -1;
@@ -287,7 +287,7 @@ frida_connect (int sockfd, const struct sockaddr * addr, socklen_t addrlen)
 }
 
 static ssize_t
-frida_sendmsg (int sockfd, const struct msghdr * msg, int flags)
+zymbiote_sendmsg (int sockfd, const struct msghdr * msg, int flags)
 {
   for (;;)
   {
@@ -295,7 +295,7 @@ frida_sendmsg (int sockfd, const struct msghdr * msg, int flags)
     if (n != -1)
       return n;
 
-    if (frida_get_errno () == EINTR)
+    if (zymbiote_get_errno () == EINTR)
       continue;
 
     return -1;
@@ -303,7 +303,7 @@ frida_sendmsg (int sockfd, const struct msghdr * msg, int flags)
 }
 
 static bool
-frida_sendmsg_all (int sockfd, struct iovec * iov, size_t iovlen, int flags)
+zymbiote_sendmsg_all (int sockfd, struct iovec * iov, size_t iovlen, int flags)
 {
   size_t idx = 0;
   size_t off = 0;
@@ -320,7 +320,7 @@ frida_sendmsg_all (int sockfd, struct iovec * iov, size_t iovlen, int flags)
     m.msg_controllen = 0;
     m.msg_flags = 0;
 
-    ssize_t n = frida_sendmsg (sockfd, &m, flags);
+    ssize_t n = zymbiote_sendmsg (sockfd, &m, flags);
     if (n == -1)
       return false;
 
@@ -351,7 +351,7 @@ frida_sendmsg_all (int sockfd, struct iovec * iov, size_t iovlen, int flags)
 }
 
 static ssize_t
-frida_recv (int sockfd, void * buf, size_t len, int flags)
+zymbiote_recv (int sockfd, void * buf, size_t len, int flags)
 {
   for (;;)
   {
@@ -359,7 +359,7 @@ frida_recv (int sockfd, void * buf, size_t len, int flags)
     if (n != -1)
       return n;
 
-    if (frida_get_errno () == EINTR)
+    if (zymbiote_get_errno () == EINTR)
       continue;
 
     return -1;
