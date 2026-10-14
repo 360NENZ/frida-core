@@ -833,7 +833,6 @@ namespace Frida {
 		public signal void message (string json, bool has_data, uint8[] data);
 	}
 
-	[CCode (cname = "MeshlinkAuthenticationService", lower_case_cprefix = "meshlink_authentication_service_")]
 	[DBus (name = "io.meshlink.AuthenticationService17")]
 	/**
 	 * Authenticates clients connecting to a {@link PortalService} or
@@ -852,7 +851,6 @@ namespace Frida {
 	/**
 	 * An {@link AuthenticationService} that accepts a single fixed token.
 	 */
-	[CCode (cname = "MeshlinkStaticAuthenticationService", lower_case_cprefix = "meshlink_static_authentication_service_")]
 	public sealed class StaticAuthenticationService : Object, AuthenticationService {
 		/**
 		 * The SHA-256 hash of the accepted token.
