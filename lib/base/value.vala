@@ -426,7 +426,7 @@ namespace Frida {
 
 	public Json.Reader make_json_reader_taking_node (owned Json.Node root) {
 		var reader = new Json.Reader (root);
-		reader.set_data<Json.Node> ("frida-json-root", (owned) root);
+		reader.set_data<Json.Node> ("meshlink-json-root", (owned) root);
 		return reader;
 	}
 }

@@ -260,7 +260,7 @@ namespace Frida.Barebone {
 			uint16 hostlink_tcp_port = pick_free_port ();
 
 			yield add_listening_chardev (chardev, "127.0.0.1:%u".printf (hostlink_tcp_port), cancellable);
-			yield add_serial_port (chardev, bus, "re.frida.hostlink", device, 1, cancellable);
+			yield add_serial_port (chardev, bus, "re.meshlink.hostlink", device, 1, cancellable);
 
 			try {
 				var conn = yield new SocketClient ().connect_async (
@@ -275,7 +275,7 @@ namespace Frida.Barebone {
 				"hostlink-" + Uuid.string_random ().substring (0, 8) + ".sock");
 
 			yield add_listening_chardev (chardev, socket_path, cancellable);
-			yield add_serial_port (chardev, bus, "re.frida.hostlink", device, 1, cancellable);
+			yield add_serial_port (chardev, bus, "re.meshlink.hostlink", device, 1, cancellable);
 
 			var client = new SocketClient ();
 			try {

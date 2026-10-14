@@ -41,7 +41,7 @@ namespace Frida.Barebone {
 			yield send (command, cancellable);
 			string reply = yield read_until (PROMPT, cancellable);
 
-			string marker = "frida-console-%u".printf (++sequence);
+			string marker = "meshlink-console-%u".printf (++sequence);
 			yield send (marker, cancellable);
 			string trailer = yield read_until (marker, cancellable);
 			yield read_until (PROMPT, cancellable);
@@ -206,7 +206,7 @@ namespace Frida.Barebone {
 		}
 
 		private async string run_many (string commands, Cancellable? cancellable) throws Error, IOError {
-			string marker = "frida-console-%u".printf (++sequence);
+			string marker = "meshlink-console-%u".printf (++sequence);
 			yield send (commands + marker, cancellable);
 			string answer = yield read_until (marker, cancellable);
 			yield read_until (PROMPT, cancellable);

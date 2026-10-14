@@ -85,7 +85,7 @@ namespace Frida {
 			var script = new BareboneScript (id, services);
 
 			unowned string runtime_js = (string) Frida.Data.Barebone.get_script_runtime_js_blob ().data;
-			script.add_program (runtime_js, "/_frida.js");
+			script.add_program (runtime_js, "/meshlink/bootstrap.js");
 			script.add_program (source, "/agent.js");
 
 			return script;
