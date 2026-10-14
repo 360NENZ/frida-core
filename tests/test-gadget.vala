@@ -28,8 +28,8 @@ namespace Frida.GadgetTest {
 					return;
 			}
 
-			var gadget_filename = Path.build_filename (gadget_dir, "frida-gadget" + Frida.Test.os_library_suffix ());
-			var config_filename = Path.build_filename (gadget_dir, "frida-gadget.config");
+			var gadget_filename = Path.build_filename (gadget_dir, "meshlink-gadget" + Frida.Test.os_library_suffix ());
+			var config_filename = Path.build_filename (gadget_dir, "meshlink-gadget.config");
 			var script_filename = Path.build_filename (data_dir, "test-gadget-standalone.js");
 
 			var envp = new string[] {

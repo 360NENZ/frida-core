@@ -21,7 +21,7 @@ rsync -rLz \
   frida-tests \
   labrats \
   ../lib/agent/meshlink-agent.dylib \
-  ../../../frida-ios-arm64e/lib/frida-gadget.dylib \
+  ../../../frida-ios-arm64e/lib/meshlink-gadget.dylib \
   "$core_tests/test-gadget-standalone.js" \
   "$remote_host:$remote_prefix/" || exit 1
 

@@ -226,7 +226,7 @@ endif
 
 helper_name = 'frida-helper' + exe_suffix
 agent_name = 'meshlink-agent' + shlib_suffix
-gadget_name = 'frida-gadget' + shlib_suffix
+gadget_name = 'meshlink-gadget' + shlib_suffix
 
 frida_libdir_name = f'frida-@api_version@'
 root_asset_dir = get_option('libdir') / frida_libdir_name

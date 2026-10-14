@@ -91,9 +91,9 @@ modulated_gadget = custom_target('frida-gadget-modulated',
 need_universal_gadget = host_os_family == 'darwin' and gadget_compat != ''
 
 if host_os == 'macos'
-  identity = '@executable_path/../Frameworks/FridaGadget.dylib'
+  identity = '@executable_path/../Frameworks/MeshlinkGadget.dylib'
 elif host_os in ['ios', 'tvos']
-  identity = '@executable_path/Frameworks/FridaGadget.dylib'
+  identity = '@executable_path/Frameworks/MeshlinkGadget.dylib'
 else
   identity = gadget_name
 endif

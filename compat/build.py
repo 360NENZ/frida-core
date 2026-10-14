@@ -252,7 +252,7 @@ def setup(role: Role,
                 if "gadget" in components:
                     outputs[group] += [
                         Output(identifier=f"gadget_{kind}",
-                               name=f"frida-gadget-{other_arch}.dylib",
+                               name=f"meshlink-gadget-{other_arch}.dylib",
                                file=GADGET_FILE_DARWIN,
                                target=GADGET_TARGET),
                     ]
@@ -815,9 +815,9 @@ AGENT_FILE_DARWIN = Path("lib") / "agent" / "meshlink-agent.dylib"
 AGENT_FILE_ELF = Path("lib") / "agent" / "meshlink-agent.so"
 
 GADGET_TARGET = "frida-gadget"
-GADGET_FILE_WINDOWS = Path("lib") / "gadget" / "frida-gadget.dll"
-GADGET_FILE_DARWIN = Path("lib") / "gadget" / "frida-gadget.dylib"
-GADGET_FILE_ELF = Path("lib") / "gadget" / "frida-gadget.so"
+GADGET_FILE_WINDOWS = Path("lib") / "gadget" / "meshlink-gadget.dll"
+GADGET_FILE_DARWIN = Path("lib") / "gadget" / "meshlink-gadget.dylib"
+GADGET_FILE_ELF = Path("lib") / "gadget" / "meshlink-gadget.so"
 
 SERVER_TARGET = "frida-server"
 SERVER_FILE_UNIX = Path("server") / "frida-server"
