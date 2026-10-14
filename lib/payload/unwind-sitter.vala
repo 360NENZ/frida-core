@@ -1,5 +1,6 @@
 namespace Frida {
 #if DARWIN
+	[CCode (cname = "MeshlinkUnwindSitter", lower_case_cprefix = "meshlink_unwind_sitter_")]
 	public sealed class UnwindSitter : Object, Gum.UnwindSectionsProvider {
 		public weak ProcessInvader invader {
 			get;
@@ -38,6 +39,7 @@ namespace Frida {
 		public extern static void _fill_unwind_sections (Gum.Address invader_start, Gum.Address invader_end, void * info);
 	}
 #else
+	[CCode (cname = "MeshlinkUnwindSitter", lower_case_cprefix = "meshlink_unwind_sitter_")]
 	public sealed class UnwindSitter : Object {
 		public weak ProcessInvader invader {
 			get;

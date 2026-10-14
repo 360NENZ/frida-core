@@ -1,5 +1,6 @@
 namespace Frida {
 #if DARWIN
+	[CCode (cname = "MeshlinkThreadSuspendMonitor", lower_case_cprefix = "meshlink_thread_suspend_monitor_")]
 	public sealed class ThreadSuspendMonitor : Object {
 		public weak ProcessInvader invader {
 			get;
@@ -52,7 +53,7 @@ namespace Frida {
 			unowned Gum.InvocationContext context = Gum.Interceptor.get_current_invocation ();
 			unowned ThreadSuspendMonitor monitor = (ThreadSuspendMonitor) context.get_replacement_data ();
 
-			if (monitor.is_called_by_frida (context))
+			if (monitor.is_called_by_payload (context))
 				return monitor.task_threads (task_id, threads, count);
 
 			return monitor.handle_task_threads (task_id, threads, count);
@@ -72,7 +73,7 @@ namespace Frida {
 			unowned Gum.InvocationContext context = Gum.Interceptor.get_current_invocation ();
 			unowned ThreadSuspendMonitor monitor = (ThreadSuspendMonitor) context.get_replacement_data ();
 
-			if (monitor.is_called_by_frida (context))
+			if (monitor.is_called_by_payload (context))
 				return monitor.thread_suspend (thread_id);
 
 			return monitor.handle_thread_suspend (thread_id);
@@ -113,7 +114,7 @@ namespace Frida {
 			unowned Gum.InvocationContext context = Gum.Interceptor.get_current_invocation ();
 			unowned ThreadSuspendMonitor monitor = (ThreadSuspendMonitor) context.get_replacement_data ();
 
-			if (monitor.is_called_by_frida (context))
+			if (monitor.is_called_by_payload (context))
 				return monitor.thread_resume (thread_id);
 
 			return monitor.handle_thread_resume (thread_id);
@@ -126,13 +127,14 @@ namespace Frida {
 			return thread_resume (thread_id);
 		}
 
-		private bool is_called_by_frida (Gum.InvocationContext context) {
+		private bool is_called_by_payload (Gum.InvocationContext context) {
 			Gum.MemoryRange range = invader.get_memory_range ();
 			var caller = Gum.Address.from_pointer (context.get_return_address ());
 			return caller >= range.base_address && caller < range.base_address + range.size;
 		}
 	}
 #else
+	[CCode (cname = "MeshlinkThreadSuspendMonitor", lower_case_cprefix = "meshlink_thread_suspend_monitor_")]
 	public sealed class ThreadSuspendMonitor : Object {
 		public weak ProcessInvader invader {
 			get;

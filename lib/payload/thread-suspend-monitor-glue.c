@@ -5,7 +5,7 @@
 #include <gum/gumdarwin.h>
 
 void
-_frida_thread_suspend_monitor_remove_cloaked_threads (task_inspect_t task, thread_act_array_t * threads, mach_msg_type_number_t * count)
+_meshlink_thread_suspend_monitor_remove_cloaked_threads (task_inspect_t task, thread_act_array_t * threads, mach_msg_type_number_t * count)
 {
   guint i, o;
   thread_act_array_t old_threads = *threads;

@@ -37,7 +37,7 @@ static FridaDyldUnwindSections * frida_create_cached_sections (FridaCreateArgs *
 static gboolean frida_fill_info (const GumDarwinSectionDetails * details, FridaFillInfoContext * ctx);
 
 void
-_frida_unwind_sitter_fill_unwind_sections (GumAddress invader_start, GumAddress invader_end, void * info)
+_meshlink_unwind_sitter_fill_unwind_sections (GumAddress invader_start, GumAddress invader_end, void * info)
 {
   FridaDyldUnwindSections * unwind_sections = info;
   FridaDyldUnwindSections * cached;
@@ -87,7 +87,7 @@ frida_create_cached_sections (FridaCreateArgs * args)
   cached_sections = g_slice_new0 (FridaDyldUnwindSections);
   cached_sections->mh = header;
 
-  module = gum_darwin_module_new_from_memory ("Frida", mach_task_self (), GPOINTER_TO_SIZE (header),
+  module = gum_darwin_module_new_from_memory ("Meshlink", mach_task_self (), GPOINTER_TO_SIZE (header),
       GUM_DARWIN_MODULE_FLAGS_NONE, NULL);
   if (module == NULL)
     return cached_sections;
