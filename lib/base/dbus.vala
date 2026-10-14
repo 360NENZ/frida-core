@@ -60,6 +60,7 @@ namespace Frida {
 		return yield connection.get_proxy (null, ObjectPath.HOST_SESSION, DBusProxyFlags.NONE, cancellable);
 	}
 
+	[CCode (cname = "MeshlinkDummyInputStream", lower_case_cprefix = "meshlink_dummy_input_stream_")]
 	private sealed class DummyInputStream : InputStream {
 		private bool done = false;
 		private Mutex mutex;

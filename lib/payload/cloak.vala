@@ -234,6 +234,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkDirListCloaker", lower_case_cprefix = "meshlink_dir_list_cloaker_")]
 	private sealed class DirListCloaker : Object {
 		public weak DirListFilter filter {
 			get;
@@ -307,6 +308,7 @@ namespace Frida {
 				return tracked_handles.contains (handle);
 		}
 
+		[CCode (cname = "MeshlinkOpenDirListener", lower_case_cprefix = "meshlink_open_dir_listener_")]
 		private class OpenDirListener : Object, Gum.InvocationListener {
 			public weak DirListCloaker parent {
 				get;
@@ -338,6 +340,7 @@ namespace Frida {
 			}
 		}
 
+		[CCode (cname = "MeshlinkCloseDirListener", lower_case_cprefix = "meshlink_close_dir_listener_")]
 		private class CloseDirListener : Object, Gum.InvocationListener {
 			public weak DirListCloaker parent {
 				get;
@@ -355,6 +358,7 @@ namespace Frida {
 			}
 		}
 
+		[CCode (cname = "MeshlinkReadDirListener", lower_case_cprefix = "meshlink_read_dir_listener_")]
 		private class ReadDirListener : Object, Gum.InvocationListener {
 			public weak DirListCloaker parent {
 				get;
@@ -408,6 +412,7 @@ namespace Frida {
 			private delegate void * ReadDirFunc (Posix.Dir dir);
 		}
 
+		[CCode (cname = "MeshlinkReadDirRListener", lower_case_cprefix = "meshlink_read_dir_r_listener_")]
 		private class ReadDirRListener : Object, Gum.InvocationListener {
 			public weak DirListCloaker parent {
 				get;
@@ -482,6 +487,7 @@ namespace Frida {
 			return name;
 		}
 
+		[CCode (cname = "MeshlinkDirEntryKind", cprefix = "MESHLINK_DIR_ENTRY_KIND_")]
 		private enum DirEntKind {
 			LEGACY,
 			MODERN

@@ -1099,6 +1099,7 @@ namespace Frida {
 
 	public extern static unowned string _version_string ();
 
+	[CCode (cname = "MeshlinkWebConnection", lower_case_cprefix = "meshlink_web_connection_")]
 	private sealed class WebConnection : VirtualStream {
 		public signal void websocket_closed ();
 

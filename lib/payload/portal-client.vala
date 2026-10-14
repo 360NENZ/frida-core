@@ -348,6 +348,7 @@ namespace Frida {
 			eternalized ();
 		}
 
+		[CCode (cname = "MeshlinkPortalLiveAgentSession", lower_case_cprefix = "meshlink_portal_live_agent_session_")]
 		private class LiveAgentSession : BaseAgentSession {
 			public uint registration_id {
 				get;

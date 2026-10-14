@@ -37,6 +37,7 @@ namespace Frida {
 			interceptor.detach (close_listener);
 		}
 
+		[CCode (cname = "MeshlinkFdCloseListener", lower_case_cprefix = "meshlink_fd_close_listener_")]
 		private class CloseListener : Object, Gum.InvocationListener {
 			public weak FileDescriptorGuard parent {
 				get;

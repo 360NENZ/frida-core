@@ -139,6 +139,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkVirtualInputStream", lower_case_cprefix = "meshlink_virtual_input_stream_")]
 	private sealed class VirtualInputStream : InputStream, PollableInputStream {
 		private weak VirtualStream stream;
 
@@ -226,6 +227,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkVirtualOutputStream", lower_case_cprefix = "meshlink_virtual_output_stream_")]
 	private sealed class VirtualOutputStream : OutputStream, PollableOutputStream {
 		private weak VirtualStream? stream;
 
