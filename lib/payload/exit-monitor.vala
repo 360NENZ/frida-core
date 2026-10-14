@@ -136,6 +136,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkExitHandler", lower_case_cprefix = "meshlink_exit_handler_")]
 	public interface ExitHandler : Object {
 		public abstract bool supports_async_exit ();
 		public abstract async void prepare_to_exit ();

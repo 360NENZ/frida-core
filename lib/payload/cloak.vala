@@ -1,4 +1,5 @@
 namespace Frida {
+	[CCode (cname = "MeshlinkThreadIgnoreScope", lower_case_cprefix = "meshlink_thread_ignore_scope_")]
 	public sealed class ThreadIgnoreScope {
 		public enum Kind {
 			APPLICATION_THREAD,

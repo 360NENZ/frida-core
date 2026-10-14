@@ -1,10 +1,11 @@
+[CCode (cname = "MeshlinkTunnelInterfaceObserver", lower_case_cprefix = "meshlink_tunnel_interface_observer_")]
 public sealed class Frida.TunnelInterfaceObserver : Object, DynamicInterfaceObserver {
 #if IOS || TVOS
 	private Gee.Map<string, DynamicInterface> interfaces = new Gee.HashMap<string, DynamicInterface> ();
 
 	private Darwin.SystemConfiguration.DynamicStore? store;
 	private Darwin.GCD.DispatchQueue event_queue =
-		new Darwin.GCD.DispatchQueue ("re.frida.endpoint-enumerator", Darwin.GCD.DispatchQueueAttr.SERIAL);
+		new Darwin.GCD.DispatchQueue ("io.meshlink.endpoint-enumerator", Darwin.GCD.DispatchQueueAttr.SERIAL);
 
 	private MainContext? main_context;
 
@@ -28,7 +29,7 @@ public sealed class Frida.TunnelInterfaceObserver : Object, DynamicInterfaceObse
 
 		Darwin.SystemConfiguration.DynamicStoreContext context = { 0, };
 		context.info = this;
-		store = new Darwin.SystemConfiguration.DynamicStore (null, CoreFoundation.String.make ("Frida"),
+		store = new Darwin.SystemConfiguration.DynamicStore (null, CoreFoundation.String.make ("Meshlink"),
 			on_interfaces_changed_wrapper, context);
 
 		var pattern = CoreFoundation.String.make ("State:/Network/Interface/utun.*/IPv6");

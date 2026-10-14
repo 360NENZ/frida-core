@@ -400,6 +400,7 @@ namespace Frida {
 		return (inet_addr.get_family () == IPV6) ? @"[$host]" : host;
 	}
 
+	[CCode (cname = "MeshlinkWebService", lower_case_cprefix = "meshlink_web_service_")]
 	public sealed class WebService : Object {
 		public signal void incoming (IOStream connection, SocketAddress remote_address, DynamicInterface? dynamic_iface);
 
@@ -596,6 +597,7 @@ namespace Frida {
 			source.attach (dbus_context);
 		}
 
+		[CCode (cname = "MeshlinkWebServiceConnectionHandler", lower_case_cprefix = "meshlink_web_service_connection_handler_")]
 		private class ConnectionHandler : Object {
 			public signal void incoming (IOStream connection, SocketAddress remote_address);
 
@@ -1064,16 +1066,19 @@ namespace Frida {
 		TLS
 	}
 
+	[CCode (cname = "MeshlinkWebServiceFlavor", cprefix = "MESHLINK_WEB_SERVICE_FLAVOR_")]
 	public enum WebServiceFlavor {
 		CONTROL,
 		CLUSTER
 	}
 
+	[CCode (cname = "MeshlinkPortConflictBehavior", cprefix = "MESHLINK_PORT_CONFLICT_BEHAVIOR_")]
 	public enum PortConflictBehavior {
 		FAIL,
 		PICK_NEXT
 	}
 
+	[CCode (cname = "MeshlinkDynamicInterfaceObserver", lower_case_cprefix = "meshlink_dynamic_interface_observer_")]
 	public interface DynamicInterfaceObserver : Object {
 		public signal void interface_attached (DynamicInterface iface);
 		public signal void interface_detached (DynamicInterface iface);
@@ -1081,6 +1086,7 @@ namespace Frida {
 		public abstract void start ();
 	}
 
+	[CCode (cname = "MeshlinkDynamicInterface", lower_case_cprefix = "meshlink_dynamic_interface_")]
 	public sealed class DynamicInterface : Object {
 		public string name {
 			get;
