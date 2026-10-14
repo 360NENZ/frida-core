@@ -71,6 +71,7 @@ namespace Frida {
 		return own_range;
 	}
 
+	[CCode (cname = "MeshlinkProcessInvader", lower_case_cprefix = "meshlink_process_invader_")]
 	public interface ProcessInvader : Object {
 		public abstract SpawnStartState query_current_spawn_state ();
 

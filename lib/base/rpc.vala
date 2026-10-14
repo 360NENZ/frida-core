@@ -2,6 +2,7 @@ namespace Frida {
 	/**
 	 * Issues RPC calls over a {@link RpcPeer}, matching responses to requests.
 	 */
+	[CCode (cname = "MeshlinkRpcClient", lower_case_cprefix = "meshlink_rpc_client_")]
 	public sealed class RpcClient : Object {
 		/**
 		 * The peer used to send and receive RPC messages.
@@ -187,6 +188,7 @@ namespace Frida {
 	 * A transport over which an {@link RpcClient} sends and receives RPC
 	 * messages.
 	 */
+	[CCode (cname = "MeshlinkRpcPeer", lower_case_cprefix = "meshlink_rpc_peer_")]
 	public interface RpcPeer : Object {
 		/**
 		 * Posts an RPC message to the peer.

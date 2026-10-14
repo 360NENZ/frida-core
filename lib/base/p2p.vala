@@ -169,6 +169,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkPeerSocket", lower_case_cprefix = "meshlink_peer_socket_")]
 	public sealed class PeerSocket : Object, DatagramBased {
 		public Nice.Agent agent {
 			get;
