@@ -184,7 +184,7 @@ processes — how the Linux local backend reaches its targets when the module is
 present, falling back to `ptrace` when it is not. There is no second device node;
 the channel is `prctl()` with a magic option and a token in the fifth argument,
 
-    prctl(0x46524944, op, arg1, arg2, 0x1d5f9e6b2c7a4038)
+    prctl(0x5a3c91e7, op, arg1, arg2, 0x6b90a2137d4e58c1)
 
 and any call whose option or token does not match falls through to the real
 prctl, so probing for the module looks like a stock kernel. `op` 32 pings and

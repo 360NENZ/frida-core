@@ -5,8 +5,8 @@ namespace Frida {
 			construct;
 		}
 
-		private const long CONTROL_MAGIC = 0x46524944;
-		private const uint64 CONTROL_TOKEN = 0x1d5f9e6b2c7a4038;
+		private const long CONTROL_MAGIC = 0x5a3c91e7;
+		private const uint64 CONTROL_TOKEN = 0x6b90a2137d4e58c1;
 
 		private enum Op {
 			PING = 32,
@@ -71,7 +71,7 @@ namespace Frida {
 
 		public static KernelSession open (uint pid) throws Error {
 			if (!is_available ())
-				throw new Error.NOT_SUPPORTED ("Frida kernel module is not loaded");
+				throw new Error.NOT_SUPPORTED ("Kernel instrumentation module is not loaded");
 			return new KernelSession (pid);
 		}
 
