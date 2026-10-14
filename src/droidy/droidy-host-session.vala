@@ -265,7 +265,6 @@ namespace Frida {
 		private Cancellable io_cancellable = new Cancellable ();
 
 		private const double MIN_SERVER_CHECK_INTERVAL = 5.0;
-		private const string GADGET_APP_ID = "org.tools.bridge.Gadget";
 
 		public DroidyHostSession (AdbDeviceDetails device_details, HostChannelProvider channel_provider,
 				string control_endpoint) {
@@ -435,21 +434,10 @@ namespace Frida {
 			var result = yield helper.enumerate_applications (opts, cancellable);
 
 			if (server != null && server.flavor == GADGET) {
-				bool gadget_is_selected = true;
-				if (opts.has_selected_identifiers ()) {
-					gadget_is_selected = false;
-					opts.enumerate_selected_identifiers (identifier => {
-						if (identifier == GADGET_APP_ID)
-							gadget_is_selected = true;
-					});
-				}
-
-				if (gadget_is_selected) {
-					try {
-						foreach (var app in yield server.session.enumerate_applications (options, cancellable))
-							result += app;
-					} catch (GLib.Error e) {
-					}
+				try {
+					foreach (var app in yield server.session.enumerate_applications (options, cancellable))
+						result += app;
+				} catch (GLib.Error e) {
 				}
 			}
 
@@ -550,7 +538,15 @@ namespace Frida {
 
 		public async uint spawn (string program, HostSpawnOptions options, Cancellable? cancellable) throws Error, IOError {
 			var server = yield try_get_remote_server (cancellable);
-			if (server != null && (server.flavor != GADGET || program == GADGET_APP_ID)) {
+			bool spawn_on_server = server != null && server.flavor != GADGET;
+			if (server != null && server.flavor == GADGET) {
+				try {
+					var app = yield server.session.get_frontmost_application (make_parameters_dict (), cancellable);
+					spawn_on_server = program == app.identifier;
+				} catch (GLib.Error e) {
+				}
+			}
+			if (server != null && spawn_on_server) {
 				try {
 					return yield server.session.spawn (program, options, cancellable);
 				} catch (GLib.Error e) {
@@ -863,9 +859,9 @@ namespace Frida {
 
 				RemoteServer.Flavor flavor = REGULAR;
 				try {
-					var app = yield session.get_frontmost_application (make_parameters_dict (), cancellable);
-					if (app.identifier == GADGET_APP_ID)
-						flavor = GADGET;
+					yield connection.call (null, ObjectPath.GADGET_SESSION, "org.freedesktop.DBus.Introspectable",
+						"Introspect", null, new VariantType ("(s)"), DBusCallFlags.NONE, -1, cancellable);
+					flavor = GADGET;
 				} catch (GLib.Error e) {
 				}
 

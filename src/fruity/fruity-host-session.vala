@@ -219,7 +219,6 @@ namespace Frida {
 		private Cancellable io_cancellable = new Cancellable ();
 
 		private const double MIN_SERVER_CHECK_INTERVAL = 5.0;
-		private const string GADGET_APP_ID = "org.tools.bridge.Gadget";
 		private const string DEBUGSERVER_ENDPOINT_17PLUS = "com.apple.internal.dt.remote.debugproxy";
 		private const string DEBUGSERVER_ENDPOINT_14PLUS = "com.apple.debugserver.DVTSecureSocketProxy";
 		private const string DEBUGSERVER_ENDPOINT_LEGACY = "com.apple.debugserver?tls=handshake-only";
@@ -778,7 +777,15 @@ namespace Frida {
 
 		public async uint spawn (string program, HostSpawnOptions options, Cancellable? cancellable) throws Error, IOError {
 			var server = yield try_get_remote_server (cancellable);
-			if (server != null && (server.flavor != GADGET || program == GADGET_APP_ID)) {
+			bool spawn_on_server = server != null && server.flavor != GADGET;
+			if (server != null && server.flavor == GADGET) {
+				try {
+					var app = yield server.session.get_frontmost_application (make_parameters_dict (), cancellable);
+					spawn_on_server = program == app.identifier;
+				} catch (GLib.Error e) {
+				}
+			}
+			if (server != null && spawn_on_server) {
 				try {
 					return yield server.session.spawn (program, options, cancellable);
 				} catch (GLib.Error e) {
@@ -1331,9 +1338,9 @@ namespace Frida {
 
 				RemoteServer.Flavor flavor = REGULAR;
 				try {
-					var app = yield session.get_frontmost_application (make_parameters_dict (), cancellable);
-					if (app.identifier == GADGET_APP_ID)
-						flavor = GADGET;
+					yield connection.call (null, ObjectPath.GADGET_SESSION, "org.freedesktop.DBus.Introspectable",
+						"Introspect", null, new VariantType ("(s)"), DBusCallFlags.NONE, -1, cancellable);
+					flavor = GADGET;
 				} catch (GLib.Error e) {
 				}
 
