@@ -1240,7 +1240,7 @@ namespace Frida {
 				services: services,
 				id: id,
 				persist_timeout: persist_timeout,
-				frida_context: MainContext.ref_thread_default (),
+				runtime_context: MainContext.ref_thread_default (),
 				dbus_context: dbus_context
 			);
 		}
@@ -1323,7 +1323,7 @@ namespace Frida {
 				pid: pid,
 				id: id,
 				persist_timeout: persist_timeout,
-				frida_context: MainContext.ref_thread_default (),
+				runtime_context: MainContext.ref_thread_default (),
 				dbus_context: dbus_context
 			);
 		}
@@ -1431,7 +1431,7 @@ namespace Frida {
 			}
 		}
 
-		public MainContext frida_context {
+		public MainContext runtime_context {
 			get;
 			construct;
 		}
@@ -1446,10 +1446,10 @@ namespace Frida {
 		protected AgentMessageTransmitter transmitter;
 
 		construct {
-			assert (frida_context != null);
+			assert (runtime_context != null);
 			assert (dbus_context != null);
 
-			transmitter = new AgentMessageTransmitter (this, persist_timeout, frida_context, dbus_context);
+			transmitter = new AgentMessageTransmitter (this, persist_timeout, runtime_context, dbus_context);
 			transmitter.closed.connect (on_transmitter_closed);
 			transmitter.new_candidates.connect (on_transmitter_new_candidates);
 			transmitter.candidate_gathering_done.connect (on_transmitter_candidate_gathering_done);

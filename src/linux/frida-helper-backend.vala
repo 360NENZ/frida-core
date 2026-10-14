@@ -1489,7 +1489,7 @@ namespace Frida {
 			construct;
 		}
 
-		public UnixConnection frida_ctrl {
+		public UnixConnection loader_control {
 			get;
 			construct;
 		}
@@ -1537,13 +1537,13 @@ namespace Frida {
 		private Promise<bool> cancel_request = new Promise<bool> ();
 		private Cancellable io_cancellable = new Cancellable ();
 
-		private RemoteAgent (uint pid, InjectSpec spec, BootstrapResult bres, UnixConnection frida_ctrl,
+		private RemoteAgent (uint pid, InjectSpec spec, BootstrapResult bres, UnixConnection loader_control,
 				UnixConnection? agent_ctrl = null) {
 			Object (
 				pid: pid,
 				inject_spec: spec,
 				bootstrap_result: bres,
-				frida_ctrl: frida_ctrl,
+				loader_control: loader_control,
 				agent_ctrl: agent_ctrl
 			);
 		}
@@ -1570,20 +1570,20 @@ namespace Frida {
 		}
 
 		internal static async RemoteAgent start (LoaderLaunch launch, InjectSpec spec, uint pid, BootstrapResult bres,
-				UnixConnection frida_ctrl, UnixConnection? agent_ctrl, Cancellable? cancellable) throws Error, IOError {
-			var agent = new RemoteAgent (pid, spec, bres, frida_ctrl, agent_ctrl);
+				UnixConnection loader_control, UnixConnection? agent_ctrl, Cancellable? cancellable) throws Error, IOError {
+			var agent = new RemoteAgent (pid, spec, bres, loader_control, agent_ctrl);
 
 			try {
 				var io_priority = Priority.DEFAULT;
 
 				if (launch == FROM_SCRATCH)
-					frida_ctrl.send_fd (spec.library_so.get_fd (), cancellable);
+					loader_control.send_fd (spec.library_so.get_fd (), cancellable);
 
 				if (agent.agent_ctrlfd_for_peer != null) {
-					frida_ctrl.send_fd (agent.agent_ctrlfd_for_peer.handle, cancellable);
+					loader_control.send_fd (agent.agent_ctrlfd_for_peer.handle, cancellable);
 					agent.agent_ctrlfd_for_peer = null;
 				} else {
-					yield frida_ctrl.get_output_stream ().write_async ({ 0 }, io_priority, cancellable);
+					yield loader_control.get_output_stream ().write_async ({ 0 }, io_priority, cancellable);
 				}
 			} catch (GLib.Error e) {
 				if (e is IOError.CANCELLED)
@@ -1599,7 +1599,7 @@ namespace Frida {
 
 		public void ack () {
 			uint8 raw_type = HelperMessageType.ACK;
-			frida_ctrl.get_output_stream ().write_all_async.begin ((uint8[]) &raw_type, Priority.DEFAULT, null);
+			loader_control.get_output_stream ().write_all_async.begin ((uint8[]) &raw_type, Priority.DEFAULT, null);
 		}
 
 		private async void monitor () {
@@ -1607,7 +1607,7 @@ namespace Frida {
 			try {
 				var unload_policy = UnloadPolicy.IMMEDIATE;
 
-				InputStream input = frida_ctrl.get_input_stream ();
+				InputStream input = loader_control.get_input_stream ();
 				var io_priority = Priority.DEFAULT;
 				size_t n;
 
@@ -1717,7 +1717,7 @@ namespace Frida {
 		}
 
 		public RemoteAgent clone (uint clone_id, AgentFeatures features) {
-			var agent = new RemoteAgent (0, inject_spec.clone (clone_id, features), bootstrap_result.clone (), frida_ctrl);
+			var agent = new RemoteAgent (0, inject_spec.clone (clone_id, features), bootstrap_result.clone (), loader_control);
 			agent._state = _state;
 			return agent;
 		}

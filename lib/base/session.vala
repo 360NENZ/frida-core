@@ -176,7 +176,7 @@ namespace Frida {
 			set;
 		}
 
-		public MainContext frida_context {
+		public MainContext runtime_context {
 			get;
 			construct;
 		}
@@ -214,18 +214,18 @@ namespace Frida {
 			INTERRUPTED
 		}
 
-		public AgentMessageTransmitter (AgentSession agent_session, uint persist_timeout, MainContext frida_context,
+		public AgentMessageTransmitter (AgentSession agent_session, uint persist_timeout, MainContext runtime_context,
 				MainContext dbus_context) {
 			Object (
 				agent_session: agent_session,
 				persist_timeout: persist_timeout,
-				frida_context: frida_context,
+				runtime_context: runtime_context,
 				dbus_context: dbus_context
 			);
 		}
 
 		construct {
-			assert (frida_context != null);
+			assert (runtime_context != null);
 			assert (dbus_context != null);
 		}
 
@@ -269,7 +269,7 @@ namespace Frida {
 				close.begin (null);
 				return false;
 			});
-			expiry_timer.attach (frida_context);
+			expiry_timer.attach (runtime_context);
 		}
 
 		public void resume (uint rx_batch_id, out uint tx_batch_id) throws Error {
@@ -722,7 +722,7 @@ namespace Frida {
 		protected void schedule_on_frida_thread (owned SourceFunc function) {
 			var source = new IdleSource ();
 			source.set_callback ((owned) function);
-			source.attach (frida_context);
+			source.attach (runtime_context);
 		}
 
 		protected void schedule_on_dbus_thread (owned SourceFunc function) {
