@@ -1,4 +1,5 @@
 namespace Frida {
+	[CCode (cname = "MeshlinkPromise", lower_case_cprefix = "meshlink_promise_")]
 	public sealed class Promise<T> {
 		private Impl<T> impl;
 
@@ -24,6 +25,7 @@ namespace Frida {
 			impl.reject (error);
 		}
 
+		[CCode (cname = "MeshlinkPromiseImpl", lower_case_cprefix = "meshlink_promise_impl_")]
 		private class Impl<T> : Object, Future<T> {
 			public bool ready {
 				get {
@@ -154,6 +156,7 @@ namespace Frida {
 			}
 		}
 
+		[CCode (cname = "MeshlinkPromiseCompletionFuncEntry", lower_case_cprefix = "meshlink_promise_completion_func_entry_")]
 		private class CompletionFuncEntry {
 			public SourceFunc func;
 
@@ -162,6 +165,7 @@ namespace Frida {
 			}
 		}
 
+		[CCode (cname = "MeshlinkPromiseThenHandlerEntry", lower_case_cprefix = "meshlink_promise_then_handler_entry_")]
 		private class ThenHandlerEntry<T> {
 			public FutureCompletionHandler<T> handler;
 
@@ -171,6 +175,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkFuture", lower_case_cprefix = "meshlink_future_")]
 	public interface Future<T> : Object {
 		public abstract bool ready { get; }
 		public abstract T? value { get; }
