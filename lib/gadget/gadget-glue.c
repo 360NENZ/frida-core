@@ -253,17 +253,17 @@ frida_parse_apple_parameters (const gchar * apple[], gboolean * found_range, Gum
 
   while ((entry = apple[i++]) != NULL)
   {
-    if (g_str_has_prefix (entry, "frida_dylib_range="))
+    if (g_str_has_prefix (entry, "meshlink_dylib_range="))
     {
-      *found_range = sscanf (entry, "frida_dylib_range=0x%" G_GINT64_MODIFIER "x,0x%" G_GSIZE_MODIFIER "x",
+      *found_range = sscanf (entry, "meshlink_dylib_range=0x%" G_GINT64_MODIFIER "x,0x%" G_GSIZE_MODIFIER "x",
           &range->base_address, &range->size) == 2;
     }
-    else if (g_str_has_prefix (entry, "frida_gadget_config="))
+    else if (g_str_has_prefix (entry, "meshlink_gadget_config="))
     {
       guchar * data;
       gsize size;
 
-      data = g_base64_decode (entry + 20, &size);
+      data = g_base64_decode (entry + sizeof ("meshlink_gadget_config=") - 1, &size);
       if (data != NULL)
       {
         *config_data = g_strndup ((const gchar *) data, size);
