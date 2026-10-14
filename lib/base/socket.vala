@@ -329,7 +329,7 @@ namespace Frida {
 		var msg = new Soup.Message.from_uri ("GET", uri);
 		Soup.websocket_client_prepare_handshake (msg, origin, null, null);
 		msg.request_headers.replace ("Host", make_host_header_value (uri));
-		msg.request_headers.replace ("User-Agent", "Frida/" + _version_string ());
+		msg.request_headers.replace ("User-Agent", "Meshlink/" + _version_string ());
 		msg.request_headers.foreach ((name, val) => {
 			request.append (name + ": " + val + "\r\n");
 		});
@@ -744,7 +744,7 @@ namespace Frida {
 
 			private void on_http_request (Soup.Server server, Soup.ServerMessage msg, string path,
 					HashTable<string, string>? query) {
-				msg.get_response_headers ().replace ("Server", "Frida/" + _version_string ());
+				msg.get_response_headers ().replace ("Server", "Meshlink/" + _version_string ());
 
 				msg.pause ();
 				handle_http_request.begin (msg, path);
@@ -1018,7 +1018,7 @@ namespace Frida {
 <center><h1>301 Moved Permanently</h1></center>
 <hr><center>%s</center>
 </body>
-</html>""".printf ("Frida/" + _version_string ());
+</html>""".printf ("Meshlink/" + _version_string ());
 
 				if (msg.get_method () == "HEAD") {
 					var headers = msg.get_response_headers ();
