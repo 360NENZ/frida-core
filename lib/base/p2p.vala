@@ -66,6 +66,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkPeerSessionDescription", lower_case_cprefix = "meshlink_peer_session_description_")]
 	public class PeerSessionDescription {
 		public uint64 session_id = 0;
 		public string? ice_ufrag;
@@ -154,6 +155,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkPeerSetup", cprefix = "MESHLINK_PEER_SETUP_")]
 	public enum PeerSetup {
 		ACTIVE,
 		PASSIVE,

@@ -50,7 +50,7 @@ public sealed class Frida.TunnelInterfaceObserver : Object, DynamicInterfaceObse
 	}
 
 	private void on_interfaces_changed (CoreFoundation.Array changed_keys) {
-		schedule_on_frida_thread (() => {
+		schedule_on_main_thread (() => {
 			if (store != null)
 				handle_interface_changes (changed_keys);
 			return Source.REMOVE;
@@ -88,7 +88,7 @@ public sealed class Frida.TunnelInterfaceObserver : Object, DynamicInterfaceObse
 		}
 	}
 
-	private void schedule_on_frida_thread (owned SourceFunc function) {
+	private void schedule_on_main_thread (owned SourceFunc function) {
 		var source = new IdleSource ();
 		source.set_callback ((owned) function);
 		source.attach (main_context);

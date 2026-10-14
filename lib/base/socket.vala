@@ -372,7 +372,7 @@ namespace Frida {
 		}
 
 		WebConnection connection = null;
-		var frida_context = MainContext.ref_thread_default ();
+		var main_context = MainContext.ref_thread_default ();
 		var dbus_context = yield get_dbus_context ();
 		var dbus_source = new IdleSource ();
 		dbus_source.set_callback (() => {
@@ -380,9 +380,9 @@ namespace Frida {
 				new List<Soup.WebsocketExtension> ());
 			connection = new WebConnection (websocket);
 
-			var frida_source = new IdleSource ();
-			frida_source.set_callback (negotiate_connection.callback);
-			frida_source.attach (frida_context);
+			var main_source = new IdleSource ();
+			main_source.set_callback (negotiate_connection.callback);
+			main_source.attach (main_context);
 
 			return Source.REMOVE;
 		});
@@ -437,7 +437,7 @@ namespace Frida {
 
 		private Cancellable io_cancellable = new Cancellable ();
 
-		private MainContext? frida_context;
+		private MainContext? main_context;
 		private MainContext? dbus_context;
 
 		public WebService (EndpointParameters endpoint_params, WebServiceFlavor flavor,
@@ -451,7 +451,7 @@ namespace Frida {
 		}
 
 		public async void start (Cancellable? cancellable) throws Error, IOError {
-			frida_context = MainContext.ref_thread_default ();
+			main_context = MainContext.ref_thread_default ();
 			dbus_context = yield get_dbus_context ();
 
 			cancellable.set_error_if_cancelled ();
@@ -468,13 +468,13 @@ namespace Frida {
 		private async void handle_start_request (Promise<SocketAddress> start_request, Cancellable? cancellable) {
 			try {
 				SocketAddress effective_address = yield do_start (cancellable);
-				schedule_on_frida_thread (() => {
+				schedule_on_main_thread (() => {
 					start_request.resolve (effective_address);
 					return Source.REMOVE;
 				});
 			} catch (GLib.Error e) {
 				GLib.Error start_error = e;
-				schedule_on_frida_thread (() => {
+				schedule_on_main_thread (() => {
 					start_request.reject (start_error);
 					return Source.REMOVE;
 				});
@@ -552,7 +552,7 @@ namespace Frida {
 		}
 
 		private void on_incoming_connection (ConnectionHandler handler, IOStream connection, SocketAddress remote_address) {
-			schedule_on_frida_thread (() => {
+			schedule_on_main_thread (() => {
 				incoming (connection, remote_address, handler.dynamic_iface);
 				return Source.REMOVE;
 			});
@@ -581,12 +581,12 @@ namespace Frida {
 				main_handler.close ();
 		}
 
-		private void schedule_on_frida_thread (owned SourceFunc function) {
-			assert (frida_context != null);
+		private void schedule_on_main_thread (owned SourceFunc function) {
+			assert (main_context != null);
 
 			var source = new IdleSource ();
 			source.set_callback ((owned) function);
-			source.attach (frida_context);
+			source.attach (main_context);
 		}
 
 		private void schedule_on_dbus_thread (owned SourceFunc function) {
