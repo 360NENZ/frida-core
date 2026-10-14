@@ -43,6 +43,7 @@ namespace Frida {
 	}
 
 #if ANDROID
+	[CCode (cname = "MeshlinkThreadCountCloaker", lower_case_cprefix = "meshlink_thread_count_cloaker_")]
 	public sealed class ThreadCountCloaker : Object {
 		private GetOsThreadStat * get_os_thread_stat_slot;
 		private static GetOsThreadStat old_get_os_thread_stat_impl;
@@ -191,11 +192,13 @@ namespace Frida {
 		}
 	}
 #else
+	[CCode (cname = "MeshlinkThreadCountCloaker", lower_case_cprefix = "meshlink_thread_count_cloaker_")]
 	public sealed class ThreadCountCloaker : Object {
 	}
 #endif
 
 #if LINUX
+	[CCode (cname = "MeshlinkThreadListCloaker", lower_case_cprefix = "meshlink_thread_list_cloaker_")]
 	public sealed class ThreadListCloaker : Object, DirListFilter {
 		private string our_dir_by_pid;
 		private DirListCloaker cloaker;
@@ -215,6 +218,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkFDListCloaker", lower_case_cprefix = "meshlink_fd_list_cloaker_")]
 	public sealed class FDListCloaker : Object, DirListFilter {
 		private string our_dir_by_pid;
 		private DirListCloaker cloaker;
@@ -503,14 +507,17 @@ namespace Frida {
 		public char d_name[256];
 	}
 
+	[CCode (cname = "MeshlinkDirListFilter", lower_case_cprefix = "meshlink_dir_list_filter_")]
 	public interface DirListFilter : Object {
 		public abstract bool matches_directory (string path);
 		public abstract bool matches_file (string name);
 	}
 #else
+	[CCode (cname = "MeshlinkThreadListCloaker", lower_case_cprefix = "meshlink_thread_list_cloaker_")]
 	public sealed class ThreadListCloaker : Object {
 	}
 
+	[CCode (cname = "MeshlinkFDListCloaker", lower_case_cprefix = "meshlink_fd_list_cloaker_")]
 	public sealed class FDListCloaker : Object {
 	}
 #endif

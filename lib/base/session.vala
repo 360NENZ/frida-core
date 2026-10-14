@@ -156,6 +156,7 @@ namespace Frida {
 		DEBUGGER
 	}
 
+	[CCode (cname = "MeshlinkAgentMessageTransmitter", lower_case_cprefix = "meshlink_agent_message_transmitter_")]
 	public sealed class AgentMessageTransmitter : Object {
 		public signal void closed ();
 		public signal void new_candidates (string[] candidate_sdps);

@@ -1,4 +1,5 @@
 namespace Frida {
+	[CCode (cname = "MeshlinkPortalClient", lower_case_cprefix = "meshlink_portal_client_")]
 	public sealed class PortalClient : Object, AgentSessionProvider {
 		public signal void resume ();
 		public signal void kill ();

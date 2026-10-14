@@ -1,5 +1,6 @@
 namespace Frida {
 #if WINDOWS
+	[CCode (cname = "MeshlinkFileDescriptorGuard", lower_case_cprefix = "meshlink_file_descriptor_guard_")]
 	public sealed class FileDescriptorGuard : Object {
 		public Gum.MemoryRange agent_range {
 			get;
@@ -11,6 +12,7 @@ namespace Frida {
 		}
 	}
 #else
+	[CCode (cname = "MeshlinkFileDescriptorGuard", lower_case_cprefix = "meshlink_file_descriptor_guard_")]
 	public sealed class FileDescriptorGuard : Object {
 		public Gum.MemoryRange agent_range {
 			get;

@@ -1,4 +1,5 @@
 namespace Frida {
+	[CCode (cname = "MeshlinkExitMonitor", lower_case_cprefix = "meshlink_exit_monitor_")]
 	public sealed class ExitMonitor : Object, Gum.InvocationListener {
 		public weak ExitHandler handler {
 			get;

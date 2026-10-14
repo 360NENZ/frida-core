@@ -1,4 +1,5 @@
 namespace Frida {
+	[CCode (cname = "MeshlinkBaseAgentSession", lower_case_cprefix = "meshlink_base_agent_session_")]
 	public abstract class BaseAgentSession : Object, AgentSession {
 		public signal void closed ();
 		public signal void script_eternalized (Gum.Script script);

@@ -1,5 +1,6 @@
 namespace Frida {
 #if WINDOWS
+	[CCode (cname = "MeshlinkForkMonitor", lower_case_cprefix = "meshlink_fork_monitor_")]
 	public sealed class ForkMonitor : Object {
 		public weak ForkHandler handler {
 			get;
@@ -11,6 +12,7 @@ namespace Frida {
 		}
 	}
 #else
+	[CCode (cname = "MeshlinkForkMonitor", lower_case_cprefix = "meshlink_fork_monitor_")]
 	public sealed class ForkMonitor : Object, Gum.InvocationListener {
 		public weak ForkHandler handler {
 			get;

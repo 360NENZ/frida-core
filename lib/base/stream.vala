@@ -1,4 +1,5 @@
 namespace Frida {
+	[CCode (cname = "MeshlinkVirtualStream", lower_case_cprefix = "meshlink_virtual_stream_")]
 	public abstract class VirtualStream : IOStream {
 		public override InputStream input_stream {
 			get {

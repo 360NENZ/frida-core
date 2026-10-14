@@ -1,4 +1,5 @@
 namespace Frida {
+	[CCode (cname = "MeshlinkScriptEngine", lower_case_cprefix = "meshlink_script_engine_")]
 	public sealed class ScriptEngine : Object {
 		public signal void message_from_script (AgentScriptId script_id, string json, Bytes? data);
 		public signal void message_from_debugger (AgentScriptId script_id, string message);
@@ -231,6 +232,7 @@ namespace Frida {
 			source.attach (Gum.ScriptBackend.get_scheduler ().get_js_context ());
 		}
 
+		[CCode (cname = "MeshlinkScriptInstance", lower_case_cprefix = "meshlink_script_instance_")]
 		public sealed class ScriptInstance : Object, RpcPeer {
 			public signal void closed ();
 			public signal void message (string json, Bytes? data);
