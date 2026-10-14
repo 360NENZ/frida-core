@@ -124,8 +124,8 @@ frida_libc_shim_deinit (void)
 # define O_DIRECTORY 0
 #endif
 
-#define FRIDA_FILE_MAGIC 0x46524944u /* 'FRID' */
-#define FRIDA_DIR_MAGIC  0x46444952u /* 'FDIR' */
+#define STREAM_HANDLE_MAGIC 0x4d534846u
+#define DIR_HANDLE_MAGIC    0x4d534844u
 
 #define FRIDA_STDIO_BUFSIZE 4096
 #define FRIDA_GETLINE_INITIAL_SIZE 128
@@ -1623,7 +1623,7 @@ opendir (const char * name)
     return NULL;
 
   d = g_new0 (FridaDir, 1);
-  d->magic = FRIDA_DIR_MAGIC;
+  d->magic = DIR_HANDLE_MAGIC;
   d->fd = fd;
   d->close_fd = TRUE;
   d->cap = FRIDA_STDIO_BUFSIZE;
@@ -1642,7 +1642,7 @@ fdopendir (int fd)
   FridaDir * d;
 
   d = g_new0 (FridaDir, 1);
-  d->magic = FRIDA_DIR_MAGIC;
+  d->magic = DIR_HANDLE_MAGIC;
   d->fd = fd;
   d->close_fd = TRUE;
   d->cap = FRIDA_STDIO_BUFSIZE;
@@ -2031,7 +2031,7 @@ frida_file_get_impl (FILE * stream)
 
   h = (FridaFileHandle *) stream;
 
-  assert (h->magic == FRIDA_FILE_MAGIC);
+  assert (h->magic == STREAM_HANDLE_MAGIC);
   assert (h->impl != NULL);
 
   return h->impl;
@@ -2051,7 +2051,7 @@ frida_file_bind_slot (FILE * slot, FridaFile * impl)
 
   h = (FridaFileHandle *) slot;
 
-  h->magic = FRIDA_FILE_MAGIC;
+  h->magic = STREAM_HANDLE_MAGIC;
   h->impl = impl;
 }
 
@@ -2071,7 +2071,7 @@ frida_file_wrap (FridaFile * impl)
 #endif
 
   h = (FridaFileHandle *) stream;
-  h->magic = FRIDA_FILE_MAGIC;
+  h->magic = STREAM_HANDLE_MAGIC;
   h->impl = impl;
 
   return stream;
@@ -2086,7 +2086,7 @@ frida_file_unwrap (FILE * stream)
 
   h = (FridaFileHandle *) stream;
 
-  assert (h->magic == FRIDA_FILE_MAGIC);
+  assert (h->magic == STREAM_HANDLE_MAGIC);
 
   h->magic = 0;
   h->impl = NULL;
@@ -2306,7 +2306,7 @@ frida_dir_get_impl (DIR * dirp)
 
   d = (FridaDir *) dirp;
 
-  assert (d->magic == FRIDA_DIR_MAGIC);
+  assert (d->magic == DIR_HANDLE_MAGIC);
 
   return d;
 }
@@ -2315,7 +2315,7 @@ static DIR *
 frida_dir_wrap (FridaDir * impl)
 {
   assert (impl != NULL);
-  assert (impl->magic == FRIDA_DIR_MAGIC);
+  assert (impl->magic == DIR_HANDLE_MAGIC);
 
   return (DIR *) impl;
 }
@@ -2326,7 +2326,7 @@ frida_dir_free (FridaDir * d)
   if (d == NULL)
     return;
 
-  assert (d->magic == FRIDA_DIR_MAGIC);
+  assert (d->magic == DIR_HANDLE_MAGIC);
 
   d->magic = 0;
 
