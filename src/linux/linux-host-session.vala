@@ -1991,9 +1991,9 @@ namespace Frida {
 			uint64 setargv0 = 0;
 			uint64 setcontext = 0;
 			zymbiote.enumerate_exports (e => {
-				if (e.name == "zymbiote_replacement_setargv0")
+				if (e.name == "relay_zymbiote_replacement_setargv0")
 					setargv0 = payload_base + (e.address - text.vm_address);
-				else if (e.name == "zymbiote_replacement_setcontext")
+				else if (e.name == "relay_zymbiote_replacement_setcontext")
 					setcontext = payload_base + (e.address - text.vm_address);
 				return true;
 			});

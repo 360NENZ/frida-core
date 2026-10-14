@@ -40,8 +40,8 @@ ZymbioteContext zymbiote =
   .socket_path = "/runtime-worker-00000000000000000000000000000000",
 };
 
-int zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name);
-int zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * seinfo, const char * name);
+int relay_zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name);
+int relay_zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * seinfo, const char * name);
 
 static void zymbiote_wait_for_permission_to_resume (const char * process_name, bool * revert_now);
 
@@ -57,7 +57,7 @@ static ssize_t zymbiote_recv (int sockfd, void * buf, size_t len, int flags);
 __attribute__ ((section (".text.entrypoint")))
 __attribute__ ((visibility ("default")))
 int
-zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * seinfo, const char * name)
+relay_zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * seinfo, const char * name)
 {
   int res;
 
@@ -77,7 +77,7 @@ zymbiote_replacement_setcontext (uid_t uid, bool is_system_server, const char * 
 __attribute__ ((section (".text.entrypoint")))
 __attribute__ ((visibility ("default")))
 int
-zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name)
+relay_zymbiote_replacement_setargv0 (JNIEnv * env, jobject clazz, jstring name)
 {
   const char * name_utf8;
   bool revert_now;
