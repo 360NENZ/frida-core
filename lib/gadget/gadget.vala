@@ -1967,7 +1967,7 @@ namespace Frida.Gadget {
 				config: config,
 				location: location,
 				connectable: parse_cluster_address (address, interaction.port),
-				host: (address != null) ? address : "lolcathost",
+				host: (address != null) ? address : "localhost",
 				certificate: parse_certificate (interaction.certificate, location),
 				token: interaction.token,
 				acl: interaction.acl
