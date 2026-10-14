@@ -9,5 +9,5 @@ cd "$core_tests/../"
 make
 cd build/tests
 adb shell "mkdir -p $remote_prefix"
-adb push frida-tests labrats ../lib/agent/frida-agent.so $remote_prefix
+adb push frida-tests labrats ../lib/agent/meshlink-agent.so $remote_prefix
 adb shell "su -c '$remote_prefix/frida-tests $@'"

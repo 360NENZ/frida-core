@@ -47,7 +47,7 @@ namespace Frida {
 			injector.uninjected.connect (on_uninjected);
 
 #if HAVE_EMBEDDED_ASSETS
-			agent = new AgentDescriptor (PathTemplate ("<arch>\\frida-agent.dll"),
+			agent = new AgentDescriptor (PathTemplate ("<arch>\\meshlink-agent.dll"),
 				new Bytes.static (Frida.Data.Agent.get_runtime_arm64_dll_blob ().data),
 				new Bytes.static (Frida.Data.Agent.get_runtime_x86_64_dll_blob ().data),
 				new Bytes.static (Frida.Data.Agent.get_runtime_x86_dll_blob ().data),

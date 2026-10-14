@@ -20,7 +20,7 @@ ssh "$remote_host" "mkdir -p '$remote_prefix'"
 rsync -rLz \
   frida-tests \
   labrats \
-  ../lib/agent/frida-agent.dylib \
+  ../lib/agent/meshlink-agent.dylib \
   ../../../frida-ios-arm64e/lib/frida-gadget.dylib \
   "$core_tests/test-gadget-standalone.js" \
   "$remote_host:$remote_prefix/" || exit 1

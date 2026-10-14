@@ -245,7 +245,7 @@ def setup(role: Role,
                 if "agent" in components:
                     outputs[group] += [
                         Output(identifier=f"agent_{kind}",
-                               name=f"frida-agent-{other_arch}.dylib",
+                               name=f"meshlink-agent-{other_arch}.dylib",
                                file=AGENT_FILE_DARWIN,
                                target=AGENT_TARGET),
                     ]
@@ -810,9 +810,9 @@ HELPER_FILE_WINDOWS = Path("src") / "frida-helper.exe"
 HELPER_FILE_UNIX = Path("src") / "frida-helper"
 
 AGENT_TARGET = "frida-agent"
-AGENT_FILE_WINDOWS = Path("lib") / "agent" / "frida-agent.dll"
-AGENT_FILE_DARWIN = Path("lib") / "agent" / "frida-agent.dylib"
-AGENT_FILE_ELF = Path("lib") / "agent" / "frida-agent.so"
+AGENT_FILE_WINDOWS = Path("lib") / "agent" / "meshlink-agent.dll"
+AGENT_FILE_DARWIN = Path("lib") / "agent" / "meshlink-agent.dylib"
+AGENT_FILE_ELF = Path("lib") / "agent" / "meshlink-agent.so"
 
 GADGET_TARGET = "frida-gadget"
 GADGET_FILE_WINDOWS = Path("lib") / "gadget" / "frida-gadget.dll"
