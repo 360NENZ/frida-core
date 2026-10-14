@@ -259,7 +259,7 @@ namespace Frida {
 		private static void throw_helper_error (GLib.Error e) throws Error, IOError {
 #if MACOS
 			if (e is IOError.CLOSED) {
-				throw new Error.PERMISSION_DENIED ("Oops, frida-helper appears to have crashed. It may have been killed " +
+				throw new Error.PERMISSION_DENIED ("The helper process appears to have crashed. It may have been killed " +
 					"by the system while trying to access a hardened process. If this is the case, try setting these " +
 					"boot arguments: `sudo nvram boot-args=\"-arm64e_preview_abi thid_should_crash=0 " +
 					"tss_should_crash=0\"`. For more information, see: https://github.com/frida/frida-core/issues/524");

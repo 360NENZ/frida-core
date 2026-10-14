@@ -64,7 +64,7 @@ custom_target('bootstrapper-bin',
   input: [bootstrapper],
   output: ['bootstrapper.bin'],
   command: [objcopy, objcopy_flags, '@INPUT0@', '@OUTPUT0@'],
-  install_dir: 'share' / 'frida-helpers',
+  install_dir: 'share' / 'meshlink-helpers',
   install: true,
 )
 test('bootstrapper', executable('test-bootstrapper', bootstrapper_sources,
@@ -83,7 +83,7 @@ custom_target('loader-bin',
   input: [loader],
   output: ['loader.bin'],
   command: [objcopy, objcopy_flags, '@INPUT0@', '@OUTPUT0@'],
-  install_dir: 'share' / 'frida-helpers',
+  install_dir: 'share' / 'meshlink-helpers',
   install: true,
 )
 
@@ -98,7 +98,7 @@ if host_machine.system() == 'android'
     c_args: zymbiote_flags + extra_flags,
     link_args: extra_link_args,
     link_depends: [helper_lds],
-    install_dir: 'share' / 'frida-helpers',
+    install_dir: 'share' / 'meshlink-helpers',
     install: true,
   )
 endif

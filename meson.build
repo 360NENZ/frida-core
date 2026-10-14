@@ -224,7 +224,7 @@ else
   shlib_suffix = '.so'
 endif
 
-helper_name = 'frida-helper' + exe_suffix
+helper_name = 'meshlink-helper' + exe_suffix
 agent_name = 'meshlink-agent' + shlib_suffix
 gadget_name = 'meshlink-gadget' + shlib_suffix
 

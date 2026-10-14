@@ -52,7 +52,7 @@ build-native: ext/linux/tools/include/nolibc/nolibc.h
 	rm -rf build
 	$(MESON) setup --prefix /usr --cross-file $(crossfile) -Db_lto=true build
 	DESTDIR=$(abspath build/dist) $(MESON) install -C build
-	for f in build/dist/usr/share/frida-helpers/*; do \
+	for f in build/dist/usr/share/meshlink-helpers/*; do \
 		install -m644 $$f $(native_outdir)/; \
 	done
 

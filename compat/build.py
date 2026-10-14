@@ -238,7 +238,7 @@ def setup(role: Role,
                 if "helper" in components:
                     outputs[group] += [
                         Output(identifier=f"helper_{kind}",
-                               name=f"frida-helper-{other_arch}",
+                               name=f"meshlink-helper-{other_arch}",
                                file=HELPER_FILE_UNIX,
                                target=HELPER_TARGET),
                     ]
@@ -806,8 +806,8 @@ OVERRIDDEN_COMPAT_OPTIONS = {
 }
 
 HELPER_TARGET = "frida-helper"
-HELPER_FILE_WINDOWS = Path("src") / "frida-helper.exe"
-HELPER_FILE_UNIX = Path("src") / "frida-helper"
+HELPER_FILE_WINDOWS = Path("src") / "meshlink-helper.exe"
+HELPER_FILE_UNIX = Path("src") / "meshlink-helper"
 
 AGENT_TARGET = "frida-agent"
 AGENT_FILE_WINDOWS = Path("lib") / "agent" / "meshlink-agent.dll"
