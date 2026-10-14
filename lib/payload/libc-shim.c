@@ -599,6 +599,48 @@ vfprintf (FILE * stream, const char * format, va_list args)
   return frida_write_formatted_to_fd (frida_file_get_impl (stream)->fd, format, args);
 }
 
+#ifdef HAVE_GLIBC
+
+G_GNUC_INTERNAL int
+__printf_chk (int flag, const char * format, ...)
+{
+  int result;
+  va_list args;
+
+  va_start (args, format);
+  result = frida_write_formatted_to_fd (1, format, args);
+  va_end (args);
+
+  return result;
+}
+
+G_GNUC_INTERNAL int
+__fprintf_chk (FILE * stream, int flag, const char * format, ...)
+{
+  int result;
+  va_list args;
+
+  va_start (args, format);
+  result = frida_write_formatted_to_fd (frida_file_get_impl (stream)->fd, format, args);
+  va_end (args);
+
+  return result;
+}
+
+G_GNUC_INTERNAL int
+__vprintf_chk (int flag, const char * format, va_list args)
+{
+  return frida_write_formatted_to_fd (1, format, args);
+}
+
+G_GNUC_INTERNAL int
+__vfprintf_chk (FILE * stream, int flag, const char * format, va_list args)
+{
+  return frida_write_formatted_to_fd (frida_file_get_impl (stream)->fd, format, args);
+}
+
+#endif
+
 G_GNUC_INTERNAL int
 vsnprintf (char * string, size_t size, const char * format, va_list args)
 {
