@@ -1,4 +1,5 @@
 namespace Frida {
+	[CCode (cname = "MeshlinkHostSession", lower_case_cprefix = "meshlink_host_session_")]
 	[DBus (name = "io.meshlink.HostSession17")]
 	public interface HostSession : Object {
 		public abstract async void ping (uint interval_seconds, Cancellable? cancellable) throws GLib.Error;
@@ -46,6 +47,7 @@ namespace Frida {
 		public signal void uninjected (InjectorPayloadId id);
 	}
 
+	[CCode (cname = "MeshlinkAgentSessionProvider", lower_case_cprefix = "meshlink_agent_session_provider_")]
 	[DBus (name = "io.meshlink.AgentSessionProvider17")]
 	public interface AgentSessionProvider : Object {
 		public abstract async void open (AgentSessionId id, HashTable<string, Variant> options,
@@ -61,6 +63,7 @@ namespace Frida {
 		public signal void child_gating_changed (uint subscriber_count);
 	}
 
+	[CCode (cname = "MeshlinkAgentSession", lower_case_cprefix = "meshlink_agent_session_")]
 	[DBus (name = "io.meshlink.AgentSession17")]
 	public interface AgentSession : Object {
 		public abstract async void close (Cancellable? cancellable) throws GLib.Error;
@@ -105,6 +108,7 @@ namespace Frida {
 		public signal void candidate_gathering_done ();
 	}
 
+	[CCode (cname = "MeshlinkAgentController", lower_case_cprefix = "meshlink_agent_controller_")]
 	[DBus (name = "io.meshlink.AgentController17")]
 	public interface AgentController : Object {
 #if !WINDOWS
@@ -126,6 +130,7 @@ namespace Frida {
 			Cancellable? cancellable) throws GLib.Error;
 	}
 
+	[CCode (cname = "MeshlinkAgentMessageSink", lower_case_cprefix = "meshlink_agent_message_sink_")]
 	[DBus (name = "io.meshlink.AgentMessageSink17")]
 	public interface AgentMessageSink : Object {
 		public abstract async void post_messages (AgentMessage[] messages, uint batch_id,
