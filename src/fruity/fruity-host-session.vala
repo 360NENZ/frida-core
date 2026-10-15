@@ -1011,7 +1011,7 @@ namespace Frida {
 			}
 
 			if (pid == 0)
-				throw new Error.NOT_SUPPORTED ("The Frida system session is not available on jailed iOS");
+				throw new Error.NOT_SUPPORTED ("The system session is not available on jailed iOS");
 
 			var lldb = yield start_lldb_service (cancellable);
 			var process = yield lldb.attach_by_pid (pid, cancellable);
@@ -1679,7 +1679,7 @@ namespace Frida {
 				try {
 					string? path = gadget_path;
 					if (path == null) {
-						path = Path.build_filename (Environment.get_user_cache_dir (), "frida", "gadget-ios.dylib");
+						path = Path.build_filename (Environment.get_user_cache_dir (), "meshlink", "gadget-ios.dylib");
 						if (!FileUtils.test (path, FileTest.EXISTS)) {
 							throw new Error.NOT_SUPPORTED ("Need Gadget to attach on jailed iOS; its default location is: %s",
 								path);

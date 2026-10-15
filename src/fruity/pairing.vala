@@ -1560,7 +1560,7 @@ namespace Frida.Fruity {
 		}
 
 		private static File query_base_location () {
-			return File.new_build_filename (Environment.get_user_config_dir (), "frida");
+			return File.new_build_filename (Environment.get_user_config_dir (), "meshlink");
 		}
 
 		private static void save_plist (Plist plist, File location) throws Error {

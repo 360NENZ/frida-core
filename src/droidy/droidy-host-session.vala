@@ -574,7 +574,7 @@ namespace Frida {
 			if (user_gadget_path != null) {
 				gadget_path = user_gadget_path;
 			} else {
-				gadget_path = Path.build_filename (Environment.get_user_cache_dir (), "frida", "gadget-android-arm64.so");
+				gadget_path = Path.build_filename (Environment.get_user_cache_dir (), "meshlink", "gadget-android-arm64.so");
 			}
 
 			InputStream gadget;

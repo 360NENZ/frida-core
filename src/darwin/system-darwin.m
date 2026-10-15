@@ -654,7 +654,7 @@ frida_temporary_directory_get_system_tmp (void)
   else
   {
 #ifdef HAVE_MACOS
-    return g_build_filename (g_get_user_cache_dir (), "frida", NULL);
+    return g_build_filename (g_get_user_cache_dir (), "meshlink", NULL);
 #else
     return g_strdup (g_get_tmp_dir ());
 #endif

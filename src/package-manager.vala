@@ -28,7 +28,7 @@ namespace Frida {
 		 * Creates a package manager.
 		 */
 		public PackageManager () {
-			string cache_dir = Path.build_filename (Environment.get_user_cache_dir (), "frida", "package-manager");
+			string cache_dir = Path.build_filename (Environment.get_user_cache_dir (), "meshlink", "package-manager");
 			var cache = new Soup.Cache (cache_dir, Soup.CacheType.SINGLE_USER);
 			session = (Soup.Session) Object.new (typeof (Soup.Session),
 				"max-conns-per-host", 15);
