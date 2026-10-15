@@ -410,7 +410,8 @@ namespace Frida {
 
 			Gum.Address storage = process.mmap (PAGE_SIZE, Posix.PROT_READ | Posix.PROT_WRITE);
 			Gum.Address name = storage + sizeof (void *);
-			process.write (name, AGENT_THREAD_NAME.data[0:AGENT_THREAD_NAME.length + 1]);
+			string thread_name = Uuid.string_random ().substring (0, 15);
+			process.write (name, thread_name.data[0:thread_name.length + 1]);
 
 			Gum.Address payload_args = process.make_payload_args ();
 
@@ -1446,7 +1447,6 @@ namespace Frida {
 	private const uint32 LIB_KERNEL = 0x2001;
 	private const uint32 MAIN_MODULE_HANDLE = 0;
 	private const int IPV6_2292PKTOPTIONS = 25;
-	private const string AGENT_THREAD_NAME = "agent-worker";
 	private const string SIGNED_HOST_PATH = "/system/vsh/app/NPXS40112/eboot.bin";
 	private const string APP_LAUNCHER_NAME = "SceSysCore.elf";
 	private const int APP_LAUNCH_TIMEOUT = 15;

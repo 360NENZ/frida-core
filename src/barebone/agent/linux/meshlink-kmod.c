@@ -25,6 +25,7 @@
 #include <linux/moduleparam.h>
 #include <linux/nsproxy.h>
 #include <linux/poll.h>
+#include <linux/random.h>
 #include <linux/sched.h>
 #include <linux/sched/mm.h>
 #include <linux/seq_file.h>
@@ -656,18 +657,30 @@ meshlink_kmod_panic (const char * message)
   panic ("%s", message);
 }
 
+static void
+meshlink_make_thread_name (char name[TASK_COMM_LEN])
+{
+  u64 nonce;
+
+  get_random_bytes (&nonce, sizeof (nonce));
+  snprintf (name, TASK_COMM_LEN, "%015llx",
+      (unsigned long long) (nonce & 0x0fffffffffffffffULL));
+}
+
 int
 meshlink_kmod_spawn_thread (MeshlinkThreadEntry entry,
                          void * parameter)
 {
   struct meshlink_thread_ctx * ctx;
   struct task_struct * task;
+  char name[TASK_COMM_LEN];
 
   ctx = kmalloc (sizeof (struct meshlink_thread_ctx), GFP_KERNEL);
   ctx->entry = entry;
   ctx->parameter = parameter;
 
-  task = kthread_run (meshlink_thread_trampoline, ctx, "agent-worker");
+  meshlink_make_thread_name (name);
+  task = kthread_run (meshlink_thread_trampoline, ctx, "%s", name);
   if (IS_ERR (task))
     {
       kfree (ctx);
@@ -1186,7 +1199,10 @@ meshlink_adopt_target_context (struct task_struct * leader)
 void
 meshlink_kmod_install_hooks (void)
 {
-  meshlink_op_worker = kthread_run (meshlink_op_worker_fn, NULL, "op-worker");
+  char name[TASK_COMM_LEN];
+
+  meshlink_make_thread_name (name);
+  meshlink_op_worker = kthread_run (meshlink_op_worker_fn, NULL, "%s", name);
 
   meshlink_interceptor = gum_interceptor_obtain ();
 
