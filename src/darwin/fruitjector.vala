@@ -19,7 +19,6 @@ namespace Frida {
 
 		private Gee.HashMap<uint, uint> pid_by_id = new Gee.HashMap<uint, uint> ();
 		private Gee.HashMap<uint, TemporaryFile> blob_file_by_id = new Gee.HashMap<uint, TemporaryFile> ();
-		private uint next_blob_id = 1;
 
 		public Fruitjector (DarwinHelper helper, bool close_helper, TemporaryDirectory tempdir) {
 			Object (helper: helper, close_helper: close_helper, tempdir: tempdir);
@@ -64,7 +63,7 @@ namespace Frida {
 			// We can optimize this later when our mapper is always used instead of dyld
 			FileUtils.chmod (tempdir.path, 0755);
 
-			var name = "blob%u.dylib".printf (next_blob_id++);
+			var name = Uuid.string_random () + ".dylib";
 			var file = new TemporaryFile.from_stream (name, new MemoryInputStream.from_bytes (blob), tempdir);
 
 			var id = yield inject_library_file (pid, file.path, entrypoint, data, cancellable);

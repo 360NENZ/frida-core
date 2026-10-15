@@ -28,7 +28,6 @@ namespace Frida {
 		public uint next_instance_id = 1;
 
 		private Gee.HashMap<uint, TemporaryFile> blob_files = new Gee.HashMap<uint, TemporaryFile> ();
-		private uint next_blob_id = 1;
 
 		private Cancellable io_cancellable = new Cancellable ();
 
@@ -58,7 +57,7 @@ namespace Frida {
 
 		public async uint inject_library_blob (uint pid, Bytes blob, string entrypoint, string data, Cancellable? cancellable)
 				throws Error, IOError {
-			var name = "blob%u.so".printf (next_blob_id++);
+			var name = Uuid.string_random () + ".so";
 			var file = new TemporaryFile.from_stream (name, new MemoryInputStream.from_bytes (blob), resource_store.tempdir);
 			var path = file.path;
 			FileUtils.chmod (path, 0755);
