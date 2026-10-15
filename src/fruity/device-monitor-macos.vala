@@ -8,7 +8,7 @@ namespace Frida.Fruity {
 
 		private XpcClient? pairingd;
 		private Darwin.GCD.DispatchQueue queue =
-			new Darwin.GCD.DispatchQueue ("re.frida.fruity.remotepairing", Darwin.GCD.DispatchQueueAttr.SERIAL);
+			new Darwin.GCD.DispatchQueue ("net.pairing.worker", Darwin.GCD.DispatchQueueAttr.SERIAL);
 
 		public async void start (Cancellable? cancellable) throws IOError {
 			pairingd = XpcClient.make_for_mach_service ("com.apple.CoreDevice.remotepairingd", queue);
