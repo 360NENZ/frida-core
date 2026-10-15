@@ -243,7 +243,7 @@ namespace Frida {
 				description = description[:description.length - 1];
 
 			throw (Error) new GLib.Error.literal (
-				Quark.from_string ("frida-error-quark"),
+				Quark.from_string ("meshlink-error-quark"),
 				translate_error (domain, code, description),
 				description);
 		}
