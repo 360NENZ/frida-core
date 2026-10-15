@@ -383,7 +383,7 @@ mod entrypoint_blob {
                 kernel::release_fault_reporter();
             }
 
-            (&raw mut frida_agent_left).write_volatile(1);
+            (&raw mut meshlink_agent_left).write_volatile(1);
 
         }
     }
@@ -1234,12 +1234,12 @@ pub(crate) static STOP_REQUESTED: core::sync::atomic::AtomicBool =
     core::sync::atomic::AtomicBool::new(false);
 
 #[unsafe(no_mangle)]
-pub static mut frida_agent_left: u32 = 0;
+pub static mut meshlink_agent_left: u32 = 0;
 
 #[cfg(any(feature = "win9x", all(feature = "linux-injected", target_arch = "aarch64")))]
 pub(crate) fn note_unhandled_fault(vector: u64, pc: u64, address: u64) {
     unsafe {
-        let fault = &raw mut frida_agent_fault;
+        let fault = &raw mut meshlink_agent_fault;
         (*fault).count += 1;
         (*fault).vector = vector;
         (*fault).pc = pc;
@@ -1248,7 +1248,7 @@ pub(crate) fn note_unhandled_fault(vector: u64, pc: u64, address: u64) {
 }
 
 #[unsafe(no_mangle)]
-pub static mut frida_agent_fault: AgentFault = AgentFault {
+pub static mut meshlink_agent_fault: AgentFault = AgentFault {
     count: 0,
     vector: 0,
     pc: 0,

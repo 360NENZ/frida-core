@@ -231,9 +231,9 @@ namespace Frida.Barebone {
 			elf.enumerate_symbols (e => {
 				if (e.name == "_start")
 					start_address = base_va + e.address;
-				else if (e.name == "frida_agent_left")
+				else if (e.name == "meshlink_agent_left")
 					left_flag = base_va + e.address;
-				else if (e.name == "frida_agent_fault")
+				else if (e.name == "meshlink_agent_fault")
 					fault_record = base_va + e.address;
 				if (e.type == FUNC && e.size != 0)
 					agent_symbols.add (new AgentSymbol (e.name, base_va + e.address, e.size));
