@@ -18,7 +18,6 @@ namespace Frida {
 		private Gee.HashMap<uint, uint> pid_by_id = new Gee.HashMap<uint, uint> ();
 		private Gee.HashMap<uint, TemporaryFile> blob_file_by_id = new Gee.HashMap<uint, TemporaryFile> ();
 		private uint next_injectee_id = 1;
-		private uint next_blob_id = 1;
 		private bool did_prep_tempdir = false;
 
 		public Linjector (LinuxHelper helper, bool close_helper, TemporaryDirectory tempdir) {
@@ -58,7 +57,7 @@ namespace Frida {
 
 		public async uint inject_library_blob (uint pid, Bytes blob, string entrypoint, string data, Cancellable? cancellable)
 				throws Error, IOError {
-			string name = "blob%u.so".printf (next_blob_id++);
+			string name = Uuid.string_random () + ".so";
 			AgentFeatures features = 0;
 
 			if (MemoryFileDescriptor.is_supported ()) {

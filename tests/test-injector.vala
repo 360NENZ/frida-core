@@ -4,6 +4,10 @@ namespace Frida.InjectorTest {
 			test_dynamic_injection (Frida.Test.Arch.CURRENT);
 		});
 
+#if LINUX
+		GLib.Test.add_func ("/Injector/inject-blob-current-arch", test_blob_injection);
+#endif
+
 		if (can_test_cross_arch_injection) {
 			GLib.Test.add_func ("/Injector/inject-dynamic-other-arch", () => {
 				test_dynamic_injection (Frida.Test.Arch.OTHER);
@@ -85,6 +89,28 @@ namespace Frida.InjectorTest {
 
 		rat.close ();
 	}
+
+#if LINUX
+	private static void test_blob_injection () {
+		var logfile = File.new_for_path (Frida.Test.path_to_temporary_file ("blob-injection.log"));
+		try {
+			logfile.delete ();
+		} catch (GLib.Error delete_error) {
+		}
+		var rat = new Labrat ("sleeper", { "FRIDA_LABRAT_LOGFILE=" + logfile.get_path () });
+
+		rat.inject ("simple-agent", "", Frida.Test.Arch.CURRENT, true);
+		rat.wait_for_uninject ();
+		assert_true (content_of (logfile) == ">m<");
+
+		rat.close ();
+		try {
+			logfile.delete ();
+		} catch (GLib.Error delete_error) {
+			assert_not_reached ();
+		}
+	}
+#endif
 
 	private static void test_resident_injection (Frida.Test.Arch arch) {
 		var logfile = File.new_for_path (Frida.Test.path_to_temporary_file ("resident-injection.log"));
@@ -239,16 +265,17 @@ namespace Frida.InjectorTest {
 			});
 		}
 
-		public void inject (string name, string data, Frida.Test.Arch arch = Frida.Test.Arch.CURRENT) {
+		public void inject (string name, string data, Frida.Test.Arch arch = Frida.Test.Arch.CURRENT,
+				bool blob = false) {
 			var loop = new MainLoop ();
 			Idle.add (() => {
-				perform_injection.begin (name, data, arch, loop);
+				perform_injection.begin (name, data, arch, blob, loop);
 				return false;
 			});
 			loop.run ();
 		}
 
-		private async void perform_injection (string name, string data, Frida.Test.Arch arch, MainLoop loop) {
+		private async void perform_injection (string name, string data, Frida.Test.Arch arch, bool blob, MainLoop loop) {
 			if (injector == null) {
 				injector = Injector.new ();
 				injector.uninjected.connect (on_uninjected);
@@ -258,7 +285,12 @@ namespace Frida.InjectorTest {
 				var path = Frida.Test.Labrats.path_to_library (name, arch);
 				assert_true (FileUtils.test (path, FileTest.EXISTS));
 
-				yield injector.inject_library_file (process.id, path, "frida_agent_main", data);
+				if (blob) {
+					var bytes = File.new_for_path (path).load_bytes (null, null);
+					yield injector.inject_library_blob (process.id, bytes, "frida_agent_main", data);
+				} else {
+					yield injector.inject_library_file (process.id, path, "frida_agent_main", data);
+				}
 			} catch (GLib.Error e) {
 				printerr ("\nFAIL: %s\n\n", e.message);
 				assert_not_reached ();
