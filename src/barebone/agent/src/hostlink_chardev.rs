@@ -27,7 +27,7 @@ unsafe impl Send for Hostlink {}
 
 impl Hostlink {
     pub fn init(on_rx: Option<fn(&[u8])>) -> Result<Self, ()> {
-        if unsafe { frida_kmod_link_open() } != 0 {
+        if unsafe { meshlink_kmod_link_open() } != 0 {
             return Err(());
         }
 
@@ -46,8 +46,8 @@ impl Hostlink {
     pub fn send(&self, payload: &[u8]) {
         let header = (payload.len() as u32).to_le_bytes();
         unsafe {
-            frida_kmod_link_send(header.as_ptr() as *const c_void, header.len());
-            frida_kmod_link_send(payload.as_ptr() as *const c_void, payload.len());
+            meshlink_kmod_link_send(header.as_ptr() as *const c_void, header.len());
+            meshlink_kmod_link_send(payload.as_ptr() as *const c_void, payload.len());
         }
     }
 
@@ -97,25 +97,25 @@ impl Hostlink {
 
 impl Drop for Hostlink {
     fn drop(&mut self) {
-        unsafe { frida_kmod_link_close() };
+        unsafe { meshlink_kmod_link_close() };
     }
 }
 
 #[cfg(feature = "xnu-kext")]
 pub fn a_turn_is_wanted() -> bool {
-    unsafe { frida_kmod_link_pending() }
+    unsafe { meshlink_kmod_link_pending() }
 }
 
 fn recv_nonblocking(dst: &mut [u8]) -> usize {
-    let n = unsafe { frida_kmod_link_recv(dst.as_mut_ptr() as *mut c_void, dst.len()) };
+    let n = unsafe { meshlink_kmod_link_recv(dst.as_mut_ptr() as *mut c_void, dst.len()) };
     if n <= 0 { 0 } else { n as usize }
 }
 
 unsafe extern "C" {
-    fn frida_kmod_link_open() -> c_int;
-    fn frida_kmod_link_close();
-    fn frida_kmod_link_send(data: *const c_void, size: usize) -> c_int;
-    fn frida_kmod_link_recv(data: *mut c_void, size: usize) -> isize;
+    fn meshlink_kmod_link_open() -> c_int;
+    fn meshlink_kmod_link_close();
+    fn meshlink_kmod_link_send(data: *const c_void, size: usize) -> c_int;
+    fn meshlink_kmod_link_recv(data: *mut c_void, size: usize) -> isize;
     #[cfg(feature = "xnu-kext")]
-    fn frida_kmod_link_pending() -> bool;
+    fn meshlink_kmod_link_pending() -> bool;
 }

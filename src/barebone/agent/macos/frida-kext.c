@@ -331,18 +331,18 @@ frida_dev_write (dev_t dev, struct uio * uio, int ioflag)
 }
 
 int
-frida_kmod_link_open (void)
+meshlink_kmod_link_open (void)
 {
   return frida_link.open ? 0 : -1;
 }
 
 void
-frida_kmod_link_close (void)
+meshlink_kmod_link_close (void)
 {
 }
 
 int
-frida_kmod_link_send (const void * data, size_t size)
+meshlink_kmod_link_send (const void * data, size_t size)
 {
   lck_mtx_lock (frida_link.lock);
 
@@ -363,7 +363,7 @@ frida_kmod_link_send (const void * data, size_t size)
 }
 
 bool
-frida_kmod_link_pending (void)
+meshlink_kmod_link_pending (void)
 {
   bool pending;
 
@@ -377,7 +377,7 @@ frida_kmod_link_pending (void)
 }
 
 ssize_t
-frida_kmod_link_recv (void * data, size_t size)
+meshlink_kmod_link_recv (void * data, size_t size)
 {
   size_t n;
 

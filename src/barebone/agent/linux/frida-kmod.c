@@ -286,15 +286,15 @@ extern void gum_interceptor_revert (GumInterceptor * self, void * function_addre
 int frida_agent_start (void);
 void frida_agent_stop (void);
 
-u64 frida_kmod_find_symbol (const char * name);
-u64 frida_kmod_find_function (const char * name);
-void * frida_kmod_remap_writable (u64 first_page, unsigned int n_pages);
-void frida_kmod_unmap_writable (void * mapping);
-unsigned int frida_kmod_wait_prepare (void);
-void frida_kmod_wait_commit (unsigned int seq, s64 timeout_us);
-void frida_kmod_wake (void);
-void frida_kmod_yield (void);
-void frida_kmod_install_hooks (void);
+u64 meshlink_kmod_find_symbol (const char * name);
+u64 meshlink_kmod_find_function (const char * name);
+void * meshlink_kmod_remap_writable (u64 first_page, unsigned int n_pages);
+void meshlink_kmod_unmap_writable (void * mapping);
+unsigned int meshlink_kmod_wait_prepare (void);
+void meshlink_kmod_wait_commit (unsigned int seq, s64 timeout_us);
+void meshlink_kmod_wake (void);
+void meshlink_kmod_yield (void);
+void meshlink_kmod_install_hooks (void);
 
 static void frida_resolve_kallsyms (void);
 static void frida_resolve_kernel_range (void);
@@ -331,11 +331,11 @@ static void * frida_resolve_unexported (const char * name);
 static void * frida_rewind_to_function_entry (void * address);
 static void * frida_unseal_landing_pad (void * address);
 static int frida_thread_trampoline (void * data);
-static void frida_kmod_module_range (struct module * mod, u64 * base, u64 * size);
-static struct module * frida_kmod_module_at (u64 base);
-static const char * frida_kmod_symbol_name (const struct kernel_symbol * sym);
-static u64 frida_kmod_symbol_value (const struct kernel_symbol * sym);
-static int frida_kmod_on_module_state (struct notifier_block * nb, unsigned long action,
+static void meshlink_kmod_module_range (struct module * mod, u64 * base, u64 * size);
+static struct module * meshlink_kmod_module_at (u64 base);
+static const char * meshlink_kmod_symbol_name (const struct kernel_symbol * sym);
+static u64 meshlink_kmod_symbol_value (const struct kernel_symbol * sym);
+static int meshlink_kmod_on_module_state (struct notifier_block * nb, unsigned long action,
     void * data);
 static int frida_dev_open (struct inode * inode, struct file * file);
 static int frida_dev_release (struct inode * inode, struct file * file);
@@ -382,10 +382,10 @@ static u64 frida_kernel_size;
 static typeof (&kallsyms_lookup_name) frida_kallsyms_lookup_name_impl;
 static typeof (&kallsyms_on_each_symbol) frida_kallsyms_on_each_symbol_impl;
 static struct list_head * frida_modules;
-static FridaModuleEventFunc frida_kmod_module_event_func;
-static void * frida_kmod_module_event_data;
-static struct notifier_block frida_kmod_module_notifier = {
-  .notifier_call = frida_kmod_on_module_state,
+static FridaModuleEventFunc meshlink_kmod_module_event_func;
+static void * meshlink_kmod_module_event_data;
+static struct notifier_block meshlink_kmod_module_notifier = {
+  .notifier_call = meshlink_kmod_on_module_state,
 };
 static struct mutex * frida_module_mutex;
 static typeof (&set_memory_ro) frida_set_memory_ro_impl;
@@ -476,7 +476,7 @@ static struct miscdevice frida_dev =
 };
 
 static int __init
-frida_kmod_init (void)
+meshlink_kmod_init (void)
 {
   frida_resolve_kallsyms ();
   frida_resolve_kernel_range ();
@@ -487,14 +487,14 @@ frida_kmod_init (void)
 }
 
 static void __exit
-frida_kmod_exit (void)
+meshlink_kmod_exit (void)
 {
   frida_remove_cloak_hooks ();
   frida_agent_stop ();
 }
 
-module_init (frida_kmod_init);
-module_exit (frida_kmod_exit);
+module_init (meshlink_kmod_init);
+module_exit (meshlink_kmod_exit);
 
 MODULE_LICENSE ("GPL");
 MODULE_DESCRIPTION ("Meshlink instrumentation agent");
@@ -520,10 +520,10 @@ frida_resolve_kallsyms (void)
    * callable but unexported. Being absent from Module.symvers only stops the module
    * loader from resolving them, so go through kallsyms like everything else here.
    */
-  frida_set_memory_ro_impl = (void *) frida_kmod_find_function ("set_memory_ro");
-  frida_set_memory_rw_impl = (void *) frida_kmod_find_function ("set_memory_rw");
-  frida_set_memory_x_impl = (void *) frida_kmod_find_function ("set_memory_x");
-  frida_set_memory_nx_impl = (void *) frida_kmod_find_function ("set_memory_nx");
+  frida_set_memory_ro_impl = (void *) meshlink_kmod_find_function ("set_memory_ro");
+  frida_set_memory_rw_impl = (void *) meshlink_kmod_find_function ("set_memory_rw");
+  frida_set_memory_x_impl = (void *) meshlink_kmod_find_function ("set_memory_x");
+  frida_set_memory_nx_impl = (void *) meshlink_kmod_find_function ("set_memory_nx");
 }
 
 static void
@@ -531,8 +531,8 @@ frida_resolve_kernel_range (void)
 {
   u64 start, end;
 
-  start = frida_kmod_find_symbol ("_stext");
-  end = frida_kmod_find_symbol ("_end");
+  start = meshlink_kmod_find_symbol ("_stext");
+  end = meshlink_kmod_find_symbol ("_end");
   if (start == 0 || end == 0)
     return;
 
@@ -543,24 +543,24 @@ frida_resolve_kernel_range (void)
 static void
 frida_resolve_process_ops (void)
 {
-  frida_find_task_by_vpid_impl = (FridaFindTaskByVpidFunc) frida_kmod_find_function ("find_task_by_vpid");
-  frida_get_task_mm_impl = (FridaGetTaskMmFunc) frida_kmod_find_function ("get_task_mm");
-  frida_mmput_impl = (FridaMmputFunc) frida_kmod_find_function ("mmput");
-  frida_kthread_use_mm_impl = (FridaKthreadUseMmFunc) frida_kmod_find_function ("kthread_use_mm");
-  frida_kthread_unuse_mm_impl = (FridaKthreadUnuseMmFunc) frida_kmod_find_function ("kthread_unuse_mm");
-  frida_vm_mmap_impl = (FridaVmMmapFunc) frida_kmod_find_function ("vm_mmap");
-  frida_vm_munmap_impl = (FridaVmMunmapFunc) frida_kmod_find_function ("vm_munmap");
-  frida_user_mode_thread_impl = (FridaUserModeThreadFunc) frida_kmod_find_function ("user_mode_thread");
-  frida_detach_pid_impl = (FridaDetachPidFunc) frida_kmod_find_function ("detach_pid");
-  frida_free_pids_impl = (FridaFreePidsFunc) frida_kmod_find_function ("free_pids");
-  frida_task_join_group_stop_impl = (FridaTaskJoinGroupStopFunc) frida_kmod_find_function ("task_join_group_stop");
-  frida_cleanup_sighand_impl = (FridaCleanupSighandFunc) frida_kmod_find_function ("__cleanup_sighand");
-  frida_kmem_cache_free_impl = (FridaKmemCacheFreeFunc) frida_kmod_find_function ("kmem_cache_free");
-  frida_put_files_struct_impl = (FridaPutFilesStructFunc) frida_kmod_find_function ("put_files_struct");
-  frida_switch_task_namespaces_impl = (FridaSwitchTaskNamespacesFunc) frida_kmod_find_function ("switch_task_namespaces");
-  frida_free_fs_struct_impl = (FridaFreeFsStructFunc) frida_kmod_find_function ("free_fs_struct");
-  frida_signal_cachep = (struct kmem_cache **) frida_kmod_find_symbol ("signal_cachep");
-  frida_tasklist_lock = (rwlock_t *) frida_kmod_find_symbol ("tasklist_lock");
+  frida_find_task_by_vpid_impl = (FridaFindTaskByVpidFunc) meshlink_kmod_find_function ("find_task_by_vpid");
+  frida_get_task_mm_impl = (FridaGetTaskMmFunc) meshlink_kmod_find_function ("get_task_mm");
+  frida_mmput_impl = (FridaMmputFunc) meshlink_kmod_find_function ("mmput");
+  frida_kthread_use_mm_impl = (FridaKthreadUseMmFunc) meshlink_kmod_find_function ("kthread_use_mm");
+  frida_kthread_unuse_mm_impl = (FridaKthreadUnuseMmFunc) meshlink_kmod_find_function ("kthread_unuse_mm");
+  frida_vm_mmap_impl = (FridaVmMmapFunc) meshlink_kmod_find_function ("vm_mmap");
+  frida_vm_munmap_impl = (FridaVmMunmapFunc) meshlink_kmod_find_function ("vm_munmap");
+  frida_user_mode_thread_impl = (FridaUserModeThreadFunc) meshlink_kmod_find_function ("user_mode_thread");
+  frida_detach_pid_impl = (FridaDetachPidFunc) meshlink_kmod_find_function ("detach_pid");
+  frida_free_pids_impl = (FridaFreePidsFunc) meshlink_kmod_find_function ("free_pids");
+  frida_task_join_group_stop_impl = (FridaTaskJoinGroupStopFunc) meshlink_kmod_find_function ("task_join_group_stop");
+  frida_cleanup_sighand_impl = (FridaCleanupSighandFunc) meshlink_kmod_find_function ("__cleanup_sighand");
+  frida_kmem_cache_free_impl = (FridaKmemCacheFreeFunc) meshlink_kmod_find_function ("kmem_cache_free");
+  frida_put_files_struct_impl = (FridaPutFilesStructFunc) meshlink_kmod_find_function ("put_files_struct");
+  frida_switch_task_namespaces_impl = (FridaSwitchTaskNamespacesFunc) meshlink_kmod_find_function ("switch_task_namespaces");
+  frida_free_fs_struct_impl = (FridaFreeFsStructFunc) meshlink_kmod_find_function ("free_fs_struct");
+  frida_signal_cachep = (struct kmem_cache **) meshlink_kmod_find_symbol ("signal_cachep");
+  frida_tasklist_lock = (rwlock_t *) meshlink_kmod_find_symbol ("tasklist_lock");
 }
 
 static void
@@ -570,8 +570,8 @@ frida_resolve_code_allocator (void)
   FridaExecmemAllocRwFunc alloc_rw;
   FridaExecmemFreeFunc free;
 
-  alloc_rw = (FridaExecmemAllocRwFunc) frida_kmod_find_function ("execmem_alloc_rw");
-  free = (FridaExecmemFreeFunc) frida_kmod_find_function ("execmem_free");
+  alloc_rw = (FridaExecmemAllocRwFunc) meshlink_kmod_find_function ("execmem_alloc_rw");
+  free = (FridaExecmemFreeFunc) meshlink_kmod_find_function ("execmem_free");
   if (alloc_rw == NULL || free == NULL)
     return;
 
@@ -628,32 +628,32 @@ frida_unseal_landing_pad (void * address)
   n_pages = ((((unsigned long) address + ENDBR_INSN_SIZE - 1) & PAGE_MASK)
       - first_page) / PAGE_SIZE + 1;
 
-  alias = frida_kmod_remap_writable (first_page, n_pages);
+  alias = meshlink_kmod_remap_writable (first_page, n_pages);
   if (alias == NULL)
     return address;
 
   *(u32 *) ((u8 *) alias + ((unsigned long) address - first_page)) = gen_endbr ();
 
-  frida_kmod_unmap_writable (alias);
+  meshlink_kmod_unmap_writable (alias);
 #endif
 
   return address;
 }
 
 void
-frida_kmod_log (const char * message)
+meshlink_kmod_log (const char * message)
 {
   printk (KERN_INFO "%s", message);
 }
 
 void
-frida_kmod_panic (const char * message)
+meshlink_kmod_panic (const char * message)
 {
   panic ("%s", message);
 }
 
 int
-frida_kmod_spawn_thread (FridaThreadEntry entry,
+meshlink_kmod_spawn_thread (FridaThreadEntry entry,
                          void * parameter)
 {
   struct frida_thread_ctx * ctx;
@@ -686,7 +686,7 @@ frida_thread_trampoline (void * data)
 }
 
 u64
-frida_kmod_process_alloc (int pid,
+meshlink_kmod_process_alloc (int pid,
                           u64 size,
                           int prot)
 {
@@ -707,7 +707,7 @@ frida_kmod_process_alloc (int pid,
 }
 
 int
-frida_kmod_process_free (int pid,
+meshlink_kmod_process_free (int pid,
                          u64 address,
                          u64 size)
 {
@@ -728,7 +728,7 @@ frida_kmod_process_free (int pid,
 }
 
 u64
-frida_kmod_process_write (int pid,
+meshlink_kmod_process_write (int pid,
                           u64 address,
                           const void * data,
                           u64 size)
@@ -750,7 +750,7 @@ frida_kmod_process_write (int pid,
 }
 
 u64
-frida_kmod_process_read (int pid,
+meshlink_kmod_process_read (int pid,
                          u64 address,
                          void * data,
                          u64 size)
@@ -772,7 +772,7 @@ frida_kmod_process_read (int pid,
 }
 
 int
-frida_kmod_process_spawn_thread (int pid,
+meshlink_kmod_process_spawn_thread (int pid,
                                  u64 entry,
                                  u64 stack,
                                  u64 arg,
@@ -811,7 +811,7 @@ frida_kmod_process_spawn_thread (int pid,
 }
 
 int
-frida_kmod_cloak_add_thread (int tgid, int tid)
+meshlink_kmod_cloak_add_thread (int tgid, int tid)
 {
   int result;
   struct frida_cloak * c;
@@ -851,7 +851,7 @@ beach:
 }
 
 int
-frida_kmod_cloak_remove_thread (int tgid, int tid)
+meshlink_kmod_cloak_remove_thread (int tgid, int tid)
 {
   struct frida_cloak * c;
   unsigned int i;
@@ -877,7 +877,7 @@ frida_kmod_cloak_remove_thread (int tgid, int tid)
 }
 
 int
-frida_kmod_cloak_add_range (int tgid, u64 base, u64 size)
+meshlink_kmod_cloak_add_range (int tgid, u64 base, u64 size)
 {
   int result;
   struct frida_cloak * c;
@@ -912,7 +912,7 @@ beach:
 }
 
 int
-frida_kmod_cloak_remove_range (int tgid, u64 base, u64 size)
+meshlink_kmod_cloak_remove_range (int tgid, u64 base, u64 size)
 {
   struct frida_cloak * c;
   unsigned int i;
@@ -938,7 +938,7 @@ frida_kmod_cloak_remove_range (int tgid, u64 base, u64 size)
 }
 
 int
-frida_kmod_cloak_add_fd (int tgid, int fd)
+meshlink_kmod_cloak_add_fd (int tgid, int fd)
 {
   int result;
   struct frida_cloak * c;
@@ -978,7 +978,7 @@ beach:
 }
 
 int
-frida_kmod_cloak_remove_fd (int tgid, int fd)
+meshlink_kmod_cloak_remove_fd (int tgid, int fd)
 {
   struct frida_cloak * c;
   unsigned int i;
@@ -1180,22 +1180,22 @@ frida_adopt_target_context (struct task_struct * leader)
 }
 
 void
-frida_kmod_install_hooks (void)
+meshlink_kmod_install_hooks (void)
 {
   frida_op_worker = kthread_run (frida_op_worker_fn, NULL, "op-worker");
 
   frida_interceptor = gum_interceptor_obtain ();
 
-  frida_show_map_addr = (void *) frida_kmod_find_symbol ("show_map");
-  frida_show_smap_addr = (void *) frida_kmod_find_symbol ("show_smap");
-  frida_proc_fill_cache_addr = (void *) frida_kmod_find_symbol ("proc_fill_cache");
-  frida_sys_prctl_addr = (void *) frida_kmod_find_symbol (FRIDA_SYSCALL_NAME_PRCTL);
-  frida_proc_pid_status_addr = (void *) frida_kmod_find_symbol ("proc_pid_status");
-  frida_do_task_stat_addr = (void *) frida_kmod_find_symbol ("do_task_stat");
-  frida_release_task_addr = (void *) frida_kmod_find_symbol ("release_task");
-  frida_proc_task_instantiate_addr = (void *) frida_kmod_find_symbol ("proc_task_instantiate");
-  frida_proc_fd_instantiate_addr = (void *) frida_kmod_find_symbol ("proc_fd_instantiate");
-  frida_proc_fdinfo_instantiate_addr = (void *) frida_kmod_find_symbol ("proc_fdinfo_instantiate");
+  frida_show_map_addr = (void *) meshlink_kmod_find_symbol ("show_map");
+  frida_show_smap_addr = (void *) meshlink_kmod_find_symbol ("show_smap");
+  frida_proc_fill_cache_addr = (void *) meshlink_kmod_find_symbol ("proc_fill_cache");
+  frida_sys_prctl_addr = (void *) meshlink_kmod_find_symbol (FRIDA_SYSCALL_NAME_PRCTL);
+  frida_proc_pid_status_addr = (void *) meshlink_kmod_find_symbol ("proc_pid_status");
+  frida_do_task_stat_addr = (void *) meshlink_kmod_find_symbol ("do_task_stat");
+  frida_release_task_addr = (void *) meshlink_kmod_find_symbol ("release_task");
+  frida_proc_task_instantiate_addr = (void *) meshlink_kmod_find_symbol ("proc_task_instantiate");
+  frida_proc_fd_instantiate_addr = (void *) meshlink_kmod_find_symbol ("proc_fd_instantiate");
+  frida_proc_fdinfo_instantiate_addr = (void *) meshlink_kmod_find_symbol ("proc_fdinfo_instantiate");
 
   gum_interceptor_begin_transaction (frida_interceptor);
   gum_interceptor_replace (frida_interceptor, frida_show_map_addr, frida_show_map,
@@ -1325,17 +1325,17 @@ frida_sys_prctl (const struct pt_regs * regs)
   switch (op)
   {
     case FRIDA_CLOAK_OP_ADD_THREAD:
-      return frida_kmod_cloak_add_thread (tgid, arg1);
+      return meshlink_kmod_cloak_add_thread (tgid, arg1);
     case FRIDA_CLOAK_OP_REMOVE_THREAD:
-      return frida_kmod_cloak_remove_thread (tgid, arg1);
+      return meshlink_kmod_cloak_remove_thread (tgid, arg1);
     case FRIDA_CLOAK_OP_ADD_RANGE:
-      return frida_kmod_cloak_add_range (tgid, arg1, arg2);
+      return meshlink_kmod_cloak_add_range (tgid, arg1, arg2);
     case FRIDA_CLOAK_OP_REMOVE_RANGE:
-      return frida_kmod_cloak_remove_range (tgid, arg1, arg2);
+      return meshlink_kmod_cloak_remove_range (tgid, arg1, arg2);
     case FRIDA_CLOAK_OP_ADD_FD:
-      return frida_kmod_cloak_add_fd (tgid, arg1);
+      return meshlink_kmod_cloak_add_fd (tgid, arg1);
     case FRIDA_CLOAK_OP_REMOVE_FD:
-      return frida_kmod_cloak_remove_fd (tgid, arg1);
+      return meshlink_kmod_cloak_remove_fd (tgid, arg1);
     case FRIDA_PROCESS_OP_ALLOC:
       return frida_prctl_alloc (uargs);
     case FRIDA_PROCESS_OP_FREE:
@@ -1458,7 +1458,7 @@ frida_prctl_cloak_thread (const struct frida_cloak_thread_args __user * uargs)
   if (copy_from_user (&args, uargs, sizeof args) != 0)
     return -EFAULT;
 
-  return frida_kmod_cloak_add_thread (args.tgid, args.tid);
+  return meshlink_kmod_cloak_add_thread (args.tgid, args.tid);
 }
 
 static long
@@ -1469,7 +1469,7 @@ frida_prctl_cloak_range (const struct frida_cloak_range_args __user * uargs)
   if (copy_from_user (&args, uargs, sizeof args) != 0)
     return -EFAULT;
 
-  return frida_kmod_cloak_add_range (args.tgid, args.base, args.size);
+  return meshlink_kmod_cloak_add_range (args.tgid, args.base, args.size);
 }
 
 static long
@@ -1516,7 +1516,7 @@ frida_do_alloc (void * data)
 {
   const struct frida_alloc_args * args = data;
 
-  return frida_kmod_process_alloc (args->pid, args->size, args->prot);
+  return meshlink_kmod_process_alloc (args->pid, args->size, args->prot);
 }
 
 static long
@@ -1524,7 +1524,7 @@ frida_do_free (void * data)
 {
   const struct frida_free_args * args = data;
 
-  return frida_kmod_process_free (args->pid, args->address, args->size);
+  return meshlink_kmod_process_free (args->pid, args->address, args->size);
 }
 
 static long
@@ -1532,7 +1532,7 @@ frida_do_write (void * data)
 {
   const struct frida_xfer_job * job = data;
 
-  return frida_kmod_process_write (job->pid, job->address, job->buffer, job->size);
+  return meshlink_kmod_process_write (job->pid, job->address, job->buffer, job->size);
 }
 
 static long
@@ -1540,7 +1540,7 @@ frida_do_read (void * data)
 {
   const struct frida_xfer_job * job = data;
 
-  return frida_kmod_process_read (job->pid, job->address, job->buffer, job->size);
+  return meshlink_kmod_process_read (job->pid, job->address, job->buffer, job->size);
 }
 
 static long
@@ -1548,7 +1548,7 @@ frida_do_spawn (void * data)
 {
   const struct frida_spawn_args * args = data;
 
-  return frida_kmod_process_spawn_thread (args->pid, args->entry, args->stack, args->arg, args->tls);
+  return meshlink_kmod_process_spawn_thread (args->pid, args->entry, args->stack, args->arg, args->tls);
 }
 
 static int __nocfi
@@ -1656,7 +1656,7 @@ frida_do_task_stat (struct seq_file * m,
 static void __nocfi
 frida_release_task (struct task_struct * p)
 {
-  frida_kmod_cloak_remove_thread (p->tgid, p->pid);
+  meshlink_kmod_cloak_remove_thread (p->tgid, p->pid);
   if (p->group_leader == p)
     frida_cloak_forget (p->tgid);
 
@@ -1863,13 +1863,13 @@ frida_cloak_find (pid_t tgid)
 }
 
 void *
-frida_kmod_alloc (size_t size)
+meshlink_kmod_alloc (size_t size)
 {
   return kvmalloc (size, GFP_KERNEL);
 }
 
 void
-frida_kmod_free (void * ptr,
+meshlink_kmod_free (void * ptr,
                  size_t size)
 {
   kvfree (ptr);
@@ -1880,7 +1880,7 @@ frida_kmod_free (void * ptr,
  * which rules out the slab allocator and its sub-page objects.
  */
 void *
-frida_kmod_alloc_code (size_t size)
+meshlink_kmod_alloc_code (size_t size)
 {
   size_t n_bytes = PAGE_ALIGN (size);
 
@@ -1893,7 +1893,7 @@ frida_kmod_alloc_code (size_t size)
 }
 
 void
-frida_kmod_free_code (void * ptr,
+meshlink_kmod_free_code (void * ptr,
                       size_t size)
 {
 #ifdef FRIDA_HAVE_EXECMEM
@@ -1908,7 +1908,7 @@ frida_kmod_free_code (void * ptr,
 }
 
 void
-frida_kmod_own_range (u64 * base,
+meshlink_kmod_own_range (u64 * base,
                       u64 * size)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION (6, 4, 0)
@@ -1927,7 +1927,7 @@ frida_kmod_own_range (u64 * base,
  * length prefix framing is done by the agent, so this is a plain byte stream.
  */
 int
-frida_kmod_link_open (void)
+meshlink_kmod_link_open (void)
 {
   int res;
 
@@ -1957,7 +1957,7 @@ free_to_client:
 }
 
 int
-frida_kmod_link_send (const void * data,
+meshlink_kmod_link_send (const void * data,
                       size_t size)
 {
   unsigned int written;
@@ -1981,7 +1981,7 @@ frida_kmod_link_send (const void * data,
 }
 
 long
-frida_kmod_link_recv (void * data,
+meshlink_kmod_link_recv (void * data,
                       size_t size)
 {
   unsigned int n;
@@ -1994,7 +1994,7 @@ frida_kmod_link_recv (void * data,
 }
 
 void
-frida_kmod_link_close (void)
+meshlink_kmod_link_close (void)
 {
   if (!frida_link_registered)
     return;
@@ -2073,7 +2073,7 @@ frida_dev_write (struct file * file,
   if (res != 0)
     return res;
 
-  frida_kmod_wake ();
+  meshlink_kmod_wake ();
 
   return copied;
 }
@@ -2098,13 +2098,13 @@ frida_dev_poll (struct file * file,
  * so the commit returns immediately instead of sleeping through it.
  */
 unsigned int
-frida_kmod_wait_prepare (void)
+meshlink_kmod_wait_prepare (void)
 {
   return (unsigned int) atomic_read (&frida_wake_seq);
 }
 
 void
-frida_kmod_wait_commit (unsigned int seq,
+meshlink_kmod_wait_commit (unsigned int seq,
                         s64 timeout_us)
 {
   s64 capped_timeout_us;
@@ -2167,7 +2167,7 @@ frida_should_wake (unsigned int seq)
 }
 
 void
-frida_kmod_wake (void)
+meshlink_kmod_wake (void)
 {
   atomic_inc (&frida_wake_seq);
   wake_up_all (&frida_wq);
@@ -2179,7 +2179,7 @@ frida_kmod_wake (void)
  * undiagnosable. Every loop the agent runs calls this.
  */
 void
-frida_kmod_yield (void)
+meshlink_kmod_yield (void)
 {
   if (frida_can_sleep ())
     cond_resched ();
@@ -2188,13 +2188,13 @@ frida_kmod_yield (void)
 }
 
 s64
-frida_kmod_monotonic_micros (void)
+meshlink_kmod_monotonic_micros (void)
 {
   return ktime_to_us (ktime_get ());
 }
 
 void
-frida_kmod_wall_clock_micros (unsigned int * secs,
+meshlink_kmod_wall_clock_micros (unsigned int * secs,
                               unsigned int * micros)
 {
   struct timespec64 ts;
@@ -2208,13 +2208,13 @@ frida_kmod_wall_clock_micros (unsigned int * secs,
 /* Handed to JavaScript as a GumThreadId, so it has to fit in the 48 bits a
  * double represents exactly. */
 u64
-frida_kmod_current_thread_id (void)
+meshlink_kmod_current_thread_id (void)
 {
   return ((u64) (uintptr_t) current) & ((1ULL << 48) - 1);
 }
 
 int
-frida_kmod_protect (u64 address,
+meshlink_kmod_protect (u64 address,
                     size_t size,
                     unsigned int gum_prot)
 {
@@ -2247,7 +2247,7 @@ frida_kmod_protect (u64 address,
  * STRICT_KERNEL_RWX has made read-only.
  */
 void *
-frida_kmod_remap_writable (u64 first_page,
+meshlink_kmod_remap_writable (u64 first_page,
                            unsigned int n_pages)
 {
   struct page ** pages;
@@ -2279,7 +2279,7 @@ frida_kmod_remap_writable (u64 first_page,
 }
 
 void
-frida_kmod_unmap_writable (void * mapping)
+meshlink_kmod_unmap_writable (void * mapping)
 {
   struct frida_writable_alias * alias = NULL, * candidate;
 
@@ -2348,13 +2348,13 @@ frida_flush_icache_range (unsigned long start, unsigned long size)
 }
 
 u64
-frida_kmod_kernel_base (void)
+meshlink_kmod_kernel_base (void)
 {
   return frida_kernel_base;
 }
 
 u64
-frida_kmod_kernel_size (void)
+meshlink_kmod_kernel_size (void)
 {
   return frida_kernel_size;
 }
@@ -2364,7 +2364,7 @@ frida_kmod_kernel_size (void)
  * from kallsyms. Without them we report nothing rather than walk unsynchronised.
  */
 void __nocfi
-frida_kmod_enumerate_modules (FridaFoundModuleFunc func,
+meshlink_kmod_enumerate_modules (FridaFoundModuleFunc func,
                               void * user_data)
 {
   struct module * mod;
@@ -2381,7 +2381,7 @@ frida_kmod_enumerate_modules (FridaFoundModuleFunc func,
       if (mod->state != MODULE_STATE_LIVE)
         continue;
 
-      frida_kmod_module_range (mod, &base, &size);
+      meshlink_kmod_module_range (mod, &base, &size);
 
       if (!func (mod->name, "", base, size, user_data))
         break;
@@ -2391,7 +2391,7 @@ frida_kmod_enumerate_modules (FridaFoundModuleFunc func,
 }
 
 int __nocfi
-frida_kmod_enumerate_module_symbols (u64 base,
+meshlink_kmod_enumerate_module_symbols (u64 base,
                                      FridaFoundModuleSymbolFunc func,
                                      void * user_data)
 {
@@ -2406,7 +2406,7 @@ frida_kmod_enumerate_module_symbols (u64 base,
 
   mutex_lock (frida_module_mutex);
 
-  mod = frida_kmod_module_at (base);
+  mod = meshlink_kmod_module_at (base);
   ks = (mod != NULL) ? rcu_dereference_sched (mod->kallsyms) : NULL;
 
   if (ks != NULL)
@@ -2432,7 +2432,7 @@ frida_kmod_enumerate_module_symbols (u64 base,
 }
 
 int __nocfi
-frida_kmod_enumerate_module_exports (u64 base,
+meshlink_kmod_enumerate_module_exports (u64 base,
                                      FridaFoundModuleExportFunc func,
                                      void * user_data)
 {
@@ -2444,14 +2444,14 @@ frida_kmod_enumerate_module_exports (u64 base,
 
   mutex_lock (frida_module_mutex);
 
-  mod = frida_kmod_module_at (base);
+  mod = meshlink_kmod_module_at (base);
   if (mod != NULL)
     {
       for (i = 0; i != mod->num_syms; i++)
         {
           const struct kernel_symbol * sym = &mod->syms[i];
 
-          if (!func (frida_kmod_symbol_name (sym), frida_kmod_symbol_value (sym), user_data))
+          if (!func (meshlink_kmod_symbol_name (sym), meshlink_kmod_symbol_value (sym), user_data))
             break;
         }
     }
@@ -2462,29 +2462,29 @@ frida_kmod_enumerate_module_exports (u64 base,
 }
 
 void
-frida_kmod_watch_modules (FridaModuleEventFunc func,
+meshlink_kmod_watch_modules (FridaModuleEventFunc func,
                           void * user_data)
 {
-  frida_kmod_module_event_func = func;
-  frida_kmod_module_event_data = user_data;
+  meshlink_kmod_module_event_func = func;
+  meshlink_kmod_module_event_data = user_data;
 
-  register_module_notifier (&frida_kmod_module_notifier);
+  register_module_notifier (&meshlink_kmod_module_notifier);
 }
 
 void
-frida_kmod_unwatch_modules (void)
+meshlink_kmod_unwatch_modules (void)
 {
-  if (frida_kmod_module_event_func == NULL)
+  if (meshlink_kmod_module_event_func == NULL)
     return;
 
-  unregister_module_notifier (&frida_kmod_module_notifier);
+  unregister_module_notifier (&meshlink_kmod_module_notifier);
 
-  frida_kmod_module_event_func = NULL;
-  frida_kmod_module_event_data = NULL;
+  meshlink_kmod_module_event_func = NULL;
+  meshlink_kmod_module_event_data = NULL;
 }
 
 static struct module *
-frida_kmod_module_at (u64 base)
+meshlink_kmod_module_at (u64 base)
 {
   struct module * mod;
 
@@ -2495,7 +2495,7 @@ frida_kmod_module_at (u64 base)
     {
       u64 start, size;
 
-      frida_kmod_module_range (mod, &start, &size);
+      meshlink_kmod_module_range (mod, &start, &size);
       if (start == base)
         return mod;
     }
@@ -2504,7 +2504,7 @@ frida_kmod_module_at (u64 base)
 }
 
 static const char *
-frida_kmod_symbol_name (const struct kernel_symbol * sym)
+meshlink_kmod_symbol_name (const struct kernel_symbol * sym)
 {
 #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
   return offset_to_ptr (&sym->name_offset);
@@ -2514,7 +2514,7 @@ frida_kmod_symbol_name (const struct kernel_symbol * sym)
 }
 
 static u64
-frida_kmod_symbol_value (const struct kernel_symbol * sym)
+meshlink_kmod_symbol_value (const struct kernel_symbol * sym)
 {
 #ifdef CONFIG_HAVE_ARCH_PREL32_RELOCATIONS
   return (u64) (uintptr_t) offset_to_ptr (&sym->value_offset);
@@ -2524,7 +2524,7 @@ frida_kmod_symbol_value (const struct kernel_symbol * sym)
 }
 
 static void
-frida_kmod_module_range (struct module * mod, u64 * base, u64 * size)
+meshlink_kmod_module_range (struct module * mod, u64 * base, u64 * size)
 {
 #if LINUX_VERSION_CODE >= KERNEL_VERSION (6, 4, 0)
   *base = (u64) (uintptr_t) mod->mem[MOD_TEXT].base;
@@ -2536,13 +2536,13 @@ frida_kmod_module_range (struct module * mod, u64 * base, u64 * size)
 }
 
 static int
-frida_kmod_on_module_state (struct notifier_block * nb, unsigned long action, void * data)
+meshlink_kmod_on_module_state (struct notifier_block * nb, unsigned long action, void * data)
 {
   struct module * mod = data;
   u64 base, size;
   int loaded;
 
-  if (frida_kmod_module_event_func == NULL)
+  if (meshlink_kmod_module_event_func == NULL)
     return NOTIFY_DONE;
 
   if (action == MODULE_STATE_LIVE)
@@ -2552,16 +2552,16 @@ frida_kmod_on_module_state (struct notifier_block * nb, unsigned long action, vo
   else
     return NOTIFY_DONE;
 
-  frida_kmod_module_range (mod, &base, &size);
+  meshlink_kmod_module_range (mod, &base, &size);
 
-  frida_kmod_module_event_func (loaded, mod->name, "", base, size,
-      frida_kmod_module_event_data);
+  meshlink_kmod_module_event_func (loaded, mod->name, "", base, size,
+      meshlink_kmod_module_event_data);
 
   return NOTIFY_DONE;
 }
 
 u64
-frida_kmod_find_symbol (const char * name)
+meshlink_kmod_find_symbol (const char * name)
 {
   if (frida_kallsyms_lookup_name_impl == NULL)
     return 0;
@@ -2570,11 +2570,11 @@ frida_kmod_find_symbol (const char * name)
 }
 
 u64
-frida_kmod_find_function (const char * name)
+meshlink_kmod_find_function (const char * name)
 {
   u64 address;
 
-  address = frida_kmod_find_symbol (name);
+  address = meshlink_kmod_find_symbol (name);
   if (address == 0)
     return 0;
 
@@ -2587,7 +2587,7 @@ frida_kmod_find_function (const char * name)
  * an address, so no separate check for that case is needed.
  */
 int
-frida_kmod_symbol_name_from_address (u64 address,
+meshlink_kmod_symbol_name_from_address (u64 address,
                                      char * buffer,
                                      size_t size,
                                      u64 * symbol_address)
@@ -2598,7 +2598,7 @@ frida_kmod_symbol_name_from_address (u64 address,
   sprint_symbol_no_offset (rendered, (unsigned long) address);
   frida_strip_module_suffix (rendered);
 
-  base = frida_kmod_find_symbol (rendered);
+  base = meshlink_kmod_find_symbol (rendered);
   if (base == 0)
     return 0;
 
@@ -2619,7 +2619,7 @@ frida_strip_module_suffix (char * rendered)
 }
 
 int
-frida_kmod_enumerate_symbols (FridaFoundSymbolFunc func,
+meshlink_kmod_enumerate_symbols (FridaFoundSymbolFunc func,
                               void * user_data)
 {
   struct frida_symbol_visit_ctx ctx = { func, user_data };
