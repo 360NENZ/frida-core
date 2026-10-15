@@ -1,7 +1,6 @@
 namespace Frida.Server {
 	private static Application application;
 
-	private const string DEFAULT_DIRECTORY = "io.meshlink.service";
 	private static bool output_version = false;
 	private static string? device_id = null;
 	private static string? listen_address = null;
@@ -197,7 +196,7 @@ namespace Frida.Server {
 
 	private static int run_application (string? device_id, EndpointParameters endpoint_params, ControlServiceOptions options,
 			ReadyHandler on_ready) {
-		TemporaryDirectory.always_use ((directory != null) ? directory : DEFAULT_DIRECTORY);
+		TemporaryDirectory.always_use ((directory != null) ? directory : TemporaryDirectory.make_name ());
 
 		application = new Application (device_id, endpoint_params, options);
 
