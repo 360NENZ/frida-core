@@ -14,9 +14,9 @@
 #include <kern/thread.h>
 #include <ptrauth.h>
 
-extern int frida_agent_start (uint64_t own_base, uint64_t own_size);
-extern void frida_agent_stop (void);
-extern void frida_agent_wake (void);
+extern int meshlink_agent_start (uint64_t own_base, uint64_t own_size);
+extern void meshlink_agent_stop (void);
+extern void meshlink_agent_wake (void);
 
 #define FRIDA_KERNEL_ADDRS(X) \
   X (panic) \
@@ -61,19 +61,19 @@ static const FridaKernelAddr frida_kernel_addrs[] = {
 extern void * frida_kext_init_start __asm ("section$start$__DATA$__mod_init_func");
 extern void * frida_kext_init_end __asm ("section$end$__DATA$__mod_init_func");
 
-const uintptr_t frida_agent_init_start = (uintptr_t) &frida_kext_init_start;
-const uintptr_t frida_agent_init_end = (uintptr_t) &frida_kext_init_end;
+const uintptr_t meshlink_agent_init_start = (uintptr_t) &frida_kext_init_start;
+const uintptr_t meshlink_agent_init_end = (uintptr_t) &frida_kext_init_end;
 
-const uintptr_t frida_agent_private_start = 0;
-const uintptr_t frida_agent_heap_start = 0;
-const uintptr_t frida_agent_relocs_start = 0;
-const uintptr_t frida_agent_relocs_end = 0;
+const uintptr_t meshlink_agent_private_start = 0;
+const uintptr_t meshlink_agent_heap_start = 0;
+const uintptr_t meshlink_agent_relocs_start = 0;
+const uintptr_t meshlink_agent_relocs_end = 0;
 
 typedef int (* FridaProcCallout) (proc_t process, void * argument);
 
-const unsigned frida_agent_disc_thread_continue =
+const unsigned meshlink_agent_disc_thread_continue =
     ptrauth_type_discriminator (thread_continue_t);
-const unsigned frida_agent_disc_proc_callout =
+const unsigned meshlink_agent_disc_proc_callout =
     ptrauth_type_discriminator (FridaProcCallout);
 
 _Static_assert (ptrauth_type_discriminator (thread_continue_t) == 0xd507,
@@ -193,7 +193,7 @@ frida_kext_stop (kmod_info_t * ki, void * d)
 {
   if (frida_running)
   {
-    frida_agent_stop ();
+    meshlink_agent_stop ();
     frida_running = false;
   }
 
@@ -325,7 +325,7 @@ frida_dev_write (dev_t dev, struct uio * uio, int ioflag)
   lck_mtx_unlock (frida_link.lock);
 
   if (result == 0 && frida_running)
-    frida_agent_wake ();
+    meshlink_agent_wake ();
 
   return result;
 }
@@ -433,7 +433,7 @@ frida_dev_ioctl (dev_t dev, u_long cmd, caddr_t data, int fflag, struct proc * p
       if (frida_running)
         return EBUSY;
 
-      if (frida_agent_start (frida_own_base, frida_own_size) != 0)
+      if (meshlink_agent_start (frida_own_base, frida_own_size) != 0)
         return ENOMEM;
 
       frida_running = true;

@@ -139,7 +139,7 @@ endif
 # follows from what the agent defines, and picolibc moves things between releases.
 LIBC := $(AGENT_TARGET_DIR)/libc-trimmed.a
 
-ENTRY_POINTS := frida_agent_start frida_agent_stop \
+ENTRY_POINTS := meshlink_agent_start meshlink_agent_stop \
 	gum_interceptor_obtain gum_interceptor_begin_transaction \
 	gum_interceptor_end_transaction gum_interceptor_replace \
 	gum_interceptor_revert

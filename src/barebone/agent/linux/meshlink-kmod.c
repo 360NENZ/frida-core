@@ -283,9 +283,10 @@ extern int gum_interceptor_replace (GumInterceptor * self, void * function_addre
     void * replacement_function, void * original_function, const void * options);
 extern void gum_interceptor_revert (GumInterceptor * self, void * function_address);
 
-int frida_agent_start (void);
-void frida_agent_stop (void);
+int meshlink_agent_start (u64 own_base, u64 own_size);
+void meshlink_agent_stop (void);
 
+void meshlink_kmod_own_range (u64 * base, u64 * size);
 u64 meshlink_kmod_find_symbol (const char * name);
 u64 meshlink_kmod_find_function (const char * name);
 void * meshlink_kmod_remap_writable (u64 first_page, unsigned int n_pages);
@@ -478,19 +479,22 @@ static struct miscdevice frida_dev =
 static int __init
 meshlink_kmod_init (void)
 {
+  u64 own_base, own_size;
+
   frida_resolve_kallsyms ();
   frida_resolve_kernel_range ();
   frida_resolve_process_ops ();
   frida_resolve_code_allocator ();
 
-  return frida_agent_start ();
+  meshlink_kmod_own_range (&own_base, &own_size);
+  return meshlink_agent_start (own_base, own_size);
 }
 
 static void __exit
 meshlink_kmod_exit (void)
 {
   frida_remove_cloak_hooks ();
-  frida_agent_stop ();
+  meshlink_agent_stop ();
 }
 
 module_init (meshlink_kmod_init);
