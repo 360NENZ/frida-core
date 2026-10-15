@@ -570,7 +570,7 @@ namespace Frida.Gadget {
 	}
 
 	private async void perform_start (Gee.Promise<int>? request) {
-		worker_ignore_scope = new ThreadIgnoreScope (FRIDA_THREAD);
+		worker_ignore_scope = new ThreadIgnoreScope (AGENT_THREAD);
 
 		try {
 			yield controller.start ();

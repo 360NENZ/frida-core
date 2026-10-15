@@ -107,7 +107,7 @@ namespace Frida.Fruity {
 #if !MACOS
 		public async TunnelConnection open_tunnel (InetAddress device_address, NetworkStack netstack,
 				Cancellable? cancellable = null) throws Error, IOError {
-			string? protocol = Environment.get_variable ("FRIDA_FRUITY_TUNNEL_PROTOCOL");
+			string? protocol = Environment.get_variable ("MESHLINK_FRUITY_TUNNEL_PROTOCOL");
 			if (protocol == null)
 				protocol = "tcp";
 

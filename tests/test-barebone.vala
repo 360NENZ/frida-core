@@ -1003,7 +1003,7 @@ namespace Frida.BareboneTest {
 	}
 
 	private BareboneConfig? xnu_config_from_environment (Frida.Test.AsyncHarness h) {
-		string? config_path = Environment.get_variable ("FRIDA_BAREBONE_CONFIG");
+		string? config_path = Environment.get_variable ("MESHLINK_BAREBONE_CONFIG");
 		if (config_path == null) {
 			h.done ();
 			return null;

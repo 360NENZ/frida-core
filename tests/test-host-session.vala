@@ -4532,7 +4532,7 @@ namespace Frida.HostSessionTest {
 					while (waited.elapsed () < 6.0)
 						yield h.process_events ();
 
-					if (Environment.get_variable ("FRIDA_BAREBONE_STAY_IN") == null)
+					if (Environment.get_variable ("MESHLINK_BAREBONE_STAY_IN") == null)
 						yield session.close (cancellable);
 				} catch (GLib.Error e) {
 					printerr ("[*] could not get into %u: %s\n", info.pid, e.message);
@@ -4551,7 +4551,7 @@ namespace Frida.HostSessionTest {
 
 			private static async void inject (Harness h) {
 				if (!GLib.Test.slow ()) {
-					stdout.printf ("<skipping, run in slow mode with FRIDA_BAREBONE_CONFIG set> ");
+					stdout.printf ("<skipping, run in slow mode with MESHLINK_BAREBONE_CONFIG set> ");
 					h.done ();
 					return;
 				}

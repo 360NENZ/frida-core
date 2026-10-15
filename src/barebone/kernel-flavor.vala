@@ -78,7 +78,7 @@ namespace Frida.Barebone {
 			// debugger is attached, which the worker hits in the allocator during gum_init.
 			var arm64 = machine as Arm64Machine;
 			bool leaving_is_safe = arm64 != null && arm64.physical_memory != null
-				&& Environment.get_variable ("FRIDA_BAREBONE_STAY") == null;
+				&& Environment.get_variable ("MESHLINK_BAREBONE_STAY") == null;
 			if (leaving_is_safe) {
 				yield debugger.detach (cancellable);
 				has_left = true;

@@ -71,7 +71,7 @@ half of Gum's platform backend (`gum_xnu.rs` / `gum_windows.rs` / `gum_linux.rs`
 
 ## Development loop
 
-    export FRIDA_BAREBONE_CONFIG=$PWD/etc/xnu.json
+    export MESHLINK_BAREBONE_CONFIG=$PWD/etc/xnu.json
     cargo build --release --features xnu --target aarch64-unknown-none-softfloat \
         && make -C ~/src/frida-python \
         && killall -9 qemu-system-aarch64 && sleep 2 \

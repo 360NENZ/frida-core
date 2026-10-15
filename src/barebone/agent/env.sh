@@ -1,4 +1,4 @@
-export FRIDA_BAREBONE_CONFIG=$PWD/etc/xnu.json
+export MESHLINK_BAREBONE_CONFIG=$PWD/etc/xnu.json
 export PYTHONPATH=$HOME/src/frida-python
 
 sdk=$HOME/src/frida-core/deps/sdk-none-arm64-softfloat_pic

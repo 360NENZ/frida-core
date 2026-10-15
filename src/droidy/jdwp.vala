@@ -811,7 +811,7 @@ namespace Frida.JDWP {
 		ERROR       = (1 << 3);
 
 		public string to_short_string () {
-			return this.to_string ().replace ("FRIDA_JDWP_CLASS_STATUS_", "");
+			return this.to_string ().replace ("MESHLINK_JDWP_CLASS_STATUS_", "");
 		}
 	}
 

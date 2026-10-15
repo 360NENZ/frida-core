@@ -2201,7 +2201,7 @@ namespace Frida {
 	 * {@link DeviceManager.add_barebone_device} to add a device of your own.
 	 *
 	 * The default Barebone device, whose ID is 'barebone', is instead configured through the
-	 * FRIDA_BAREBONE_CONFIG environment variable, which should point to the filesystem path of a
+	 * MESHLINK_BAREBONE_CONFIG environment variable, which should point to the filesystem path of a
 	 * JSON-encoded configuration file.
 	 *
 	 * Example JSON configurations:

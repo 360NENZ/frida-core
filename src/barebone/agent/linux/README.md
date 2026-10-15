@@ -169,7 +169,7 @@ the module loads.
 Serve the Barebone device from a frida-server running on the target, so the `open()`
 happens next to the device node and the host talks to an ordinary frida-server:
 
-    FRIDA_BAREBONE_CONFIG=/data/local/tmp/linux-kmod.json \
+    MESHLINK_BAREBONE_CONFIG=/data/local/tmp/linux-kmod.json \
         frida-server --device barebone -l 127.0.0.1:27042
 
 `etc/linux-kmod.json` is that config. From the host, with `adb forward tcp:27042

@@ -74,7 +74,7 @@ namespace Frida {
 				}
 			}
 
-			unowned string? config_path = Environment.get_variable ("FRIDA_BAREBONE_CONFIG");
+			unowned string? config_path = Environment.get_variable ("MESHLINK_BAREBONE_CONFIG");
 			if (config == null && config_path != null) {
 				try {
 					var config_data = yield FS.read_all_text (File.new_for_path (config_path), cancellable);
