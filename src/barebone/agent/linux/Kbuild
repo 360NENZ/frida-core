@@ -1,4 +1,4 @@
-MODULE_NAME ?= frida-agent
+MODULE_NAME ?= meshlink-agent
 
 obj-m += $(MODULE_NAME).o
 

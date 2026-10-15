@@ -470,7 +470,7 @@ static const struct file_operations frida_dev_fops =
 static struct miscdevice frida_dev =
 {
   .minor = MISC_DYNAMIC_MINOR,
-  .name = "frida",
+  .name = "meshlink",
   .fops = &frida_dev_fops,
   .mode = 0600,
 };
@@ -497,7 +497,7 @@ module_init (frida_kmod_init);
 module_exit (frida_kmod_exit);
 
 MODULE_LICENSE ("GPL");
-MODULE_DESCRIPTION ("Frida instrumentation agent");
+MODULE_DESCRIPTION ("Meshlink instrumentation agent");
 MODULE_VERSION ("1.0.0");
 
 static void
@@ -508,7 +508,7 @@ frida_resolve_kallsyms (void)
 
   if (frida_kallsyms_lookup_name_impl == NULL)
     {
-      printk (KERN_WARNING "frida: kallsyms_lookup_name unavailable\n");
+      printk (KERN_WARNING "meshlink: kallsyms_lookup_name unavailable\n");
       return;
     }
 
@@ -1923,7 +1923,7 @@ frida_kmod_own_range (u64 * base,
 /*
  * The transport is a character device rather than a socket the agent dials out on:
  * userspace decides when to attach, needs no network namespace to reach us, and the
- * relay on the other side is whatever the operator points at /dev/frida. The 4-byte
+ * relay on the other side is whatever the operator points at /dev/meshlink. The 4-byte
  * length prefix framing is done by the agent, so this is a plain byte stream.
  */
 int
@@ -1944,7 +1944,7 @@ frida_kmod_link_open (void)
     goto free_from_client;
   frida_link_registered = true;
 
-  printk (KERN_INFO "frida: listening on /dev/%s\n", frida_dev.name);
+  printk (KERN_INFO "meshlink: listening on /dev/%s\n", frida_dev.name);
 
   return 0;
 

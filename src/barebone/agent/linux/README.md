@@ -7,10 +7,10 @@ loaded from the inside as an ordinary kernel module.
 
 |                   | XNU                                              | Linux                                     |
 |-------------------|--------------------------------------------------|-------------------------------------------|
-| Delivery          | remote stub injects a freestanding ELF           | `insmod frida-agent.ko`                   |
+| Delivery          | remote stub injects a freestanding ELF           | `insmod meshlink-agent.ko`                |
 | Kernel primitives | addresses patched into `.kernel_addrs` by the host | direct calls into `frida-kmod.c`        |
 | Bootstrap config  | GVariant blob written into guest memory          | module parameters                         |
-| Transport         | virtio hostlink or vsock                         | `/dev/frida` character device             |
+| Transport         | virtio hostlink or vsock                         | `/dev/meshlink` character device          |
 | Page permissions  | host rewrites descriptors over the hostlink      | `set_memory_*()`                          |
 | Writable alias    | shadow copy, committed via physical-memory bridge | `vmap()` of the same pages               |
 | Symbols           | table supplied by the host                       | kallsyms                                  |
@@ -140,19 +140,19 @@ The prelink half runs anywhere; the kbuild half needs the x86-64 Linux host abov
 Cross-building from macOS means running that step in a container holding the kernel
 tree.
 
-    adb push src/barebone/agent/linux/frida-agent.ko /data/local/tmp/
+    adb push src/barebone/agent/linux/meshlink-agent.ko /data/local/tmp/
 
 ## Loading
 
-    insmod frida-agent.ko
+    insmod meshlink-agent.ko
 
 The module's init path returns as soon as the worker thread is running — watch
-`dmesg` for `frida: listening on /dev/frida`. `rmmod frida-agent` unwinds in the
+`dmesg` for `meshlink: listening on /dev/meshlink`. `rmmod meshlink-agent` unwinds in the
 reverse order and does not return until the worker is off the module's text.
 
 ## Talking to it
 
-The agent exposes `/dev/frida` and waits: one client at a time, `read`/`write` of the
+The agent exposes `/dev/meshlink` and waits: one client at a time, `read`/`write` of the
 same length-prefixed frames the other transports carry, with `poll` for readiness.
 It never dials out, so there is no network namespace to get right and no ordering
 requirement between loading the module and attaching a client.

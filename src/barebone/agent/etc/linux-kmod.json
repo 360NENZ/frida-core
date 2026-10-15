@@ -2,7 +2,7 @@
   "agent": {
     "transport": {
       "type": "device",
-      "path": "/dev/frida"
+      "path": "/dev/meshlink"
     }
   }
 }

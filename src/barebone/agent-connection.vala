@@ -81,7 +81,7 @@ namespace Frida.Barebone {
 
 		/**
 		 * Attaches to an agent already resident in the target, which brought its own
-		 * transport with it, such as the Linux kernel module exposing /dev/frida.
+		 * transport with it, such as the Linux kernel module exposing /dev/meshlink.
 		 */
 		public static async AgentConnection open_resident (IOStream stream, Cancellable? cancellable)
 				throws Error, IOError {

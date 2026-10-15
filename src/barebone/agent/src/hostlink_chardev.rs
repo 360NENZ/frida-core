@@ -1,4 +1,4 @@
-// Linux transport: /dev/frida, framed the same way as the XNU hostlinks (4-byte
+// Linux transport: /dev/meshlink, framed the same way as the XNU hostlinks (4-byte
 // little-endian length prefix) so the host-side (yqv) protocol is identical across
 // every transport.
 //

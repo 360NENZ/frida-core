@@ -771,13 +771,13 @@ PORT_NAME = "frida"
 PORT_PATH = "/dev/vport0p1"
 
 BRIDGE = [
-    "exec 3<> /dev/frida",
+    "exec 3<> /dev/meshlink",
     f"exec 4<> {PORT_PATH}",
     "while :; do cat <&3 >&4; done &",
     "while :; do cat <&4 >&3; sleep 1; done &",
 ]
 
-AGENT_READY_MARKER = "frida: listening on /dev/"
+AGENT_READY_MARKER = "meshlink: listening on /dev/"
 LIVE_READY_MARKER = "recovery shell launched"
 
 LINK_ANSWER_MARKER = "frida-link "

@@ -201,7 +201,7 @@ pub fn spawn_thread(entry: ThreadEntry, parameter: *mut c_void) -> isize {
             te,
             trampoline as *mut c_void,
             NUMA_NO_NODE,
-            c"frida".as_ptr(),
+            c"meshlink-worker".as_ptr(),
         );
         _wake_up_process(task);
 
@@ -439,7 +439,7 @@ fn waiters() -> *mut c_void {
 
     if !WAITERS_CLAIMED.swap(true, Ordering::AcqRel) {
         unsafe {
-            ___init_waitqueue_head(queue, c"frida".as_ptr(), (&raw mut WAITERS_KEY) as *mut c_void)
+            ___init_waitqueue_head(queue, c"meshlink-wait".as_ptr(), (&raw mut WAITERS_KEY) as *mut c_void)
         };
         WAITERS_READY.store(true, Ordering::Release);
     }
@@ -628,7 +628,7 @@ pub fn install_interrupt_handler(
             interrupt_entry(),
             None,
             IRQF_SHARED,
-            c"frida".as_ptr(),
+            c"meshlink-irq".as_ptr(),
             target,
         )
     }

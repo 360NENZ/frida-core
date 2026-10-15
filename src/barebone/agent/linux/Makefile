@@ -1,4 +1,4 @@
-# Builds frida-agent.ko in two steps, because kbuild insists on owning the final
+# Builds meshlink-agent.ko in two steps, because kbuild insists on owning the final
 # link:
 #
 #   1. Collapse the Rust staticlib plus everything it needs — the GumJS devkit and
@@ -158,7 +158,7 @@ all: modules
 
 # A module that dies in its init path is left wedged under its own name until the
 # next boot, so bring-up wants a fresh one per attempt.
-MODULE_NAME ?= frida-agent
+MODULE_NAME ?= meshlink-agent
 
 modules: $(PRELINKED)
 	$(MAKE) -C $(KDIR) $(if $(KOUT),O=$(KOUT)) M=$(CURDIR) ARCH=$(ARCH) \
