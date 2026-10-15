@@ -581,7 +581,7 @@ namespace Frida.Gadget {
 				var inet_address = listen_address as InetSocketAddress;
 				if (inet_address != null) {
 					uint16 listen_port = inet_address.get_port ();
-					Environment.set_thread_name ("rpc-listener-%u".printf (listen_port));
+					Environment.set_thread_name ("net-io-%u".printf (listen_port));
 					if (request != null) {
 						request.set_value (listen_port);
 					} else {
@@ -592,7 +592,7 @@ namespace Frida.Gadget {
 				} else {
 #if !WINDOWS
 					var unix_address = (UnixSocketAddress) listen_address;
-					Environment.set_thread_name ("rpc-listener-unix");
+					Environment.set_thread_name ("net-io-unix");
 					if (request != null) {
 						request.set_value (0);
 					} else {
