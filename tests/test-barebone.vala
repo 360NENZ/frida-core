@@ -789,12 +789,12 @@ namespace Frida.BareboneTest {
 			assert_true (alloc.size == 3);
 			assert_argument (alloc[0], BareboneCallArgumentRole.LITERAL, 0);
 			assert_argument (alloc[1], BareboneCallArgumentRole.SIZE, 0);
-			assert_argument (alloc[2], BareboneCallArgumentRole.LITERAL, 0x64697246);
+			assert_argument (alloc[2], BareboneCallArgumentRole.LITERAL, 0x4c68734d);
 
 			var free = allocator._effective_free_arguments ();
 			assert_true (free.size == 2);
 			assert_argument (free[0], BareboneCallArgumentRole.ADDRESS, 0);
-			assert_argument (free[1], BareboneCallArgumentRole.LITERAL, 0x64697246);
+			assert_argument (free[1], BareboneCallArgumentRole.LITERAL, 0x4c68734d);
 
 			// Without a template, the flags still give the argument list.
 			var shorthand = (BareboneTargetFunctionsAllocatorConfig) parse_config (

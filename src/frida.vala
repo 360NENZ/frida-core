@@ -2245,9 +2245,9 @@ namespace Frida {
 	 *    "allocator": {
 	 *      "mode": "target-functions",
 	 *      "alloc_function": "0x804e1000",
-	 *      "alloc_arguments": [ "0", "size", "0x64697246" ],
+	 *      "alloc_arguments": [ "0", "size", "0x4c68734d" ],
 	 *      "free_function": "0x804e2000",
-	 *      "free_arguments": [ "address", "0x64697246" ]
+	 *      "free_arguments": [ "address", "0x4c68734d" ]
 	 *    }
 	 *  }
 	 *
@@ -2587,7 +2587,7 @@ namespace Frida {
 		}
 
 		/** Full argument list for alloc_function, for allocators that don't take the size first.
-		 * NT's ExAllocatePoolWithTag(pool_type, size, tag) is ["0", "size", "0x64697246"].
+		 * NT's ExAllocatePoolWithTag(pool_type, size, tag) is ["0", "size", "0x4c68734d"].
 		 * Defaults to ["size", alloc_flags]. */
 		internal Gee.List<BareboneCallArgument>? alloc_arguments {
 			get;
@@ -2610,7 +2610,7 @@ namespace Frida {
 
 		/**
 		 * Adds an argument to pass to alloc_function, for allocators that don't take the size
-		 * first. NT's ExAllocatePoolWithTag(pool_type, size, tag) is ["0", "size", "0x64697246"].
+		 * first. NT's ExAllocatePoolWithTag(pool_type, size, tag) is ["0", "size", "0x4c68734d"].
 		 *
 		 * @param argument the argument to add
 		 */

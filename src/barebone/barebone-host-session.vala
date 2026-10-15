@@ -502,7 +502,7 @@ namespace Frida {
 		}
 
 		private const uint64 NON_PAGED_POOL = 0;
-		private const uint64 POOL_TAG = 0x64697246;
+		private const uint64 POOL_TAG = 0x4c68734d;
 
 		public async void destroy (HostSession session, Cancellable? cancellable) throws Error, IOError {
 			if (session != host_session)

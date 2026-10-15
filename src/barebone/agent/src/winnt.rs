@@ -119,7 +119,7 @@ pub fn free_dma(ptr: *mut u8, size: usize) {
 }
 
 const NON_PAGED_POOL: u32 = 0;
-const POOL_TAG: u32 = 0x6469_7246;
+const POOL_TAG: u32 = 0x4c68_734d;
 
 // The host enters on a thread that waits in a system service. The IRQL is PASSIVE_LEVEL and
 // the kernel stack is complete.
