@@ -64,12 +64,13 @@ namespace Frida {
 			var blob64 = Frida.Data.Agent.get_runtime_64_so_blob ();
 			var emulated_arm = Frida.Data.Agent.get_runtime_arm_so_blob ();
 			var emulated_arm64 = Frida.Data.Agent.get_runtime_arm64_so_blob ();
-			agent = new AgentDescriptor (PathTemplate ("runtime-<arch>.so"),
+			string agent_basename = Uuid.string_random ();
+			agent = new AgentDescriptor (PathTemplate (agent_basename + "-<arch>.so"),
 				new Bytes.static (blob32.data),
 				new Bytes.static (blob64.data),
 				new AgentResource[] {
-					new AgentResource ("runtime-arm.so", new Bytes.static (emulated_arm.data), tempdir),
-					new AgentResource ("runtime-arm64.so", new Bytes.static (emulated_arm64.data), tempdir),
+					new AgentResource (agent_basename + "-arm.so", new Bytes.static (emulated_arm.data), tempdir),
+					new AgentResource (agent_basename + "-arm64.so", new Bytes.static (emulated_arm64.data), tempdir),
 				},
 				AgentMode.INSTANCED,
 				tempdir);
@@ -427,18 +428,19 @@ namespace Frida {
 		}
 
 		protected override string? get_emulated_agent_path (uint pid) throws Error {
-			unowned string name;
+			unowned string arch_name;
 			switch (cpu_type_from_pid (pid)) {
 				case Gum.CpuType.IA32:
-					name = "runtime-arm.so";
+					arch_name = "arm";
 					break;
 				case Gum.CpuType.AMD64:
-					name = "runtime-arm64.so";
+					arch_name = "arm64";
 					break;
 				default:
 					throw new Error.NOT_SUPPORTED ("Emulated realm is not supported on this architecture");
 			}
 
+			string name = agent.name_template.expand (arch_name);
 			AgentResource? resource = agent.resources.first_match (r => r.name == name);
 			if (resource == null)
 				throw new Error.NOT_SUPPORTED ("Unable to handle emulated processes due to build configuration");
