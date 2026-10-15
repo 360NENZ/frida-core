@@ -121,7 +121,7 @@ fn compile_version_note(out_dir: &Path, cc: &Path, cc_args: &[&str], arch: &str)
         .filter(|v| !v.is_empty())
         .unwrap_or_else(|| "0.0.0".to_string());
     let payload = format!(
-        "{{\"type\":\"frida\",\"name\":\"frida-barebone-agent\",\
+        "{{\"type\":\"meshlink\",\"name\":\"meshlink-barebone-agent\",\
          \"version\":\"{version}\",\"architecture\":\"{arch}\"}}"
     );
 

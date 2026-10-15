@@ -2587,12 +2587,12 @@ fn report_unhandled_fault(fault: u32, eip: u32) {
 
     crate::note_unhandled_fault(fault as u64, eip as u64, address as u64);
 
-    log("frida: unhandled fault in the agent\n");
-    log("frida:   vector ");
+    log("meshlink: unhandled fault in the agent\n");
+    log("meshlink:   vector ");
     log_hex(fault);
-    log("frida:   eip ");
+    log("meshlink:   eip ");
     log_hex(eip);
-    log("frida:   address ");
+    log("meshlink:   address ");
     log_hex(address);
 }
 

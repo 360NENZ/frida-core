@@ -547,7 +547,7 @@ pub extern "C" fn _g_system_thread_create(
     data: gpointer,
 ) -> *mut GSystemThread {
     unsafe {
-        crate::kernel::log("frida: glib is creating a thread\n\0");
+        crate::kernel::log("meshlink: glib is creating a thread\n\0");
 
         let system_thread = crate::kernel::alloc(core::mem::size_of::<SystemThreadImpl>()) as *mut SystemThreadImpl;
 

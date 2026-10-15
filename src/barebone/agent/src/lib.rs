@@ -602,7 +602,7 @@ mod entrypoint_xnu_kext {
 
     #[unsafe(no_mangle)]
     pub extern "C" fn frida_agent_start(own_base: u64, own_size: u64) -> c_int {
-        kernel::log("frida: agent starting\n\0");
+        kernel::log("meshlink: agent starting\n\0");
 
         unsafe {
             OWN_RANGE = GumMemoryRange {
@@ -612,7 +612,7 @@ mod entrypoint_xnu_kext {
         }
 
         if kernel::spawn_thread(worker, ptr::null_mut()) != 0 {
-            kernel::log("frida: failed to spawn worker\n\0");
+            kernel::log("meshlink: failed to spawn worker\n\0");
             return -1;
         }
 
@@ -621,7 +621,7 @@ mod entrypoint_xnu_kext {
 
     #[unsafe(no_mangle)]
     pub extern "C" fn frida_agent_stop() {
-        kernel::log("frida: agent stopping\n\0");
+        kernel::log("meshlink: agent stopping\n\0");
 
         STOP_REQUESTED.store(true, Ordering::Release);
 
@@ -634,7 +634,7 @@ mod entrypoint_xnu_kext {
             );
         }
 
-        kernel::log("frida: agent stopped\n\0");
+        kernel::log("meshlink: agent stopped\n\0");
     }
 
     #[unsafe(no_mangle)]
@@ -658,7 +658,7 @@ mod entrypoint_xnu_kext {
             match hostlink_chardev::Hostlink::init(Some(on_frame_from_host)) {
                 Ok(hostlink) => transport_set(Transport::CharDevice(hostlink)),
                 Err(_) => {
-                    kernel::log("frida: no one to answer\n\0");
+                    kernel::log("meshlink: no one to answer\n\0");
                     WORKER_EXITED.store(true, Ordering::Release);
                     return;
                 }
@@ -693,7 +693,7 @@ mod entrypoint_linux {
     /// up Gum plus connecting to the host both block.
     #[unsafe(no_mangle)]
     pub extern "C" fn frida_agent_start(own_base: u64, own_size: u64) -> c_int {
-        kernel::log("frida: agent starting\n\0");
+        kernel::log("meshlink: agent starting\n\0");
 
         unsafe {
             OWN_RANGE = GumMemoryRange {
@@ -703,7 +703,7 @@ mod entrypoint_linux {
         }
 
         if kernel::spawn_thread(worker, ptr::null_mut()) != 0 {
-            kernel::log("frida: failed to spawn worker\n\0");
+            kernel::log("meshlink: failed to spawn worker\n\0");
             return -1;
         }
 
@@ -714,7 +714,7 @@ mod entrypoint_linux {
     /// is off our text — the module's pages go away right after.
     #[unsafe(no_mangle)]
     pub extern "C" fn frida_agent_stop() {
-        kernel::log("frida: agent stopping\n\0");
+        kernel::log("meshlink: agent stopping\n\0");
 
         STOP_REQUESTED.store(true, Ordering::Release);
 
@@ -727,7 +727,7 @@ mod entrypoint_linux {
             );
         }
 
-        kernel::log("frida: agent stopped\n\0");
+        kernel::log("meshlink: agent stopped\n\0");
     }
 
     pub fn stop_requested() -> bool {
@@ -736,7 +736,7 @@ mod entrypoint_linux {
 
     unsafe extern "C" fn worker(_parameter: *mut c_void, _wait_result: i32) {
         unsafe {
-            kernel::log("frida: worker entry\n\0");
+            kernel::log("meshlink: worker entry\n\0");
 
             crate::run_constructors();
             init_gum();
@@ -746,7 +746,7 @@ mod entrypoint_linux {
             match hostlink_chardev::Hostlink::init(Some(on_frame_from_host)) {
                 Ok(hostlink) => transport_set(Transport::CharDevice(hostlink)),
                 Err(_) => {
-                    kernel::log("frida: failed to connect to peer\n\0");
+                    kernel::log("meshlink: failed to connect to peer\n\0");
                     WORKER_EXITED.store(true, Ordering::Release);
                     return;
                 }
@@ -2751,7 +2751,7 @@ pub(crate) unsafe extern "C" fn frida_panic_handler(
     _user_data: *mut c_void,
 ) {
     let msg = unsafe { CStr::from_ptr(message).to_str().unwrap() };
-    panic!("[Frida] {}", msg);
+    panic!("[Meshlink] {}", msg);
 }
 
 pub(crate) unsafe extern "C" fn frida_log_handler(
@@ -2761,7 +2761,7 @@ pub(crate) unsafe extern "C" fn frida_log_handler(
     _user_data: *mut c_void,
 ) {
     let msg = unsafe { CStr::from_ptr(message).to_str().unwrap() };
-    kprintln!("[Frida] {}", msg);
+    kprintln!("[Meshlink] {}", msg);
 }
 
 #[panic_handler]
