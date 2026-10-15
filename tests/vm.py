@@ -508,8 +508,8 @@ def boot_kmod_guest(args):
         if args.socket is not None:
             channel = [
                 "-device", "virtio-serial",
-                "-chardev", f"socket,id=frida,path={args.socket},server=on,wait=off",
-                "-device", f"virtserialport,chardev=frida,name={port}",
+                "-chardev", f"socket,id=meshlink,path={args.socket},server=on,wait=off",
+                "-device", f"virtserialport,chardev=meshlink,name={port}",
             ]
 
         process = subprocess.Popen([
@@ -727,9 +727,9 @@ KMOD_GUEST_ARCH = "x86_64"
 
 BUSYBOX_URL = "https://busybox.net/downloads/binaries/1.35.0-x86_64-linux-musl/busybox"
 
-VIRTIO_SERIAL_ID = "frida-vserial"
+VIRTIO_SERIAL_ID = "meshlink-vserial"
 
-GDB_ID = "frida-gdb"
+GDB_ID = "meshlink-gdb"
 
 # Newest model that boots 95; older ones lack the CMOVs the agent emits.
 class WindowsGuest(NamedTuple):
@@ -751,7 +751,7 @@ WINDOWS_GUESTS = {
                             None),
 }
 
-DEBUGCON_ID = "frida-debugcon"
+DEBUGCON_ID = "meshlink-debugcon"
 DEBUGCON_PORT = 0xe9
 
 SNAPSHOT_NAME = "booted"
@@ -767,7 +767,7 @@ PORT_REMOVAL_POLL_SECONDS = 0.1
 QMP_CONNECT_TIMEOUT_SECONDS = 60
 QMP_CONNECT_POLL_SECONDS = 0.5
 
-PORT_NAME = "frida"
+PORT_NAME = "meshlink"
 PORT_PATH = "/dev/vport0p1"
 
 BRIDGE = [
@@ -780,21 +780,21 @@ BRIDGE = [
 AGENT_READY_MARKER = "meshlink: listening on /dev/"
 LIVE_READY_MARKER = "recovery shell launched"
 
-LINK_ANSWER_MARKER = "frida-link "
+LINK_ANSWER_MARKER = "meshlink-link "
 
 LET_THE_LINK_GO = (
-    "tag=frida; echo virtio0 > /sys/bus/virtio/drivers/virtio_console/unbind; "
+    "tag=meshlink; echo virtio0 > /sys/bus/virtio/drivers/virtio_console/unbind; "
     "echo $tag-link-gone"
 )
 
-LINK_GONE_MARKER = "frida-link-gone"
+LINK_GONE_MARKER = "meshlink-link-gone"
 
 WHERE_THE_LINK_IS = (
-    "tag=frida; echo $tag-link "
+    "tag=meshlink; echo $tag-link "
     "$(basename $(readlink -f /sys/bus/virtio/devices/virtio0/..) | cut -d. -f1) "
     "$(awk '/virtio0/{sub(/:/,\"\",$1); print $1}' /proc/interrupts)"
 )
-MODULE_LOAD_FAILED_MARKER = "frida-kmod-load-failed"
+MODULE_LOAD_FAILED_MARKER = "meshlink-kmod-load-failed"
 
 SLEPT_WHERE_FORBIDDEN_MARKER = "Voluntary context switch within RCU"
 

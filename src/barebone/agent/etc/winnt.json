@@ -9,7 +9,7 @@
     "transport": {
       "type": "hostlink",
       "qmp": "unix:/tmp/qmp.sock",
-      "bus": "frida-vserial.0"
+      "bus": "meshlink-vserial.0"
     }
   }
 }
