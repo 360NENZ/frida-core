@@ -1119,6 +1119,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkInjectorPayloadId", lower_case_cprefix = "meshlink_injector_payload_id_")]
 	public struct InjectorPayloadId {
 		public uint handle;
 
@@ -2036,6 +2037,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkAgentSessionId", lower_case_cprefix = "meshlink_agent_session_id_")]
 	public struct AgentSessionId {
 		public string handle;
 
@@ -2056,6 +2058,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkChannelId", lower_case_cprefix = "meshlink_channel_id_")]
 	public struct ChannelId {
 		public string handle;
 
@@ -2076,6 +2079,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkServiceSessionId", lower_case_cprefix = "meshlink_service_session_id_")]
 	public struct ServiceSessionId {
 		public string handle;
 
@@ -2096,6 +2100,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkAgentScriptId", lower_case_cprefix = "meshlink_agent_script_id_")]
 	public struct AgentScriptId {
 		public uint handle;
 
@@ -2307,6 +2312,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cname = "MeshlinkPortalMembershipId", lower_case_cprefix = "meshlink_portal_membership_id_")]
 	public struct PortalMembershipId {
 		public uint handle;
 
