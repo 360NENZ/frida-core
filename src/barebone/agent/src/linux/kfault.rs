@@ -439,7 +439,7 @@ const PROLOGUE: [u32; 4] = [0xd503233f, 0xa9be7bfd, 0x910003fd, 0xa90153f3];
 
 #[cfg(target_arch = "aarch64")]
 #[unsafe(no_mangle)]
-static mut FRIDA_ARM64_ORIGINAL_CONT: u64 = 0;
+static mut MESHLINK_ARM64_ORIGINAL_CONT: u64 = 0;
 
 #[cfg(target_arch = "aarch64")]
 pub fn install() {
@@ -450,9 +450,9 @@ pub fn install() {
         }
     }
 
-    unsafe { FRIDA_ARM64_ORIGINAL_CONT = target.add(4) as u64 };
+    unsafe { MESHLINK_ARM64_ORIGINAL_CONT = target.add(4) as u64 };
 
-    let jump = detour_to(frida_arm64_fixup as *const () as usize);
+    let jump = detour_to(meshlink_arm64_fixup as *const () as usize);
     unsafe {
         let addr = target as *mut u32;
         _aarch64_insn_patch_text_nosync(addr.add(2) as *mut c_void, jump[2]);
@@ -479,8 +479,8 @@ fn detour_to(destination: usize) -> [u32; 4] {
 
 #[cfg(target_arch = "aarch64")]
 core::arch::global_asm!(
-    ".globl frida_arm64_call_original",
-    "frida_arm64_call_original:",
+    ".globl meshlink_arm64_call_original",
+    "meshlink_arm64_call_original:",
     "paciasp",
     "stp x29, x30, [sp, #-32]!",
     "mov x29, sp",
@@ -489,20 +489,20 @@ core::arch::global_asm!(
     "add x16, x16, :lo12:{cont}",
     "ldr x16, [x16]",
     "br x16",
-    cont = sym FRIDA_ARM64_ORIGINAL_CONT,
+    cont = sym MESHLINK_ARM64_ORIGINAL_CONT,
 );
 
 #[cfg(target_arch = "aarch64")]
 unsafe extern "C" {
-    fn frida_arm64_call_original(regs: *mut c_void) -> c_int;
+    fn meshlink_arm64_call_original(regs: *mut c_void) -> c_int;
 }
 
 #[cfg(target_arch = "aarch64")]
-unsafe extern "C" fn frida_arm64_fixup(regs: *mut c_void) -> c_int {
+unsafe extern "C" fn meshlink_arm64_fixup(regs: *mut c_void) -> c_int {
     if unsafe { recovered(regs) } {
         return 1;
     }
-    unsafe { frida_arm64_call_original(regs) }
+    unsafe { meshlink_arm64_call_original(regs) }
 }
 
 #[cfg(target_arch = "aarch64")]

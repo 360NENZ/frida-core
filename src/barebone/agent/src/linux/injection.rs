@@ -233,7 +233,7 @@ fn make_the_code_executable(base: usize, size: usize) -> Option<()> {
     unsafe {
         let apply = _apply_to_existing_page_range?;
         let clean_to_unification = _caches_clean_inval_pou?;
-        if apply(memory, base, size, frida_pte_exec_trampoline, ptr::null_mut()) != 0 {
+        if apply(memory, base, size, meshlink_pte_exec_trampoline, ptr::null_mut()) != 0 {
             return None;
         }
         clean_to_unification(base, base + size);
@@ -247,9 +247,9 @@ core::arch::global_asm!(
     ".pushsection .text,\"ax\",%progbits",
     ".balign 4",
     ".word 0xa8320d42",
-    ".globl frida_pte_exec_trampoline",
-    ".type frida_pte_exec_trampoline,%function",
-    "frida_pte_exec_trampoline:",
+    ".globl meshlink_pte_exec_trampoline",
+    ".type meshlink_pte_exec_trampoline,%function",
+    "meshlink_pte_exec_trampoline:",
     "bti c",
     "b {inner}",
     ".popsection",
@@ -258,7 +258,7 @@ core::arch::global_asm!(
 
 #[cfg(target_arch = "aarch64")]
 unsafe extern "C" {
-    fn frida_pte_exec_trampoline(pte: *mut c_void, address: usize, data: *mut c_void) -> c_int;
+    fn meshlink_pte_exec_trampoline(pte: *mut c_void, address: usize, data: *mut c_void) -> c_int;
 }
 
 #[cfg(target_arch = "aarch64")]

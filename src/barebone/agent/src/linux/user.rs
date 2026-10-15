@@ -8,12 +8,12 @@ use super::arena::{Arena, FAULT_ADDRESS, FAULT_KIND, FAULT_LR, FAULT_PC, WOKEN};
 use super::facade::Primitives;
 
 pub fn entry_offset() -> usize {
-    (frida_linux_user_entry as *const () as usize) - crate::own_range().0
+    (meshlink_linux_user_entry as *const () as usize) - crate::own_range().0
 }
 
 // The copy's first word in the address space it was placed in: it says it is up, and from then
 // on it sleeps until the kernel half has something for it. Nothing here looks at a clock.
-pub extern "C" fn frida_linux_user_entry(begins: usize) -> ! {
+pub extern "C" fn meshlink_linux_user_entry(begins: usize) -> ! {
     let arena = Arena::at(begins);
 
     super::facade::select_user();
@@ -425,9 +425,9 @@ unsafe fn start_thread(stack: usize, carried: usize) -> isize {
 
 #[cfg(target_arch = "x86")]
 core::arch::global_asm!(
-    ".globl frida_start_thread",
-    ".hidden frida_start_thread",
-    "frida_start_thread:",
+    ".globl meshlink_start_thread",
+    ".hidden meshlink_start_thread",
+    "meshlink_start_thread:",
     "push ebp",
     "push ebx",
     "push esi",
@@ -454,7 +454,7 @@ core::arch::global_asm!(
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    fn frida_start_thread(number: usize, flags: usize, launch: usize) -> isize;
+    fn meshlink_start_thread(number: usize, flags: usize, launch: usize) -> isize;
 }
 
 #[cfg(target_arch = "x86")]
@@ -464,7 +464,7 @@ unsafe fn start_thread(stack: usize, carried: usize) -> isize {
         (launch as *mut usize).write(enter_thread as *const () as usize);
         ((launch + 4) as *mut usize).write(carried);
 
-        frida_start_thread(CLONE, THREAD_FLAGS, launch)
+        meshlink_start_thread(CLONE, THREAD_FLAGS, launch)
     }
 }
 
@@ -1299,9 +1299,9 @@ fn syscall(number: usize, a: usize, b: usize, c: usize, d: usize, e: usize, f: u
 
 #[cfg(target_arch = "x86")]
 core::arch::global_asm!(
-    ".globl frida_syscall",
-    ".hidden frida_syscall",
-    "frida_syscall:",
+    ".globl meshlink_syscall",
+    ".hidden meshlink_syscall",
+    "meshlink_syscall:",
     "push ebp",
     "push ebx",
     "push esi",
@@ -1323,12 +1323,12 @@ core::arch::global_asm!(
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    fn frida_syscall(number: usize, a: usize, b: usize, c: usize, d: usize, e: usize, f: usize) -> isize;
+    fn meshlink_syscall(number: usize, a: usize, b: usize, c: usize, d: usize, e: usize, f: usize) -> isize;
 }
 
 #[cfg(target_arch = "x86")]
 fn syscall(number: usize, a: usize, b: usize, c: usize, d: usize, e: usize, f: usize) -> isize {
-    unsafe { frida_syscall(number, a, b, c, d, e, f) }
+    unsafe { meshlink_syscall(number, a, b, c, d, e, f) }
 }
 
 #[cfg(target_arch = "x86_64")]
