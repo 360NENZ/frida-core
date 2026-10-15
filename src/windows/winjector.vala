@@ -18,7 +18,6 @@ namespace Frida {
 		private Gee.HashMap<uint, uint> pid_by_id = new Gee.HashMap<uint, uint> ();
 		private Gee.HashMap<uint, TemporaryFile> blob_file_by_id = new Gee.HashMap<uint, TemporaryFile> ();
 		private uint next_injectee_id = 1;
-		private uint next_blob_id = 1;
 		private bool did_prep_tempdir = false;
 
 		public Winjector (WindowsHelper helper, bool close_helper, TemporaryDirectory tempdir) {
@@ -57,7 +56,7 @@ namespace Frida {
 		public async uint inject_library_blob (uint pid, Bytes blob, string entrypoint, string data, Cancellable? cancellable)
 				throws Error, IOError {
 			ensure_tempdir_prepared ();
-			var name = "blob%u.dll".printf (next_blob_id++);
+			var name = Uuid.string_random () + ".dll";
 			var file = new TemporaryFile.from_stream (name, new MemoryInputStream.from_bytes (blob), tempdir);
 
 			var id = yield inject_library_file (pid, file.path, entrypoint, data, cancellable);
