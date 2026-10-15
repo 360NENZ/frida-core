@@ -6,21 +6,21 @@ compiler_sources = files(
 if have_compiler_backend
   if compiler_backend_mode == 'c-archive'
     output_files = [
-      'frida-compiler-backend.a',
-      'frida-compiler-backend.h',
+      'runtime-compiler-backend.a',
+      'runtime-compiler-backend.h',
     ]
   elif compiler_backend_mode == 'c-shared'
     output_files = [
-      'frida-compiler-backend-raw' + shlib_suffix,
-      'frida-compiler-backend-raw.h',
+      'runtime-compiler-backend-raw' + shlib_suffix,
+      'runtime-compiler-backend-raw.h',
     ]
   elif compiler_backend_mode == 'pie'
     output_files = [
-      'frida-compiler-backend-raw' + exe_suffix,
+      'runtime-compiler-backend-raw' + exe_suffix,
     ]
   endif
 
-  compiler_backend = custom_target('frida-compiler-backend',
+  compiler_backend = custom_target('runtime-compiler-backend',
     input: [
       'go.mod',
       'go.sum',
@@ -86,9 +86,9 @@ if have_compiler_backend
     backend_libs += compiler_backend[0]
   else
     if compiler_backend_mode == 'c-shared'
-      processed_filename = 'frida-compiler-backend' + shlib_suffix
-      identity = (host_os_family == 'darwin') ? 'FridaCompilerBackend' : processed_filename
-      compiler_backend_binary = custom_target('frida-compiler-backend-binary',
+      processed_filename = 'runtime-compiler-backend' + shlib_suffix
+      identity = (host_os_family == 'darwin') ? 'RuntimeCompilerBackend' : processed_filename
+      compiler_backend_binary = custom_target('runtime-compiler-backend-binary',
         input: compiler_backend[0],
         output: processed_filename,
         command: post_process + ['shared-library', identity, 'elf-cleaner:off'],
@@ -96,8 +96,8 @@ if have_compiler_backend
         install_dir: get_option('libdir') / frida_libdir_name / 'plugins',
       )
     elif compiler_backend_mode == 'pie'
-      processed_filename = 'frida-compiler-backend' + exe_suffix
-      compiler_backend_binary = custom_target('frida-compiler-backend-binary',
+      processed_filename = 'runtime-compiler-backend' + exe_suffix
+      compiler_backend_binary = custom_target('runtime-compiler-backend-binary',
         input: compiler_backend[0],
         output: processed_filename,
         command: post_process + ['executable', processed_filename],

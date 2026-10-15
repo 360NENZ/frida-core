@@ -581,14 +581,14 @@ if compiler_backend_opt.allowed()
       elif compiler_backend_mode == 'c-shared'
         if assets_mode == 'installed'
           vala_flags += '--define=COMPILER_BACKEND_INSTALLED_LIBRARY'
-          cdata.set_quoted('FRIDA_COMPILER_BACKEND_NAME', 'frida-compiler-backend' + shlib_suffix)
+          cdata.set_quoted('FRIDA_COMPILER_BACKEND_NAME', 'runtime-compiler-backend' + shlib_suffix)
         else
           vala_flags += '--define=COMPILER_BACKEND_EMBEDDED_LIBRARY'
         endif
       elif compiler_backend_mode == 'pie'
         if assets_mode == 'installed'
           vala_flags += '--define=COMPILER_BACKEND_INSTALLED_EXECUTABLE'
-          cdata.set_quoted('FRIDA_COMPILER_BACKEND_NAME', 'frida-compiler-backend' + exe_suffix)
+          cdata.set_quoted('FRIDA_COMPILER_BACKEND_NAME', 'runtime-compiler-backend' + exe_suffix)
         else
           vala_flags += '--define=COMPILER_BACKEND_EMBEDDED_EXECUTABLE'
         endif

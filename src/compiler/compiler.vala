@@ -2511,6 +2511,7 @@ namespace Frida {
 		}
 	}
 
+	[CCode (cprefix = "RelayCompilerBackend", lower_case_cprefix = "relay_compiler_backend_")]
 	namespace CompilerBackend {
 		private void init () {
 			if (initialized)
@@ -2540,19 +2541,19 @@ namespace Frida {
 			}
 			backend.make_resident ();
 
-			build = resolve_symbol (backend, "_frida_compiler_backend_build");
-			build_library = resolve_symbol (backend, "_frida_compiler_backend_build_library");
-			watch = resolve_symbol (backend, "_frida_compiler_backend_watch");
-			watch_library = resolve_symbol (backend, "_frida_compiler_backend_watch_library");
-			WatchSession.dispose = resolve_symbol (backend, "_frida_compiler_backend_watch_session_dispose");
-			LanguageServer.open = resolve_symbol (backend, "_frida_compiler_backend_language_server_open");
-			LanguageServer.close = resolve_symbol (backend, "_frida_compiler_backend_language_server_close");
-			LanguageServer.post = resolve_symbol (backend, "_frida_compiler_backend_language_server_post");
-			Patterns.describe = resolve_symbol (backend, "_frida_compiler_backend_patterns_describe");
-			Patterns.decode = resolve_symbol (backend, "_frida_compiler_backend_patterns_decode");
-			Patterns.call = resolve_symbol (backend, "_frida_compiler_backend_patterns_call");
+			build = resolve_symbol (backend, "_relay_compiler_backend_build");
+			build_library = resolve_symbol (backend, "_relay_compiler_backend_build_library");
+			watch = resolve_symbol (backend, "_relay_compiler_backend_watch");
+			watch_library = resolve_symbol (backend, "_relay_compiler_backend_watch_library");
+			WatchSession.dispose = resolve_symbol (backend, "_relay_compiler_backend_watch_session_dispose");
+			LanguageServer.open = resolve_symbol (backend, "_relay_compiler_backend_language_server_open");
+			LanguageServer.close = resolve_symbol (backend, "_relay_compiler_backend_language_server_close");
+			LanguageServer.post = resolve_symbol (backend, "_relay_compiler_backend_language_server_post");
+			Patterns.describe = resolve_symbol (backend, "_relay_compiler_backend_patterns_describe");
+			Patterns.decode = resolve_symbol (backend, "_relay_compiler_backend_patterns_decode");
+			Patterns.call = resolve_symbol (backend, "_relay_compiler_backend_patterns_call");
 #elif COMPILER_BACKEND_EMBEDDED_LIBRARY
-			unowned uint8[] backend_so = Frida.Data.Compiler.get_frida_compiler_backend_so_blob ().data;
+			unowned uint8[] backend_so = Relay.Data.Compiler.get_runtime_compiler_backend_so_blob ().data;
 
 			Module? backend = null;
 
@@ -2585,17 +2586,17 @@ namespace Frida {
 			}
 			backend.make_resident ();
 
-			build = resolve_symbol (backend, "_frida_compiler_backend_build");
-			build_library = resolve_symbol (backend, "_frida_compiler_backend_build_library");
-			watch = resolve_symbol (backend, "_frida_compiler_backend_watch");
-			watch_library = resolve_symbol (backend, "_frida_compiler_backend_watch_library");
-			WatchSession.dispose = resolve_symbol (backend, "_frida_compiler_backend_watch_session_dispose");
-			LanguageServer.open = resolve_symbol (backend, "_frida_compiler_backend_language_server_open");
-			LanguageServer.close = resolve_symbol (backend, "_frida_compiler_backend_language_server_close");
-			LanguageServer.post = resolve_symbol (backend, "_frida_compiler_backend_language_server_post");
-			Patterns.describe = resolve_symbol (backend, "_frida_compiler_backend_patterns_describe");
-			Patterns.decode = resolve_symbol (backend, "_frida_compiler_backend_patterns_decode");
-			Patterns.call = resolve_symbol (backend, "_frida_compiler_backend_patterns_call");
+			build = resolve_symbol (backend, "_relay_compiler_backend_build");
+			build_library = resolve_symbol (backend, "_relay_compiler_backend_build_library");
+			watch = resolve_symbol (backend, "_relay_compiler_backend_watch");
+			watch_library = resolve_symbol (backend, "_relay_compiler_backend_watch_library");
+			WatchSession.dispose = resolve_symbol (backend, "_relay_compiler_backend_watch_session_dispose");
+			LanguageServer.open = resolve_symbol (backend, "_relay_compiler_backend_language_server_open");
+			LanguageServer.close = resolve_symbol (backend, "_relay_compiler_backend_language_server_close");
+			LanguageServer.post = resolve_symbol (backend, "_relay_compiler_backend_language_server_post");
+			Patterns.describe = resolve_symbol (backend, "_relay_compiler_backend_patterns_describe");
+			Patterns.decode = resolve_symbol (backend, "_relay_compiler_backend_patterns_decode");
+			Patterns.call = resolve_symbol (backend, "_relay_compiler_backend_patterns_call");
 #elif COMPILER_BACKEND_EMBEDDED_EXECUTABLE || COMPILER_BACKEND_INSTALLED_EXECUTABLE
 			backend_process = new BackendProcess ();
 
@@ -2863,7 +2864,7 @@ namespace Frida {
 
 #if COMPILER_BACKEND_EMBEDDED_EXECUTABLE
 			private static string extract_backend_executable () throws GLib.Error {
-				unowned uint8[] blob = Frida.Data.Compiler.get_frida_compiler_backend_blob ().data;
+				unowned uint8[] blob = Relay.Data.Compiler.get_runtime_compiler_backend_blob ().data;
 
 				string path;
 				{
@@ -3593,7 +3594,7 @@ namespace Frida {
 						throw new Error.PROTOCOL ("Missing or invalid 'error' value");
 					reader.end_member ();
 
-					printerr ("[frida-compiler-backend] Language server: %s\n", error);
+					printerr ("[runtime-compiler-backend] Language server: %s\n", error);
 					return;
 				}
 
@@ -3804,7 +3805,7 @@ namespace Frida {
 						string? line = yield stream.read_line_utf8_async (Priority.DEFAULT, io_cancellable);
 						if (line == null)
 							break;
-						printerr ("[frida-compiler-backend stderr] %s\n", line);
+						printerr ("[runtime-compiler-backend stderr] %s\n", line);
 					}
 				} catch (GLib.Error e) {
 				}

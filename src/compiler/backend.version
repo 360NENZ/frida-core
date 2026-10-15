@@ -1,6 +1,6 @@
 {
   global:
-    _frida_compiler_backend_*;
+    _relay_compiler_backend_*;
 
   local:
     *;

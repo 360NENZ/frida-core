@@ -123,8 +123,8 @@ import (
 	"unsafe"
 )
 
-//export _frida_compiler_backend_build
-func _frida_compiler_backend_build(cProjectRoot, cEntrypoint *C.char, outputFormat C.FridaOutputFormat, bundleFormat C.FridaBundleFormat,
+//export _relay_compiler_backend_build
+func _relay_compiler_backend_build(cProjectRoot, cEntrypoint *C.char, outputFormat C.FridaOutputFormat, bundleFormat C.FridaBundleFormat,
 	disableTypeCheck, sourceMap, compress uintptr, cPlatform *C.char, cExternals **C.char, numExternals C.int,
 	onDiagnosticFn C.FridaDiagnosticFunc, onDiagnosticData unsafe.Pointer, onCompleteFn C.FridaBuildCompleteFunc,
 	onCompleteData unsafe.Pointer, onCompleteDataDestroy C.FridaDestroyFunc) {
@@ -162,8 +162,8 @@ func _frida_compiler_backend_build(cProjectRoot, cEntrypoint *C.char, outputForm
 	}()
 }
 
-//export _frida_compiler_backend_build_library
-func _frida_compiler_backend_build_library(cProjectRoot, cEntrypoint, cOutputDir *C.char, sourceMap uintptr,
+//export _relay_compiler_backend_build_library
+func _relay_compiler_backend_build_library(cProjectRoot, cEntrypoint, cOutputDir *C.char, sourceMap uintptr,
 	onDiagnosticFn C.FridaDiagnosticFunc, onDiagnosticData unsafe.Pointer, onCompleteFn C.FridaBuildCompleteFunc,
 	onCompleteData unsafe.Pointer, onCompleteDataDestroy C.FridaDestroyFunc) {
 	options := LibraryOptions{
@@ -190,8 +190,8 @@ func _frida_compiler_backend_build_library(cProjectRoot, cEntrypoint, cOutputDir
 	}()
 }
 
-//export _frida_compiler_backend_watch
-func _frida_compiler_backend_watch(cProjectRoot, cEntrypoint *C.char, outputFormat C.FridaOutputFormat, bundleFormat C.FridaBundleFormat,
+//export _relay_compiler_backend_watch
+func _relay_compiler_backend_watch(cProjectRoot, cEntrypoint *C.char, outputFormat C.FridaOutputFormat, bundleFormat C.FridaBundleFormat,
 	disableTypeCheck, sourceMap, compress uintptr, cPlatform *C.char, cExternals **C.char, numExternals C.int,
 	onStartingFn C.FridaStartingFunc, onStartingData unsafe.Pointer,
 	onFinishedFn C.FridaFinishedFunc, onFinishedData unsafe.Pointer,
@@ -254,8 +254,8 @@ func _frida_compiler_backend_watch(cProjectRoot, cEntrypoint *C.char, outputForm
 	}()
 }
 
-//export _frida_compiler_backend_watch_library
-func _frida_compiler_backend_watch_library(cProjectRoot, cEntrypoint, cOutputDir *C.char, sourceMap uintptr,
+//export _relay_compiler_backend_watch_library
+func _relay_compiler_backend_watch_library(cProjectRoot, cEntrypoint, cOutputDir *C.char, sourceMap uintptr,
 	onStartingFn C.FridaStartingFunc, onStartingData unsafe.Pointer,
 	onFinishedFn C.FridaFinishedFunc, onFinishedData unsafe.Pointer,
 	onDiagnosticFn C.FridaDiagnosticFunc, onDiagnosticData unsafe.Pointer,
@@ -304,16 +304,16 @@ func _frida_compiler_backend_watch_library(cProjectRoot, cEntrypoint, cOutputDir
 	}()
 }
 
-//export _frida_compiler_backend_watch_session_dispose
-func _frida_compiler_backend_watch_session_dispose(h uintptr) {
+//export _relay_compiler_backend_watch_session_dispose
+func _relay_compiler_backend_watch_session_dispose(h uintptr) {
 	handle := cgo.Handle(h)
 	session := handle.Value().(*WatchSession)
 	session.Dispose()
 	handle.Delete()
 }
 
-//export _frida_compiler_backend_language_server_open
-func _frida_compiler_backend_language_server_open(cProjectRoot *C.char,
+//export _relay_compiler_backend_language_server_open
+func _relay_compiler_backend_language_server_open(cProjectRoot *C.char,
 	onMessageFn C.FridaLanguageServerMessageFunc, onMessageData unsafe.Pointer,
 	onReadyFn C.FridaLanguageServerReadyFunc, onReadyData unsafe.Pointer, onReadyDataDestroy C.FridaDestroyFunc) {
 	projectRoot := C.GoString(cProjectRoot)
@@ -342,8 +342,8 @@ func _frida_compiler_backend_language_server_open(cProjectRoot *C.char,
 	}()
 }
 
-//export _frida_compiler_backend_language_server_close
-func _frida_compiler_backend_language_server_close(h uintptr) {
+//export _relay_compiler_backend_language_server_close
+func _relay_compiler_backend_language_server_close(h uintptr) {
 	handle := cgo.Handle(h)
 	entry := handle.Value().(*languageServerHandle)
 	entry.server.Dispose()
@@ -351,8 +351,8 @@ func _frida_compiler_backend_language_server_close(h uintptr) {
 	handle.Delete()
 }
 
-//export _frida_compiler_backend_language_server_post
-func _frida_compiler_backend_language_server_post(h uintptr, cText *C.char) *C.char {
+//export _relay_compiler_backend_language_server_post
+func _relay_compiler_backend_language_server_post(h uintptr, cText *C.char) *C.char {
 	handle := cgo.Handle(h).Value().(*languageServerHandle)
 	if err := handle.server.Post(C.GoString(cText)); err != nil {
 		return C.CString(err.Error())
@@ -360,8 +360,8 @@ func _frida_compiler_backend_language_server_post(h uintptr, cText *C.char) *C.c
 	return nil
 }
 
-//export _frida_compiler_backend_patterns_describe
-func _frida_compiler_backend_patterns_describe(cProjectRoot, cEntrypoint, cPlatform, cArch, cDefines *C.char,
+//export _relay_compiler_backend_patterns_describe
+func _relay_compiler_backend_patterns_describe(cProjectRoot, cEntrypoint, cPlatform, cArch, cDefines *C.char,
 	onResultFn C.FridaPatternResultFunc, onResultData unsafe.Pointer, onResultDataDestroy C.FridaDestroyFunc) {
 	query := patternQueryFromC(cProjectRoot, cEntrypoint, cPlatform, cArch, cDefines)
 	onResult := NewCDelegate(onResultFn, onResultData, onResultDataDestroy)
@@ -374,8 +374,8 @@ func _frida_compiler_backend_patterns_describe(cProjectRoot, cEntrypoint, cPlatf
 	}()
 }
 
-//export _frida_compiler_backend_patterns_decode
-func _frida_compiler_backend_patterns_decode(cProjectRoot, cEntrypoint, cTypeName *C.char, cData *C.uint8_t, dataLength C.int,
+//export _relay_compiler_backend_patterns_decode
+func _relay_compiler_backend_patterns_decode(cProjectRoot, cEntrypoint, cTypeName *C.char, cData *C.uint8_t, dataLength C.int,
 	address C.uint64_t, cPlatform, cArch, cDefines, cInputs *C.char, onResultFn C.FridaPatternResultFunc,
 	onResultData unsafe.Pointer, onResultDataDestroy C.FridaDestroyFunc) {
 	query := patternQueryFromC(cProjectRoot, cEntrypoint, cPlatform, cArch, cDefines)
@@ -392,8 +392,8 @@ func _frida_compiler_backend_patterns_decode(cProjectRoot, cEntrypoint, cTypeNam
 	}()
 }
 
-//export _frida_compiler_backend_patterns_call
-func _frida_compiler_backend_patterns_call(cProjectRoot, cEntrypoint, cTypeName *C.char, cData *C.uint8_t, dataLength C.int,
+//export _relay_compiler_backend_patterns_call
+func _relay_compiler_backend_patterns_call(cProjectRoot, cEntrypoint, cTypeName *C.char, cData *C.uint8_t, dataLength C.int,
 	address C.uint64_t, cPlatform, cArch, cDefines, cInputs *C.char, patternID C.uint, cFunctionName *C.char,
 	onResultFn C.FridaPatternResultFunc, onResultData unsafe.Pointer, onResultDataDestroy C.FridaDestroyFunc) {
 	query := patternQueryFromC(cProjectRoot, cEntrypoint, cPlatform, cArch, cDefines)

@@ -58,7 +58,7 @@ def build_backend(
 
     mode = config["mode"]
 
-    backend_stem = "frida-compiler-backend"
+    backend_stem = "runtime-compiler-backend"
     if mode != "c-archive":
         backend_stem += "-raw"
 
