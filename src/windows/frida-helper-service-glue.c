@@ -450,7 +450,7 @@ frida_register_service (FridaServiceContext * self, const gchar * suffix)
   servicename_utf8 = g_strconcat (self->service_basename, suffix, NULL);
   servicename = g_utf8_to_utf16 (servicename_utf8, -1, NULL, NULL, NULL);
 
-  displayname_utf8 = g_strdup_printf ("Frida %s helper (%s)", suffix, servicename_utf8);
+  displayname_utf8 = g_strdup_printf ("Runtime %s helper (%s)", suffix, servicename_utf8);
   displayname = g_utf8_to_utf16 (displayname_utf8, -1, NULL, NULL, NULL);
 
   appname_utf8 = frida_helper_service_derive_filename_for_suffix (suffix);
