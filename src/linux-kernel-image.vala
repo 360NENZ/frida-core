@@ -86,8 +86,7 @@ namespace Frida {
 			var symbols = new Gee.ArrayList<LinuxKernelSymbol> ();
 
 			var text = (string) blob.get_data ();
-			foreach (unowned string line in text.split ("
-")) {
+			foreach (unowned string line in text.split ("\n")) {
 				string[] fields = line.split (" ", 3);
 				if (fields.length != 3)
 					continue;

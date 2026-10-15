@@ -117,8 +117,7 @@ namespace Frida.Barebone {
 				var batch = new StringBuilder ();
 				for (size_t at = 0; at < chunk; at += MAX_WORDS_PER_READ) {
 					size_t count = size_t.min (chunk - at, MAX_WORDS_PER_READ);
-					batch.append_printf ("dq %s L%x
-",
+					batch.append_printf ("dq %s L%x\n",
 						format_location (start + (done + at) * WORD_SIZE), (uint) count);
 				}
 
@@ -185,12 +184,10 @@ namespace Frida.Barebone {
 					uint64 word = 0;
 					for (uint b = 0; b != WORD_SIZE; b++)
 						word |= ((uint64) data[i + b]) << (b * 8);
-					batch.append_printf ("eq %s %s
-", format_location (at), format_address (word));
+					batch.append_printf ("eq %s %s\n", format_location (at), format_address (word));
 					i += WORD_SIZE;
 				} else {
-					batch.append_printf ("eb %s %02x
-", format_location (at), data[i]);
+					batch.append_printf ("eb %s %02x\n", format_location (at), data[i]);
 					i++;
 				}
 
@@ -230,8 +227,7 @@ namespace Frida.Barebone {
 			var batch = new StringBuilder ();
 			for (uint i = 0; i != cpu_count; i++) {
 				foreach (string name in CORE_REGISTERS)
-					batch.append_printf ("r cpu%u.%s
-", i, name);
+					batch.append_printf ("r cpu%u.%s\n", i, name);
 			}
 
 			return parse_registers (yield run_many (batch.str, cancellable));
