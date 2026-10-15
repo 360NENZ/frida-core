@@ -15,7 +15,7 @@ use crate::kernel::ThreadEntry;
 
 #[cfg(target_arch = "x86")]
 pub fn log(msg: &str) {
-    unsafe { frida_k_log(msg.as_ptr() as *const c_char) };
+    unsafe { meshlink_k_log(msg.as_ptr() as *const c_char) };
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -167,7 +167,7 @@ fn kcfi_thunk_cached(cache: &AtomicUsize, callback: usize, type_ref: Option<usiz
 fn thread_entry() -> unsafe extern "C" fn(*mut c_void) -> c_int {
     let ref_fn = unsafe { _kthread_worker_fn.map(|f| f as usize) };
     unsafe {
-        core::mem::transmute(kcfi_thunk_cached(&THREAD_THUNK, frida_cb_thread as *const () as usize,
+        core::mem::transmute(kcfi_thunk_cached(&THREAD_THUNK, meshlink_cb_thread as *const () as usize,
             ref_fn))
     }
 }
@@ -182,7 +182,7 @@ fn interrupt_entry() -> unsafe extern "C" fn(c_int, *mut c_void) -> c_int {
     let ref_fn = unsafe { _vring_interrupt.map(|f| f as usize) };
     unsafe {
         core::mem::transmute(kcfi_thunk_cached(&INTERRUPT_THUNK,
-            frida_cb_interrupt as *const () as usize, ref_fn))
+            meshlink_cb_interrupt as *const () as usize, ref_fn))
     }
 }
 
@@ -212,7 +212,7 @@ pub fn spawn_thread(entry: ThreadEntry, parameter: *mut c_void) -> isize {
 
 #[cfg(target_arch = "x86")]
 pub fn alloc(size: usize) -> *mut u8 {
-    unsafe { frida_k_alloc(size, GFP_KERNEL as usize) }
+    unsafe { meshlink_k_alloc(size, GFP_KERNEL as usize) }
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -246,7 +246,7 @@ pub fn alloc_heap(size: usize) -> *mut u8 {
 #[cfg(target_arch = "x86")]
 pub fn alloc_code(size: usize) -> *mut u8 {
     unsafe {
-        frida_k_alloc_code(EXECMEM_MODULE_TEXT as usize, size, size.div_ceil(PAGE_SIZE))
+        meshlink_k_alloc_code(EXECMEM_MODULE_TEXT as usize, size, size.div_ceil(PAGE_SIZE))
     }
 }
 
@@ -269,7 +269,7 @@ pub fn alloc_code(size: usize) -> *mut u8 {
 
 #[cfg(target_arch = "x86")]
 pub fn free_code(ptr: *mut u8, _size: usize) {
-    unsafe { frida_k_free_code(ptr) };
+    unsafe { meshlink_k_free_code(ptr) };
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -349,7 +349,7 @@ pub fn patch_text(address: u64, data: *const u8, len: usize) -> bool {
 
 #[cfg(target_arch = "x86")]
 pub fn patch_text(address: u64, data: *const u8, len: usize) -> bool {
-    unsafe { !frida_k_text_poke(address as *mut c_void, data as *const c_void, len).is_null() }
+    unsafe { !meshlink_k_text_poke(address as *mut c_void, data as *const c_void, len).is_null() }
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -785,7 +785,7 @@ static mut INTERRUPT: Option<Interrupt> = None;
 // whether the interrupt was ours; the agent's handler takes the four arguments
 // XNU's interrupt controller passes.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn frida_cb_interrupt(_irq: c_int, _cookie: *mut c_void) -> c_int {
+pub unsafe extern "C" fn meshlink_cb_interrupt(_irq: c_int, _cookie: *mut c_void) -> c_int {
     let Some(interrupt) = (unsafe { &*core::ptr::addr_of!(INTERRUPT) }) else {
         return IRQ_NONE;
     };
@@ -798,7 +798,7 @@ pub unsafe extern "C" fn frida_cb_interrupt(_irq: c_int, _cookie: *mut c_void) -
 // kthread hands its worker one argument and expects an exit code back, whereas
 // the agent's threads take the pair that XNU's continuations do.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn frida_cb_thread(data: *mut c_void) -> c_int {
+pub unsafe extern "C" fn meshlink_cb_thread(data: *mut c_void) -> c_int {
     let trampoline = data as *mut Trampoline;
     unsafe {
         let Trampoline { entry, parameter } = trampoline.read();
@@ -994,66 +994,66 @@ unsafe extern "C" {
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    fn frida_k_log(message: *const c_char);
-    fn frida_k_alloc(size: usize, flags: usize) -> *mut u8;
-    fn frida_k_text_poke(addr: *mut c_void, opcode: *const c_void, len: usize) -> *mut c_void;
-    fn frida_k_alloc_code(kind: usize, size: usize, pages: usize) -> *mut u8;
-    fn frida_k_free_code(code: *mut u8);
+    fn meshlink_k_log(message: *const c_char);
+    fn meshlink_k_alloc(size: usize, flags: usize) -> *mut u8;
+    fn meshlink_k_text_poke(addr: *mut c_void, opcode: *const c_void, len: usize) -> *mut c_void;
+    fn meshlink_k_alloc_code(kind: usize, size: usize, pages: usize) -> *mut u8;
+    fn meshlink_k_free_code(code: *mut u8);
 }
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    #[link_name = "frida_k_panic"]
+    #[link_name = "meshlink_k_panic"]
     fn _panic(a0: *const c_char) -> !;
-    #[link_name = "frida_k_wake_up_process"]
+    #[link_name = "meshlink_k_wake_up_process"]
     fn _wake_up_process(a0: *mut c_void) -> c_int;
-    #[link_name = "frida_k_fget"]
+    #[link_name = "meshlink_k_fget"]
     fn _fget(a0: c_uint) -> *mut c_void;
-    #[link_name = "frida_k_fget_task"]
+    #[link_name = "meshlink_k_fget_task"]
     fn _fget_task(a0: *mut c_void, a1: c_uint) -> *mut c_void;
-    #[link_name = "frida_k_find_task_by_vpid"]
+    #[link_name = "meshlink_k_find_task_by_vpid"]
     fn _find_task_by_vpid(a0: c_uint) -> *mut c_void;
-    #[link_name = "frida_k_kernel_read"]
+    #[link_name = "meshlink_k_kernel_read"]
     fn _kernel_read(a0: *mut c_void, a1: *mut u8, a2: usize, a3: *mut i64) -> isize;
-    #[link_name = "frida_k_kernel_write"]
+    #[link_name = "meshlink_k_kernel_write"]
     fn _kernel_write(a0: *mut c_void, a1: *const u8, a2: usize, a3: *mut i64) -> isize;
-    #[link_name = "frida_k_kfree"]
+    #[link_name = "meshlink_k_kfree"]
     fn _kfree(a0: *mut u8);
-    #[link_name = "frida_k___init_waitqueue_head"]
+    #[link_name = "meshlink_k___init_waitqueue_head"]
     fn ___init_waitqueue_head(a0: *mut c_void, a1: *const c_char, a2: *mut c_void);
-    #[link_name = "frida_k_prepare_to_wait_event"]
+    #[link_name = "meshlink_k_prepare_to_wait_event"]
     fn _prepare_to_wait_event(a0: *mut c_void, a1: *mut c_void, a2: c_uint) -> c_int;
-    #[link_name = "frida_k_finish_wait"]
+    #[link_name = "meshlink_k_finish_wait"]
     fn _finish_wait(a0: *mut c_void, a1: *mut c_void);
-    #[link_name = "frida_k___wake_up"]
+    #[link_name = "meshlink_k___wake_up"]
     fn ___wake_up(a0: *mut c_void, a1: c_uint, a2: c_int, a3: *mut c_void);
-    #[link_name = "frida_k_schedule_hrtimeout_range"]
+    #[link_name = "meshlink_k_schedule_hrtimeout_range"]
     fn _schedule_hrtimeout_range(a0: *mut i64, a1: u64, a2: c_int) -> c_int;
-    #[link_name = "frida_k_pci_get_domain_bus_and_slot"]
+    #[link_name = "meshlink_k_pci_get_domain_bus_and_slot"]
     fn _pci_get_domain_bus_and_slot(a0: c_int, a1: c_uint, a2: c_uint) -> *mut c_void;
-    #[link_name = "frida_k_pci_irq_vector"]
+    #[link_name = "meshlink_k_pci_irq_vector"]
     fn _pci_irq_vector(a0: *mut c_void, a1: c_uint) -> c_int;
-    #[link_name = "frida_k_pci_dev_put"]
+    #[link_name = "meshlink_k_pci_dev_put"]
     fn _pci_dev_put(a0: *mut c_void);
-    #[link_name = "frida_k_schedule"]
+    #[link_name = "meshlink_k_schedule"]
     fn _schedule();
-    #[link_name = "frida_k_ktime_get_mono_fast_ns"]
+    #[link_name = "meshlink_k_ktime_get_mono_fast_ns"]
     fn _ktime_get_mono_fast_ns() -> u64;
-    #[link_name = "frida_k_ktime_get_real_ts64"]
+    #[link_name = "meshlink_k_ktime_get_real_ts64"]
     fn _ktime_get_real_ts64(a0: *mut Timespec64);
-    #[link_name = "frida_k_send_sig"]
+    #[link_name = "meshlink_k_send_sig"]
     fn _send_sig(a0: c_int, a1: *mut c_void, a2: c_int) -> c_int;
-    #[link_name = "frida_k_free_irq"]
+    #[link_name = "meshlink_k_free_irq"]
     fn _free_irq(a0: u32, a1: *mut c_void) -> *mut c_void;
-    #[link_name = "frida_k_vmap"]
+    #[link_name = "meshlink_k_vmap"]
     fn _vmap(a0: *mut c_void, a1: u32, a2: usize, a3: usize) -> *mut c_void;
-    #[link_name = "frida_k_ioremap"]
+    #[link_name = "meshlink_k_ioremap"]
     fn _ioremap(a0: usize, a1: usize) -> *mut c_void;
 }
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    #[link_name = "frida_k_request_threaded_irq"]
+    #[link_name = "meshlink_k_request_threaded_irq"]
     fn _request_threaded_irq(
         a0: u32,
         a1: IrqHandlerFn,
@@ -1062,16 +1062,16 @@ unsafe extern "C" {
         a4: *const c_char,
         a5: *mut c_void,
     ) -> c_int;
-    fn frida_kcb_thread(data: *mut c_void) -> c_int;
-    fn frida_kcb_interrupt(irq: c_int, cookie: *mut c_void) -> c_int;
+    fn meshlink_kcb_thread(data: *mut c_void) -> c_int;
+    fn meshlink_kcb_interrupt(irq: c_int, cookie: *mut c_void) -> c_int;
 }
 
 #[cfg(target_arch = "x86")]
-const THREAD_ENTRY: unsafe extern "C" fn(*mut c_void) -> c_int = frida_kcb_thread;
+const THREAD_ENTRY: unsafe extern "C" fn(*mut c_void) -> c_int = meshlink_kcb_thread;
 #[cfg(not(any(target_arch = "x86", target_arch = "aarch64")))]
-const THREAD_ENTRY: unsafe extern "C" fn(*mut c_void) -> c_int = frida_cb_thread;
+const THREAD_ENTRY: unsafe extern "C" fn(*mut c_void) -> c_int = meshlink_cb_thread;
 
 #[cfg(target_arch = "x86")]
-const INTERRUPT_ENTRY: unsafe extern "C" fn(c_int, *mut c_void) -> c_int = frida_kcb_interrupt;
+const INTERRUPT_ENTRY: unsafe extern "C" fn(c_int, *mut c_void) -> c_int = meshlink_kcb_interrupt;
 #[cfg(not(any(target_arch = "x86", target_arch = "aarch64")))]
-const INTERRUPT_ENTRY: unsafe extern "C" fn(c_int, *mut c_void) -> c_int = frida_cb_interrupt;
+const INTERRUPT_ENTRY: unsafe extern "C" fn(c_int, *mut c_void) -> c_int = meshlink_cb_interrupt;

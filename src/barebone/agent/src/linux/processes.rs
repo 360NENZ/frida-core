@@ -567,7 +567,7 @@ const SPLIT_GRANULARITY: usize = 1 << 30;
 
 #[cfg(target_arch = "x86")]
 fn lock_tasklist() -> usize {
-    unsafe { frida_k_lock_tasklist() }
+    unsafe { meshlink_k_lock_tasklist() }
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -585,7 +585,7 @@ fn lock_tasklist() -> usize {
 
 #[cfg(target_arch = "x86")]
 fn unlock_tasklist(flags: usize) {
-    unsafe { frida_k_unlock_tasklist(flags) };
+    unsafe { meshlink_k_unlock_tasklist(flags) };
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -634,7 +634,7 @@ pub fn cloak_task(task: *mut c_void) {
 
 #[cfg(target_arch = "x86")]
 unsafe fn detach_pid(pids: *mut *mut c_void, task: *mut c_void, kind: c_int) {
-    unsafe { frida_k_detach_pid(pids, task, kind) };
+    unsafe { meshlink_k_detach_pid(pids, task, kind) };
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -644,7 +644,7 @@ unsafe fn detach_pid(pids: *mut *mut c_void, task: *mut c_void, kind: c_int) {
 
 #[cfg(target_arch = "x86")]
 unsafe fn free_pids(pids: *mut *mut c_void) {
-    unsafe { frida_k_free_pids(pids) };
+    unsafe { meshlink_k_free_pids(pids) };
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -665,7 +665,7 @@ unsafe fn unlink(node: usize) {
 
 #[cfg(target_arch = "x86")]
 fn write_lock_tasklist() -> usize {
-    unsafe { frida_k_write_lock_tasklist() }
+    unsafe { meshlink_k_write_lock_tasklist() }
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -683,7 +683,7 @@ fn write_lock_tasklist() -> usize {
 
 #[cfg(target_arch = "x86")]
 fn write_unlock_tasklist(flags: usize) {
-    unsafe { frida_k_write_unlock_tasklist(flags) };
+    unsafe { meshlink_k_write_unlock_tasklist(flags) };
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -765,26 +765,26 @@ unsafe extern "C" {
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    #[link_name = "frida_k_copy_from_kernel_nofault"]
+    #[link_name = "meshlink_k_copy_from_kernel_nofault"]
     fn _copy_from_kernel_nofault(a0: *mut c_void, a1: *const c_void, a2: usize) -> c_long;
-    fn frida_k_lock_tasklist() -> usize;
-    fn frida_k_unlock_tasklist(flags: usize);
-    fn frida_k_write_lock_tasklist() -> usize;
-    fn frida_k_write_unlock_tasklist(flags: usize);
-    fn frida_k_detach_pid(pids: *mut *mut c_void, task: *mut c_void, kind: c_int);
-    fn frida_k_free_pids(pids: *mut *mut c_void);
+    fn meshlink_k_lock_tasklist() -> usize;
+    fn meshlink_k_unlock_tasklist(flags: usize);
+    fn meshlink_k_write_lock_tasklist() -> usize;
+    fn meshlink_k_write_unlock_tasklist(flags: usize);
+    fn meshlink_k_detach_pid(pids: *mut *mut c_void, task: *mut c_void, kind: c_int);
+    fn meshlink_k_free_pids(pids: *mut *mut c_void);
 }
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    #[link_name = "frida_k_get_task_exe_file"]
+    #[link_name = "meshlink_k_get_task_exe_file"]
     fn _get_task_exe_file(a0: *mut c_void) -> *mut c_void;
-    #[link_name = "frida_k_file_path"]
+    #[link_name = "meshlink_k_file_path"]
     fn _file_path(a0: *mut c_void, a1: *mut c_char, a2: c_int) -> *const c_char;
-    #[link_name = "frida_k_fput"]
+    #[link_name = "meshlink_k_fput"]
     fn _fput(a0: *mut c_void);
-    #[link_name = "frida_k_get_task_mm"]
+    #[link_name = "meshlink_k_get_task_mm"]
     fn _get_task_mm(a0: *mut c_void) -> *mut c_void;
-    #[link_name = "frida_k_mmput"]
+    #[link_name = "meshlink_k_mmput"]
     fn _mmput(a0: *mut c_void);
 }

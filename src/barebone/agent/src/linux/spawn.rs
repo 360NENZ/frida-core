@@ -162,7 +162,7 @@ static mut HELD_SPAWNS: Vec<(u32, Vec<u8>)> = Vec::new();
 static GATING: core::sync::atomic::AtomicBool = core::sync::atomic::AtomicBool::new(false);
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn frida_cb_hold_spawn(info: *mut c_void, _credentials: *mut c_void) -> c_int {
+pub unsafe extern "C" fn meshlink_cb_hold_spawn(info: *mut c_void, _credentials: *mut c_void) -> c_int {
     let Some(at) = field_offset("subprocess_info", "data") else {
         return 0;
     };
@@ -178,7 +178,7 @@ pub unsafe extern "C" fn frida_cb_hold_spawn(info: *mut c_void, _credentials: *m
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn frida_cb_release_words(info: *mut c_void) {
+pub unsafe extern "C" fn meshlink_cb_release_words(info: *mut c_void) {
     let Some(at) = field_offset("subprocess_info", "data") else {
         return;
     };
@@ -248,13 +248,13 @@ unsafe extern "C" {
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    #[link_name = "frida_k_call_usermodehelper_exec"]
+    #[link_name = "meshlink_k_call_usermodehelper_exec"]
     fn _call_usermodehelper_exec(a0: *mut c_void, a1: c_int) -> c_int;
 }
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    #[link_name = "frida_k_call_usermodehelper_setup"]
+    #[link_name = "meshlink_k_call_usermodehelper_setup"]
     fn _call_usermodehelper_setup(
         a0: *const u8,
         a1: *const *const u8,
@@ -264,16 +264,16 @@ unsafe extern "C" {
         a5: unsafe extern "C" fn(*mut c_void),
         a6: *mut c_void,
     ) -> *mut c_void;
-    fn frida_kcb_hold_spawn(info: *mut c_void, credentials: *mut c_void) -> c_int;
-    fn frida_kcb_release_words(info: *mut c_void);
+    fn meshlink_kcb_hold_spawn(info: *mut c_void, credentials: *mut c_void) -> c_int;
+    fn meshlink_kcb_release_words(info: *mut c_void);
 }
 
 #[cfg(target_arch = "x86")]
-const HOLD_SPAWN: unsafe extern "C" fn(*mut c_void, *mut c_void) -> c_int = frida_kcb_hold_spawn;
+const HOLD_SPAWN: unsafe extern "C" fn(*mut c_void, *mut c_void) -> c_int = meshlink_kcb_hold_spawn;
 #[cfg(not(target_arch = "x86"))]
-const HOLD_SPAWN: unsafe extern "C" fn(*mut c_void, *mut c_void) -> c_int = frida_cb_hold_spawn;
+const HOLD_SPAWN: unsafe extern "C" fn(*mut c_void, *mut c_void) -> c_int = meshlink_cb_hold_spawn;
 
 #[cfg(target_arch = "x86")]
-const RELEASE_WORDS: unsafe extern "C" fn(*mut c_void) = frida_kcb_release_words;
+const RELEASE_WORDS: unsafe extern "C" fn(*mut c_void) = meshlink_kcb_release_words;
 #[cfg(not(target_arch = "x86"))]
-const RELEASE_WORDS: unsafe extern "C" fn(*mut c_void) = frida_cb_release_words;
+const RELEASE_WORDS: unsafe extern "C" fn(*mut c_void) = meshlink_cb_release_words;

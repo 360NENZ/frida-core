@@ -209,12 +209,12 @@ unsafe fn unregister_notifier(block: *mut c_void) {
 
 #[cfg(target_arch = "x86")]
 unsafe fn register_notifier(block: *mut c_void) {
-    unsafe { frida_k_register_module_notifier(block) };
+    unsafe { meshlink_k_register_module_notifier(block) };
 }
 
 #[cfg(target_arch = "x86")]
 unsafe fn unregister_notifier(block: *mut c_void) {
-    unsafe { frida_k_unregister_module_notifier(block) };
+    unsafe { meshlink_k_unregister_module_notifier(block) };
 }
 
 #[cfg(not(target_arch = "x86"))]
@@ -223,11 +223,11 @@ const NOTIFIER_CALL: unsafe extern "C" fn(*mut NotifierBlock, c_long, *mut c_voi
 
 #[cfg(target_arch = "x86")]
 const NOTIFIER_CALL: unsafe extern "C" fn(*mut NotifierBlock, c_long, *mut c_void) -> c_int =
-    frida_kcb_module_state;
+    meshlink_kcb_module_state;
 
 #[cfg(target_arch = "x86")]
 #[unsafe(no_mangle)]
-unsafe extern "C" fn frida_cb_module_state(
+unsafe extern "C" fn meshlink_cb_module_state(
     block: *mut NotifierBlock,
     action: c_long,
     module: *mut c_void,
@@ -771,13 +771,13 @@ const MAX_NAME: usize = 64;
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    fn frida_kcb_module_state(
+    fn meshlink_kcb_module_state(
         block: *mut NotifierBlock,
         action: c_long,
         module: *mut c_void,
     ) -> c_int;
-    fn frida_k_register_module_notifier(block: *mut c_void) -> c_int;
-    fn frida_k_unregister_module_notifier(block: *mut c_void) -> c_int;
+    fn meshlink_k_register_module_notifier(block: *mut c_void) -> c_int;
+    fn meshlink_k_unregister_module_notifier(block: *mut c_void) -> c_int;
 }
 
 unsafe extern "C" {

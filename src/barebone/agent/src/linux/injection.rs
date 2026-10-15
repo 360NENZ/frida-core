@@ -359,7 +359,7 @@ struct Entry {
 // Runs on the new task before the kernel lets it out, which is where what it starts with in
 // userland is written down.
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn frida_cb_user(argument: *mut c_void) -> c_int {
+pub unsafe extern "C" fn meshlink_cb_user(argument: *mut c_void) -> c_int {
     let entry = argument as *mut Entry;
     let (arena, bootstrap, stack) = unsafe { ((*entry).arena, (*entry).bootstrap, (*entry).stack) };
     native::free(entry as *mut u8, size_of::<Entry>());
@@ -908,7 +908,7 @@ pub fn hold_what_is_spawned() {
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn frida_cb_exec(_data: *mut c_void, task: *mut c_void, _was: c_int,
+pub unsafe extern "C" fn meshlink_cb_exec(_data: *mut c_void, task: *mut c_void, _was: c_int,
         program: *mut c_void) {
     if !super::spawn::holds_this_one(task as usize) {
         return;
@@ -977,13 +977,13 @@ static HOLDING: core::sync::atomic::AtomicBool = core::sync::atomic::AtomicBool:
 const STOP: c_int = 19;
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn frida_cb_thread_appeared(_data: *mut c_void, _parent: *mut c_void,
+pub unsafe extern "C" fn meshlink_cb_thread_appeared(_data: *mut c_void, _parent: *mut c_void,
         child: *mut c_void) {
     note_a_thread(child as usize, false);
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn frida_cb_thread_left(_data: *mut c_void, task: *mut c_void, _group_dead: bool) {
+pub unsafe extern "C" fn meshlink_cb_thread_left(_data: *mut c_void, task: *mut c_void, _group_dead: bool) {
     note_a_thread(task as usize, true);
 }
 
@@ -1229,72 +1229,72 @@ unsafe extern "C" {
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    #[link_name = "frida_k_get_task_mm"]
+    #[link_name = "meshlink_k_get_task_mm"]
     fn _get_task_mm(a0: *mut c_void) -> *mut c_void;
-    #[link_name = "frida_k_kthread_use_mm"]
+    #[link_name = "meshlink_k_kthread_use_mm"]
     fn _kthread_use_mm(a0: *mut c_void);
-    #[link_name = "frida_k_kthread_unuse_mm"]
+    #[link_name = "meshlink_k_kthread_unuse_mm"]
     fn _kthread_unuse_mm(a0: *mut c_void);
-    #[link_name = "frida_k_mmput"]
+    #[link_name = "meshlink_k_mmput"]
     fn _mmput(a0: *mut c_void);
-    #[link_name = "frida_k_vm_mmap"]
+    #[link_name = "meshlink_k_vm_mmap"]
     fn _vm_mmap(a0: *mut c_void, a1: usize, a2: usize, a3: usize, a4: usize, a5: usize) -> usize;
-    #[link_name = "frida_k_vm_munmap"]
+    #[link_name = "meshlink_k_vm_munmap"]
     fn _vm_munmap(a0: usize, a1: usize) -> c_int;
-    #[link_name = "frida_k_vunmap"]
+    #[link_name = "meshlink_k_vunmap"]
     fn _vunmap(a0: *mut c_void);
-    #[link_name = "frida_k__copy_to_user"]
+    #[link_name = "meshlink_k__copy_to_user"]
     fn __copy_to_user(a0: *mut c_void, a1: *const c_void, a2: usize) -> usize;
-    #[link_name = "frida_k_down_read"]
+    #[link_name = "meshlink_k_down_read"]
     fn _down_read(a0: *mut c_void);
-    #[link_name = "frida_k_up_read"]
+    #[link_name = "meshlink_k_up_read"]
     fn _up_read(a0: *mut c_void);
-    #[link_name = "frida_k_get_user_pages_remote"]
+    #[link_name = "meshlink_k_get_user_pages_remote"]
     fn _get_user_pages_remote(a0: *mut c_void, a1: usize, a2: usize, a3: c_int, a4: *mut c_void, a5: *mut c_void) -> isize;
-    #[link_name = "frida_k_do_futex"]
+    #[link_name = "meshlink_k_do_futex"]
     fn _do_futex(a0: usize, a1: c_int, a2: u32, a3: usize, a4: usize, a5: u32, a6: u32) -> isize;
 }
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    #[link_name = "frida_k_get_user_pages_unlocked"]
+    #[link_name = "meshlink_k_get_user_pages_unlocked"]
     fn _get_user_pages_unlocked(a0: usize, a1: usize, a2: *mut c_void, a3: c_int) -> isize;
-    #[link_name = "frida_k_tracepoint_probe_register"]
+    #[link_name = "meshlink_k_tracepoint_probe_register"]
     fn _tracepoint_probe_register(a0: *mut c_void, a1: *mut c_void, a2: *mut c_void) -> c_int;
-    #[link_name = "frida_k_tracepoint_probe_unregister"]
+    #[link_name = "meshlink_k_tracepoint_probe_unregister"]
     fn _tracepoint_probe_unregister(a0: *mut c_void, a1: *mut c_void, a2: *mut c_void) -> c_int;
-    #[link_name = "frida_k_user_mode_thread"]
+    #[link_name = "meshlink_k_user_mode_thread"]
     fn _user_mode_thread(a0: unsafe extern "C" fn(*mut c_void) -> c_int, a1: *mut c_void,
         a2: usize) -> c_int;
-    fn frida_kcb_user(argument: *mut c_void) -> c_int;
-    fn frida_kcb_exec(data: *mut c_void, task: *mut c_void, was: c_int, program: *mut c_void);
-    fn frida_kcb_thread_appeared(data: *mut c_void, parent: *mut c_void, child: *mut c_void);
-    fn frida_kcb_thread_left(data: *mut c_void, task: *mut c_void, group_dead: bool);
+    fn meshlink_kcb_user(argument: *mut c_void) -> c_int;
+    fn meshlink_kcb_exec(data: *mut c_void, task: *mut c_void, was: c_int, program: *mut c_void);
+    fn meshlink_kcb_thread_appeared(data: *mut c_void, parent: *mut c_void, child: *mut c_void);
+    fn meshlink_kcb_thread_left(data: *mut c_void, task: *mut c_void, group_dead: bool);
 }
 
 #[cfg(target_arch = "x86")]
-const USER_ENTRY: unsafe extern "C" fn(*mut c_void) -> c_int = frida_kcb_user;
+const USER_ENTRY: unsafe extern "C" fn(*mut c_void) -> c_int = meshlink_kcb_user;
 #[cfg(not(target_arch = "x86"))]
-const USER_ENTRY: unsafe extern "C" fn(*mut c_void) -> c_int = frida_cb_user;
+const USER_ENTRY: unsafe extern "C" fn(*mut c_void) -> c_int = meshlink_cb_user;
 
 #[cfg(target_arch = "x86")]
 const EXEC_PROBE: unsafe extern "C" fn(*mut c_void, *mut c_void, c_int, *mut c_void) =
-    frida_kcb_exec;
+    meshlink_kcb_exec;
 #[cfg(not(target_arch = "x86"))]
 const EXEC_PROBE: unsafe extern "C" fn(*mut c_void, *mut c_void, c_int, *mut c_void) =
-    frida_cb_exec;
+    meshlink_cb_exec;
 
 
 #[cfg(target_arch = "x86")]
 const THREAD_APPEARED_PROBE: unsafe extern "C" fn(*mut c_void, *mut c_void, *mut c_void) =
-    frida_kcb_thread_appeared;
+    meshlink_kcb_thread_appeared;
 #[cfg(not(target_arch = "x86"))]
 const THREAD_APPEARED_PROBE: unsafe extern "C" fn(*mut c_void, *mut c_void, *mut c_void) =
-    frida_cb_thread_appeared;
+    meshlink_cb_thread_appeared;
 
 #[cfg(target_arch = "x86")]
 const THREAD_LEFT_PROBE: unsafe extern "C" fn(*mut c_void, *mut c_void, bool) =
-    frida_kcb_thread_left;
+    meshlink_kcb_thread_left;
 #[cfg(not(target_arch = "x86"))]
 const THREAD_LEFT_PROBE: unsafe extern "C" fn(*mut c_void, *mut c_void, bool) =
-    frida_cb_thread_left;
+    meshlink_cb_thread_left;

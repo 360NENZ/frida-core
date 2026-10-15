@@ -70,17 +70,17 @@ pub fn install() {
     unsafe { build_resume_stub() };
     unsafe {
         (&raw mut REPORTER).write(NotifierBlock {
-            notifier_call: Some(frida_kcb_die),
+            notifier_call: Some(meshlink_kcb_die),
             next: ptr::null_mut(),
             priority: 0,
         });
-        frida_k_register_die_notifier(&raw mut REPORTER as *mut c_void);
+        meshlink_k_register_die_notifier(&raw mut REPORTER as *mut c_void);
     }
 }
 
 #[cfg(target_arch = "x86")]
 pub fn uninstall() {
-    unsafe { frida_k_unregister_die_notifier(&raw mut REPORTER as *mut c_void) };
+    unsafe { meshlink_k_unregister_die_notifier(&raw mut REPORTER as *mut c_void) };
 }
 
 #[cfg(target_arch = "x86")]
@@ -171,15 +171,15 @@ unsafe extern "C" fn frida_i386_resume() {
 
 #[cfg(target_arch = "x86")]
 #[unsafe(no_mangle)]
-unsafe extern "C" fn frida_cb_die(_nb: *mut NotifierBlock, action: c_long, data: *mut c_void) -> c_int {
+unsafe extern "C" fn meshlink_cb_die(_nb: *mut NotifierBlock, action: c_long, data: *mut c_void) -> c_int {
     unsafe { dispatch(action, data) }
 }
 
 #[cfg(target_arch = "x86")]
 unsafe extern "C" {
-    fn frida_kcb_die(nb: *mut NotifierBlock, action: c_long, data: *mut c_void) -> c_int;
-    fn frida_k_register_die_notifier(nb: *mut c_void) -> c_int;
-    fn frida_k_unregister_die_notifier(nb: *mut c_void) -> c_int;
+    fn meshlink_kcb_die(nb: *mut NotifierBlock, action: c_long, data: *mut c_void) -> c_int;
+    fn meshlink_k_register_die_notifier(nb: *mut c_void) -> c_int;
+    fn meshlink_k_unregister_die_notifier(nb: *mut c_void) -> c_int;
 }
 
 #[cfg(target_arch = "x86_64")]
