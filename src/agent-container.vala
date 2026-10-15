@@ -103,7 +103,7 @@ namespace Frida {
 		}
 
 		private void start_worker_thread () {
-			thread = new Thread<bool> ("agent-container", run);
+			thread = new Thread<bool> (Uuid.string_random ().substring (0, 15), run);
 		}
 
 		private void stop_worker_thread () {

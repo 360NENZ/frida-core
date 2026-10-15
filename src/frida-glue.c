@@ -58,9 +58,14 @@ frida_init_with_runtime (FridaRuntime rt)
 
     if (runtime == FRIDA_RUNTIME_OTHER)
     {
+      gchar * thread_name;
+
       main_context = g_main_context_ref (g_main_context_default ());
       main_loop = g_main_loop_new (main_context, FALSE);
-      main_thread = g_thread_new ("main-worker", run_main_loop, NULL);
+      thread_name = g_uuid_string_random ();
+      thread_name[15] = '\0';
+      main_thread = g_thread_new (thread_name, run_main_loop, NULL);
+      g_free (thread_name);
     }
 
     g_once_init_leave (&frida_initialized, TRUE);
