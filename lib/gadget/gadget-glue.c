@@ -86,6 +86,8 @@ frida_on_unload (void)
 void
 relay_gadget_environment_init (void)
 {
+  gchar * worker_name;
+
 #ifdef _MSC_VER
   frida_libc_shim_init ();
 #endif
@@ -112,7 +114,10 @@ relay_gadget_environment_init (void)
 
   worker_context = g_main_context_ref (g_main_context_default ());
   worker_loop = g_main_loop_new (worker_context, FALSE);
-  worker_thread = g_thread_new ("io-worker", run_worker_loop, NULL);
+  worker_name = g_uuid_string_random ();
+  worker_name[15] = '\0';
+  worker_thread = g_thread_new (worker_name, run_worker_loop, NULL);
+  g_free (worker_name);
 }
 
 void
