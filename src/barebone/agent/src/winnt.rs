@@ -1017,13 +1017,13 @@ pub fn install_fault_reporter() {
         let (base, size) = crate::own_code();
         let entry = (shadow + SYNCHRONOUS_ENTRY_OFFSET) as *mut u8;
         FAULT_CONTROL = FaultControl {
-            thunk: frida_winnt_fault_thunk as *const () as usize as u64,
+            thunk: meshlink_winnt_fault_thunk as *const () as usize as u64,
             chain: entry.byte_add(chain_offset()) as u64,
             base: base as u64,
             size: size as u64,
         };
 
-        core::ptr::copy_nonoverlapping(&raw const frida_winnt_fault_vector as *const u8, entry,
+        core::ptr::copy_nonoverlapping(&raw const meshlink_winnt_fault_vector as *const u8, entry,
             template_size());
         entry.byte_add(control_offset()).cast::<u64>().write(&raw const FAULT_CONTROL as u64);
         entry.byte_add(onward_offset()).cast::<u64>()
@@ -1486,31 +1486,31 @@ fn publish(start: usize, size: usize) {
 
 #[cfg(target_arch = "aarch64")]
 fn template_size() -> usize {
-    (&raw const frida_winnt_fault_vector_end as usize)
-        - (&raw const frida_winnt_fault_vector as usize)
+    (&raw const meshlink_winnt_fault_vector_end as usize)
+        - (&raw const meshlink_winnt_fault_vector as usize)
 }
 
 #[cfg(target_arch = "aarch64")]
 fn chain_offset() -> usize {
-    (&raw const frida_winnt_fault_vector_chain as usize)
-        - (&raw const frida_winnt_fault_vector as usize)
+    (&raw const meshlink_winnt_fault_vector_chain as usize)
+        - (&raw const meshlink_winnt_fault_vector as usize)
 }
 
 #[cfg(target_arch = "aarch64")]
 fn control_offset() -> usize {
-    (&raw const frida_winnt_fault_vector_control as usize)
-        - (&raw const frida_winnt_fault_vector as usize)
+    (&raw const meshlink_winnt_fault_vector_control as usize)
+        - (&raw const meshlink_winnt_fault_vector as usize)
 }
 
 #[cfg(target_arch = "aarch64")]
 fn onward_offset() -> usize {
-    (&raw const frida_winnt_fault_vector_onward as usize)
-        - (&raw const frida_winnt_fault_vector as usize)
+    (&raw const meshlink_winnt_fault_vector_onward as usize)
+        - (&raw const meshlink_winnt_fault_vector as usize)
 }
 
 #[cfg(target_arch = "aarch64")]
 #[unsafe(no_mangle)]
-static mut frida_winnt_fault_stacks: FaultStacks = FaultStacks {
+static mut meshlink_winnt_fault_stacks: FaultStacks = FaultStacks {
     memory: [[0; FAULT_STACK_BYTES]; FAULT_STACK_SLOTS],
 };
 
@@ -1540,12 +1540,12 @@ static mut FAULT_CONTROL: FaultControl =
 
 #[cfg(target_arch = "aarch64")]
 unsafe extern "C" {
-    static frida_winnt_fault_vector: u8;
-    static frida_winnt_fault_vector_chain: u8;
-    static frida_winnt_fault_vector_control: u8;
-    static frida_winnt_fault_vector_onward: u8;
-    static frida_winnt_fault_vector_end: u8;
-    fn frida_winnt_fault_thunk();
+    static meshlink_winnt_fault_vector: u8;
+    static meshlink_winnt_fault_vector_chain: u8;
+    static meshlink_winnt_fault_vector_control: u8;
+    static meshlink_winnt_fault_vector_onward: u8;
+    static meshlink_winnt_fault_vector_end: u8;
+    fn meshlink_winnt_fault_thunk();
 }
 
 #[cfg(target_arch = "aarch64")]
@@ -1569,7 +1569,7 @@ const BRANCH_X18: u32 = 0xd61f_0240;
 
 #[cfg(target_arch = "aarch64")]
 #[unsafe(no_mangle)]
-extern "C" fn frida_winnt_on_fault(frame: *mut u64) -> usize {
+extern "C" fn meshlink_winnt_on_fault(frame: *mut u64) -> usize {
 
     let pc = read_exception_register!("elr_el1");
     let state = read_exception_register!("spsr_el1");
@@ -4673,8 +4673,8 @@ static KERNEL_BASE: AtomicUsize = AtomicUsize::new(0);
 #[cfg(target_arch = "x86")]
 core::arch::global_asm!(
     r#"
-.global frida_winnt_run_on_stack
-frida_winnt_run_on_stack:
+.global meshlink_winnt_run_on_stack
+meshlink_winnt_run_on_stack:
     push ebp
     mov ebp, esp
     mov ecx, [ebp + 8]
@@ -4698,8 +4698,8 @@ frida_winnt_run_on_stack:
 #[cfg(target_arch = "x86_64")]
 core::arch::global_asm!(
     r#"
-.global frida_winnt_run_on_stack
-frida_winnt_run_on_stack:
+.global meshlink_winnt_run_on_stack
+meshlink_winnt_run_on_stack:
     push rbp
     mov rbp, rsp
     and rdi, -16
@@ -4760,8 +4760,8 @@ frida_winnt_run_on_stack:
 #[cfg(target_arch = "aarch64")]
 core::arch::global_asm!(
     r#"
-.global frida_winnt_run_on_stack
-frida_winnt_run_on_stack:
+.global meshlink_winnt_run_on_stack
+meshlink_winnt_run_on_stack:
     stp x29, x30, [sp, #-16]!
     mov x29, sp
     and x0, x0, #-16
@@ -4773,55 +4773,55 @@ frida_winnt_run_on_stack:
     ret
 
 .balign 16
-.global frida_winnt_fault_vector
-frida_winnt_fault_vector:
+.global meshlink_winnt_fault_vector
+meshlink_winnt_fault_vector:
     mrs x18, sp_el0
     and x18, x18, #0xfffffffffffffff0
     mov sp, x18
     mrs x18, tpidr_el1
     str x16, [sp, #-8]
     str x17, [sp, #-16]
-    ldr x16, frida_winnt_fault_vector_control
+    ldr x16, meshlink_winnt_fault_vector_control
     ldr x17, [x16, #16]
     mrs x16, elr_el1
     sub x16, x16, x17
-    ldr x17, frida_winnt_fault_vector_control
+    ldr x17, meshlink_winnt_fault_vector_control
     ldr x17, [x17, #24]
     cmp x16, x17
-    b.hs frida_winnt_fault_vector_chain
-    ldr x16, frida_winnt_fault_vector_control
+    b.hs meshlink_winnt_fault_vector_chain
+    ldr x16, meshlink_winnt_fault_vector_control
     ldr x16, [x16, #0]
     ldr x17, [sp, #-16]
     br x16
 
-.global frida_winnt_fault_vector_chain
-frida_winnt_fault_vector_chain:
+.global meshlink_winnt_fault_vector_chain
+meshlink_winnt_fault_vector_chain:
     ldr x16, [sp, #-8]
     ldr x17, [sp, #-16]
-    ldr x18, frida_winnt_fault_vector_onward
+    ldr x18, meshlink_winnt_fault_vector_onward
     br x18
 
 .balign 8
-.global frida_winnt_fault_vector_control
-frida_winnt_fault_vector_control:
+.global meshlink_winnt_fault_vector_control
+meshlink_winnt_fault_vector_control:
     .quad 0
-.global frida_winnt_fault_vector_onward
-frida_winnt_fault_vector_onward:
+.global meshlink_winnt_fault_vector_onward
+meshlink_winnt_fault_vector_onward:
     .quad 0
-.global frida_winnt_fault_vector_end
-frida_winnt_fault_vector_end:
+.global meshlink_winnt_fault_vector_end
+meshlink_winnt_fault_vector_end:
 
 .set FRAME_BYTES, 288
 .set FAULT_STACK_INDEX_MASK, 15
 .set FAULT_STACK_SHIFT, 14
 
-.global frida_winnt_fault_thunk
-frida_winnt_fault_thunk:
+.global meshlink_winnt_fault_thunk
+meshlink_winnt_fault_thunk:
     mrs x16, mpidr_el1
     and x16, x16, #FAULT_STACK_INDEX_MASK
     add x16, x16, #1
-    adrp x17, frida_winnt_fault_stacks
-    add x17, x17, :lo12:frida_winnt_fault_stacks
+    adrp x17, meshlink_winnt_fault_stacks
+    add x17, x17, :lo12:meshlink_winnt_fault_stacks
     add x16, x17, x16, lsl #FAULT_STACK_SHIFT
     mov x17, sp
     mov sp, x16
@@ -4848,7 +4848,7 @@ frida_winnt_fault_thunk:
 
     mov x19, sp
     mov x0, x19
-    bl frida_winnt_on_fault
+    bl meshlink_winnt_on_fault
     cbnz x0, 1f
 
     mov x16, sp
