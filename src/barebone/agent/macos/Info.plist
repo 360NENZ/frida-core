@@ -5,13 +5,13 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
-	<string>frida-agent</string>
+	<string>meshlink-agent</string>
 	<key>CFBundleIdentifier</key>
-	<string>re.frida.agent</string>
+	<string>re.meshlink.agent</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>frida-agent</string>
+	<string>meshlink-agent</string>
 	<key>CFBundlePackageType</key>
 	<string>KEXT</string>
 	<key>CFBundleShortVersionString</key>

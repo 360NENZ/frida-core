@@ -94,9 +94,9 @@ sys_icache_invalidate (void * start, size_t size)
   invalidate_icache ((vm_offset_t) start, (unsigned) size, FALSE);
 }
 
-#define FRIDA_IOC_SET_ADDR _IOW ('F', 1, FridaAddrRequest)
-#define FRIDA_IOC_START _IO ('F', 2)
-#define FRIDA_IOC_GET_IMAGE _IOR ('F', 3, FridaImageInfo)
+#define FRIDA_IOC_SET_ADDR _IOW ('M', 1, FridaAddrRequest)
+#define FRIDA_IOC_START _IO ('M', 2)
+#define FRIDA_IOC_GET_IMAGE _IOR ('M', 3, FridaImageInfo)
 
 typedef struct _FridaAddrRequest FridaAddrRequest;
 typedef struct _FridaImageInfo FridaImageInfo;
@@ -167,7 +167,7 @@ frida_kext_start (kmod_info_t * ki, void * d)
   frida_own_base = ki->address;
   frida_own_size = ki->size;
 
-  frida_lock_group = lck_grp_alloc_init ("frida", LCK_GRP_ATTR_NULL);
+  frida_lock_group = lck_grp_alloc_init ("meshlink", LCK_GRP_ATTR_NULL);
   if (frida_lock_group == NULL)
     return KERN_FAILURE;
   frida_link.lock = lck_mtx_alloc_init (frida_lock_group, LCK_ATTR_NULL);
@@ -177,7 +177,7 @@ frida_kext_start (kmod_info_t * ki, void * d)
     return KERN_FAILURE;
 
   frida_node = devfs_make_node (makedev (frida_major, 0), DEVFS_CHAR, UID_ROOT, GID_WHEEL, 0600,
-      "frida");
+      "meshlink");
   if (frida_node == NULL)
   {
     cdevsw_remove (frida_major, &frida_cdevsw);
@@ -212,7 +212,7 @@ frida_kext_stop (kmod_info_t * ki, void * d)
   return KERN_SUCCESS;
 }
 
-KMOD_EXPLICIT_DECL (re.frida.agent, "1.0", frida_kext_start, frida_kext_stop)
+KMOD_EXPLICIT_DECL (re.meshlink.agent, "1.0", frida_kext_start, frida_kext_stop)
 
 static int
 frida_dev_open (dev_t dev, int flags, int devtype, struct proc * p)
@@ -279,7 +279,7 @@ frida_dev_read (dev_t dev, struct uio * uio, int ioflag)
 
   while (frida_link.open && frida_link.to_host_len == 0)
   {
-    if (msleep (&frida_link, frida_link.lock, PCATCH, "frida", NULL) != 0)
+    if (msleep (&frida_link, frida_link.lock, PCATCH, "meshlink", NULL) != 0)
     {
       lck_mtx_unlock (frida_link.lock);
       return EINTR;

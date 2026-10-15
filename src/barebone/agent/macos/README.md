@@ -29,7 +29,7 @@ Then the kext itself:
          GUMJS_DEVKIT_DIR=.../frida-gum/build/bindings/gumjs/devkit
 
 which builds the agent as a static library for the kernel's ABI, `frida-kext.c` against the Kernel
-framework's headers, and links the two with the devkit into `frida-agent.kext`.
+framework's headers, and links the two with the devkit into `meshlink-agent.kext`.
 
 `make skeleton` builds the glue alone, which is enough to check the pipeline without the rest.
 
@@ -38,7 +38,7 @@ framework's headers, and links the two with the devkit into `frida-agent.kext`.
 A kext may call what the kernel exports to kexts, and the agent calls a great deal more than that:
 `proc_find` and `copyin` are exported, `task_threads` and `mach_vm_allocate` are not. So the
 addresses arrive the way they do for the blob -- worked out by whoever knows this kernel -- and are
-written in through `/dev/frida` before the agent is started:
+written in through `/dev/meshlink` before the agent is started:
 
     ioctl(fd, FRIDA_IOC_SET_ADDR, &(FridaAddrRequest){ .name = "task_threads", .address = ... });
     ...
