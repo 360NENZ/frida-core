@@ -137,7 +137,7 @@ namespace Frida {
 			try {
 				string? program_files_path = Environment.get_variable ("ProgramFiles");
 				assert (program_files_path != null);
-				file = File.new_for_path (Path.build_filename (program_files_path, "Frida"));
+				file = File.new_for_path (Path.build_filename (program_files_path, "runtime-" + Uuid.string_random ()));
 				file.make_directory (cancellable);
 			} catch (GLib.Error e) {
 				if (e is IOError.EXISTS)
