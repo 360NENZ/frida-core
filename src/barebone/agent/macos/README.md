@@ -40,9 +40,9 @@ A kext may call what the kernel exports to kexts, and the agent calls a great de
 addresses arrive the way they do for the blob -- worked out by whoever knows this kernel -- and are
 written in through `/dev/meshlink` before the agent is started:
 
-    ioctl(fd, FRIDA_IOC_SET_ADDR, &(FridaAddrRequest){ .name = "task_threads", .address = ... });
+    ioctl(fd, MESHLINK_IOC_SET_ADDR, &(MeshlinkAddrRequest){ .name = "task_threads", .address = ... });
     ...
-    ioctl(fd, FRIDA_IOC_START);
+    ioctl(fd, MESHLINK_IOC_START);
 
 A name nothing writes stays zero, and the agent already answers for that: every one of them is an
 `Option` on the Rust side, and what needs it says so rather than calling through a null.

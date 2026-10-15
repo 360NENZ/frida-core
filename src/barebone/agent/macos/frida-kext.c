@@ -18,7 +18,7 @@ extern int meshlink_agent_start (uint64_t own_base, uint64_t own_size);
 extern void meshlink_agent_stop (void);
 extern void meshlink_agent_wake (void);
 
-#define FRIDA_KERNEL_ADDRS(X) \
+#define MESHLINK_KERNEL_ADDRS(X) \
   X (panic) \
   X (kalloc) X (kfree) X (kalloc_data) X (kfree_data) \
   X (proc_iterate) X (proc_find) X (proc_rele) X (proc_pid) X (proc_best_name) X (proc_task) \
@@ -40,29 +40,29 @@ extern void meshlink_agent_wake (void);
   X (convert_port_to_thread_inspect) \
   X (sock_socket) X (sock_connect) X (sock_send) X (sock_receive) X (sock_close)
 
-#define FRIDA_DEFINE_SLOT(name) void * _##name;
-FRIDA_KERNEL_ADDRS (FRIDA_DEFINE_SLOT)
-#undef FRIDA_DEFINE_SLOT
+#define MESHLINK_DEFINE_SLOT(name) void * _##name;
+MESHLINK_KERNEL_ADDRS (MESHLINK_DEFINE_SLOT)
+#undef MESHLINK_DEFINE_SLOT
 
-typedef struct _FridaKernelAddr FridaKernelAddr;
+typedef struct _MeshlinkKernelAddr MeshlinkKernelAddr;
 
-struct _FridaKernelAddr
+struct _MeshlinkKernelAddr
 {
   const char * name;
   void ** slot;
 };
 
-static const FridaKernelAddr frida_kernel_addrs[] = {
-#define FRIDA_LIST_SLOT(name) { #name, &_##name },
-  FRIDA_KERNEL_ADDRS (FRIDA_LIST_SLOT)
-#undef FRIDA_LIST_SLOT
+static const MeshlinkKernelAddr meshlink_kernel_addrs[] = {
+#define MESHLINK_LIST_SLOT(name) { #name, &_##name },
+  MESHLINK_KERNEL_ADDRS (MESHLINK_LIST_SLOT)
+#undef MESHLINK_LIST_SLOT
 };
 
-extern void * frida_kext_init_start __asm ("section$start$__DATA$__mod_init_func");
-extern void * frida_kext_init_end __asm ("section$end$__DATA$__mod_init_func");
+extern void * meshlink_kext_init_start __asm ("section$start$__DATA$__mod_init_func");
+extern void * meshlink_kext_init_end __asm ("section$end$__DATA$__mod_init_func");
 
-const uintptr_t meshlink_agent_init_start = (uintptr_t) &frida_kext_init_start;
-const uintptr_t meshlink_agent_init_end = (uintptr_t) &frida_kext_init_end;
+const uintptr_t meshlink_agent_init_start = (uintptr_t) &meshlink_kext_init_start;
+const uintptr_t meshlink_agent_init_end = (uintptr_t) &meshlink_kext_init_end;
 
 const uintptr_t meshlink_agent_private_start = 0;
 const uintptr_t meshlink_agent_heap_start = 0;
@@ -94,30 +94,30 @@ sys_icache_invalidate (void * start, size_t size)
   invalidate_icache ((vm_offset_t) start, (unsigned) size, FALSE);
 }
 
-#define FRIDA_IOC_SET_ADDR _IOW ('M', 1, FridaAddrRequest)
-#define FRIDA_IOC_START _IO ('M', 2)
-#define FRIDA_IOC_GET_IMAGE _IOR ('M', 3, FridaImageInfo)
+#define MESHLINK_IOC_SET_ADDR _IOW ('M', 1, MeshlinkAddrRequest)
+#define MESHLINK_IOC_START _IO ('M', 2)
+#define MESHLINK_IOC_GET_IMAGE _IOR ('M', 3, MeshlinkImageInfo)
 
-typedef struct _FridaAddrRequest FridaAddrRequest;
-typedef struct _FridaImageInfo FridaImageInfo;
+typedef struct _MeshlinkAddrRequest MeshlinkAddrRequest;
+typedef struct _MeshlinkImageInfo MeshlinkImageInfo;
 
-struct _FridaAddrRequest
+struct _MeshlinkAddrRequest
 {
   char name[64];
   uint64_t address;
 };
 
-struct _FridaImageInfo
+struct _MeshlinkImageInfo
 {
   uint64_t base;
   uint64_t size;
 };
 
-#define FRIDA_LINK_ROOM (1024 * 1024)
+#define MESHLINK_LINK_ROOM (1024 * 1024)
 
-typedef struct _FridaLink FridaLink;
+typedef struct _MeshlinkLink MeshlinkLink;
 
-struct _FridaLink
+struct _MeshlinkLink
 {
   lck_mtx_t * lock;
   bool open;
@@ -129,21 +129,21 @@ struct _FridaLink
   size_t from_host_len;
 };
 
-static FridaLink frida_link;
-static lck_grp_t * frida_lock_group;
+static MeshlinkLink meshlink_link;
+static lck_grp_t * meshlink_lock_group;
 
-static int frida_dev_open (dev_t dev, int flags, int devtype, struct proc * p);
-static int frida_dev_close (dev_t dev, int flags, int devtype, struct proc * p);
-static int frida_dev_read (dev_t dev, struct uio * uio, int ioflag);
-static int frida_dev_write (dev_t dev, struct uio * uio, int ioflag);
-static int frida_dev_ioctl (dev_t dev, u_long cmd, caddr_t data, int fflag, struct proc * p);
+static int meshlink_dev_open (dev_t dev, int flags, int devtype, struct proc * p);
+static int meshlink_dev_close (dev_t dev, int flags, int devtype, struct proc * p);
+static int meshlink_dev_read (dev_t dev, struct uio * uio, int ioflag);
+static int meshlink_dev_write (dev_t dev, struct uio * uio, int ioflag);
+static int meshlink_dev_ioctl (dev_t dev, u_long cmd, caddr_t data, int fflag, struct proc * p);
 
-static struct cdevsw frida_cdevsw = {
-  .d_open = frida_dev_open,
-  .d_close = frida_dev_close,
-  .d_read = frida_dev_read,
-  .d_write = frida_dev_write,
-  .d_ioctl = frida_dev_ioctl,
+static struct cdevsw meshlink_cdevsw = {
+  .d_open = meshlink_dev_open,
+  .d_close = meshlink_dev_close,
+  .d_read = meshlink_dev_read,
+  .d_write = meshlink_dev_write,
+  .d_ioctl = meshlink_dev_ioctl,
   .d_stop = eno_stop,
   .d_reset = eno_reset,
   .d_ttys = NULL,
@@ -155,33 +155,33 @@ static struct cdevsw frida_cdevsw = {
   .d_type = 0
 };
 
-static int frida_major = -1;
-static void * frida_node = NULL;
-static bool frida_running = false;
-static uint64_t frida_own_base = 0;
-static uint64_t frida_own_size = 0;
+static int meshlink_major = -1;
+static void * meshlink_node = NULL;
+static bool meshlink_running = false;
+static uint64_t meshlink_own_base = 0;
+static uint64_t meshlink_own_size = 0;
 
 kern_return_t
 meshlink_kext_start (kmod_info_t * ki, void * d)
 {
-  frida_own_base = ki->address;
-  frida_own_size = ki->size;
+  meshlink_own_base = ki->address;
+  meshlink_own_size = ki->size;
 
-  frida_lock_group = lck_grp_alloc_init ("meshlink", LCK_GRP_ATTR_NULL);
-  if (frida_lock_group == NULL)
+  meshlink_lock_group = lck_grp_alloc_init ("meshlink", LCK_GRP_ATTR_NULL);
+  if (meshlink_lock_group == NULL)
     return KERN_FAILURE;
-  frida_link.lock = lck_mtx_alloc_init (frida_lock_group, LCK_ATTR_NULL);
+  meshlink_link.lock = lck_mtx_alloc_init (meshlink_lock_group, LCK_ATTR_NULL);
 
-  frida_major = cdevsw_add (-1, &frida_cdevsw);
-  if (frida_major == -1)
+  meshlink_major = cdevsw_add (-1, &meshlink_cdevsw);
+  if (meshlink_major == -1)
     return KERN_FAILURE;
 
-  frida_node = devfs_make_node (makedev (frida_major, 0), DEVFS_CHAR, UID_ROOT, GID_WHEEL, 0600,
+  meshlink_node = devfs_make_node (makedev (meshlink_major, 0), DEVFS_CHAR, UID_ROOT, GID_WHEEL, 0600,
       "meshlink");
-  if (frida_node == NULL)
+  if (meshlink_node == NULL)
   {
-    cdevsw_remove (frida_major, &frida_cdevsw);
-    frida_major = -1;
+    cdevsw_remove (meshlink_major, &meshlink_cdevsw);
+    meshlink_major = -1;
     return KERN_FAILURE;
   }
 
@@ -191,22 +191,22 @@ meshlink_kext_start (kmod_info_t * ki, void * d)
 kern_return_t
 meshlink_kext_stop (kmod_info_t * ki, void * d)
 {
-  if (frida_running)
+  if (meshlink_running)
   {
     meshlink_agent_stop ();
-    frida_running = false;
+    meshlink_running = false;
   }
 
-  if (frida_node != NULL)
+  if (meshlink_node != NULL)
   {
-    devfs_remove (frida_node);
-    frida_node = NULL;
+    devfs_remove (meshlink_node);
+    meshlink_node = NULL;
   }
 
-  if (frida_major != -1)
+  if (meshlink_major != -1)
   {
-    cdevsw_remove (frida_major, &frida_cdevsw);
-    frida_major = -1;
+    cdevsw_remove (meshlink_major, &meshlink_cdevsw);
+    meshlink_major = -1;
   }
 
   return KERN_SUCCESS;
@@ -215,25 +215,25 @@ meshlink_kext_stop (kmod_info_t * ki, void * d)
 KMOD_EXPLICIT_DECL (re.meshlink.agent, "1.0", meshlink_kext_start, meshlink_kext_stop)
 
 static int
-frida_dev_open (dev_t dev, int flags, int devtype, struct proc * p)
+meshlink_dev_open (dev_t dev, int flags, int devtype, struct proc * p)
 {
   int result = 0;
 
-  lck_mtx_lock (frida_link.lock);
+  lck_mtx_lock (meshlink_link.lock);
 
-  if (frida_link.open)
+  if (meshlink_link.open)
   {
     result = EBUSY;
   }
   else
   {
-    frida_link.to_host = _MALLOC (FRIDA_LINK_ROOM, M_TEMP, M_WAITOK);
-    frida_link.from_host = _MALLOC (FRIDA_LINK_ROOM, M_TEMP, M_WAITOK);
-    if (frida_link.to_host != NULL && frida_link.from_host != NULL)
+    meshlink_link.to_host = _MALLOC (MESHLINK_LINK_ROOM, M_TEMP, M_WAITOK);
+    meshlink_link.from_host = _MALLOC (MESHLINK_LINK_ROOM, M_TEMP, M_WAITOK);
+    if (meshlink_link.to_host != NULL && meshlink_link.from_host != NULL)
     {
-      frida_link.to_host_len = 0;
-      frida_link.from_host_len = 0;
-      frida_link.open = true;
+      meshlink_link.to_host_len = 0;
+      meshlink_link.from_host_len = 0;
+      meshlink_link.open = true;
     }
     else
     {
@@ -241,90 +241,90 @@ frida_dev_open (dev_t dev, int flags, int devtype, struct proc * p)
     }
   }
 
-  lck_mtx_unlock (frida_link.lock);
+  lck_mtx_unlock (meshlink_link.lock);
 
   return result;
 }
 
 static int
-frida_dev_close (dev_t dev, int flags, int devtype, struct proc * p)
+meshlink_dev_close (dev_t dev, int flags, int devtype, struct proc * p)
 {
-  lck_mtx_lock (frida_link.lock);
+  lck_mtx_lock (meshlink_link.lock);
 
-  frida_link.open = false;
-  if (frida_link.to_host != NULL)
+  meshlink_link.open = false;
+  if (meshlink_link.to_host != NULL)
   {
-    _FREE (frida_link.to_host, M_TEMP);
-    frida_link.to_host = NULL;
+    _FREE (meshlink_link.to_host, M_TEMP);
+    meshlink_link.to_host = NULL;
   }
-  if (frida_link.from_host != NULL)
+  if (meshlink_link.from_host != NULL)
   {
-    _FREE (frida_link.from_host, M_TEMP);
-    frida_link.from_host = NULL;
+    _FREE (meshlink_link.from_host, M_TEMP);
+    meshlink_link.from_host = NULL;
   }
 
-  wakeup (&frida_link);
+  wakeup (&meshlink_link);
 
-  lck_mtx_unlock (frida_link.lock);
+  lck_mtx_unlock (meshlink_link.lock);
 
   return 0;
 }
 
 static int
-frida_dev_read (dev_t dev, struct uio * uio, int ioflag)
+meshlink_dev_read (dev_t dev, struct uio * uio, int ioflag)
 {
   int result = 0;
 
-  lck_mtx_lock (frida_link.lock);
+  lck_mtx_lock (meshlink_link.lock);
 
-  while (frida_link.open && frida_link.to_host_len == 0)
+  while (meshlink_link.open && meshlink_link.to_host_len == 0)
   {
-    if (msleep (&frida_link, frida_link.lock, PCATCH, "meshlink", NULL) != 0)
+    if (msleep (&meshlink_link, meshlink_link.lock, PCATCH, "meshlink", NULL) != 0)
     {
-      lck_mtx_unlock (frida_link.lock);
+      lck_mtx_unlock (meshlink_link.lock);
       return EINTR;
     }
   }
 
-  if (frida_link.to_host_len != 0)
+  if (meshlink_link.to_host_len != 0)
   {
-    size_t n = MIN ((size_t) uio_resid (uio), frida_link.to_host_len);
+    size_t n = MIN ((size_t) uio_resid (uio), meshlink_link.to_host_len);
 
-    result = uiomove ((const char *) frida_link.to_host, (int) n, uio);
+    result = uiomove ((const char *) meshlink_link.to_host, (int) n, uio);
     if (result == 0)
     {
-      memmove (frida_link.to_host, frida_link.to_host + n, frida_link.to_host_len - n);
-      frida_link.to_host_len -= n;
+      memmove (meshlink_link.to_host, meshlink_link.to_host + n, meshlink_link.to_host_len - n);
+      meshlink_link.to_host_len -= n;
     }
   }
 
-  lck_mtx_unlock (frida_link.lock);
+  lck_mtx_unlock (meshlink_link.lock);
 
   return result;
 }
 
 static int
-frida_dev_write (dev_t dev, struct uio * uio, int ioflag)
+meshlink_dev_write (dev_t dev, struct uio * uio, int ioflag)
 {
   size_t n;
   int result;
 
-  lck_mtx_lock (frida_link.lock);
+  lck_mtx_lock (meshlink_link.lock);
 
-  n = MIN ((size_t) uio_resid (uio), FRIDA_LINK_ROOM - frida_link.from_host_len);
+  n = MIN ((size_t) uio_resid (uio), MESHLINK_LINK_ROOM - meshlink_link.from_host_len);
   if (n == 0)
   {
-    lck_mtx_unlock (frida_link.lock);
+    lck_mtx_unlock (meshlink_link.lock);
     return ENOBUFS;
   }
 
-  result = uiomove ((char *) frida_link.from_host + frida_link.from_host_len, (int) n, uio);
+  result = uiomove ((char *) meshlink_link.from_host + meshlink_link.from_host_len, (int) n, uio);
   if (result == 0)
-    frida_link.from_host_len += n;
+    meshlink_link.from_host_len += n;
 
-  lck_mtx_unlock (frida_link.lock);
+  lck_mtx_unlock (meshlink_link.lock);
 
-  if (result == 0 && frida_running)
+  if (result == 0 && meshlink_running)
     meshlink_agent_wake ();
 
   return result;
@@ -333,7 +333,7 @@ frida_dev_write (dev_t dev, struct uio * uio, int ioflag)
 int
 meshlink_kmod_link_open (void)
 {
-  return frida_link.open ? 0 : -1;
+  return meshlink_link.open ? 0 : -1;
 }
 
 void
@@ -344,20 +344,20 @@ meshlink_kmod_link_close (void)
 int
 meshlink_kmod_link_send (const void * data, size_t size)
 {
-  lck_mtx_lock (frida_link.lock);
+  lck_mtx_lock (meshlink_link.lock);
 
-  if (!frida_link.open || frida_link.to_host_len + size > FRIDA_LINK_ROOM)
+  if (!meshlink_link.open || meshlink_link.to_host_len + size > MESHLINK_LINK_ROOM)
   {
-    lck_mtx_unlock (frida_link.lock);
+    lck_mtx_unlock (meshlink_link.lock);
     return -1;
   }
 
-  memcpy (frida_link.to_host + frida_link.to_host_len, data, size);
-  frida_link.to_host_len += size;
+  memcpy (meshlink_link.to_host + meshlink_link.to_host_len, data, size);
+  meshlink_link.to_host_len += size;
 
-  wakeup (&frida_link);
+  wakeup (&meshlink_link);
 
-  lck_mtx_unlock (frida_link.lock);
+  lck_mtx_unlock (meshlink_link.lock);
 
   return 0;
 }
@@ -367,11 +367,11 @@ meshlink_kmod_link_pending (void)
 {
   bool pending;
 
-  lck_mtx_lock (frida_link.lock);
+  lck_mtx_lock (meshlink_link.lock);
 
-  pending = frida_link.from_host_len != 0;
+  pending = meshlink_link.from_host_len != 0;
 
-  lck_mtx_unlock (frida_link.lock);
+  lck_mtx_unlock (meshlink_link.lock);
 
   return pending;
 }
@@ -381,62 +381,62 @@ meshlink_kmod_link_recv (void * data, size_t size)
 {
   size_t n;
 
-  lck_mtx_lock (frida_link.lock);
+  lck_mtx_lock (meshlink_link.lock);
 
-  n = MIN (size, frida_link.from_host_len);
+  n = MIN (size, meshlink_link.from_host_len);
   if (n != 0)
   {
-    memcpy (data, frida_link.from_host, n);
-    memmove (frida_link.from_host, frida_link.from_host + n, frida_link.from_host_len - n);
-    frida_link.from_host_len -= n;
+    memcpy (data, meshlink_link.from_host, n);
+    memmove (meshlink_link.from_host, meshlink_link.from_host + n, meshlink_link.from_host_len - n);
+    meshlink_link.from_host_len -= n;
   }
 
-  lck_mtx_unlock (frida_link.lock);
+  lck_mtx_unlock (meshlink_link.lock);
 
   return (ssize_t) n;
 }
 
 static int
-frida_dev_ioctl (dev_t dev, u_long cmd, caddr_t data, int fflag, struct proc * p)
+meshlink_dev_ioctl (dev_t dev, u_long cmd, caddr_t data, int fflag, struct proc * p)
 {
   switch (cmd)
   {
-    case FRIDA_IOC_SET_ADDR:
+    case MESHLINK_IOC_SET_ADDR:
     {
-      FridaAddrRequest * r = (FridaAddrRequest *) data;
+      MeshlinkAddrRequest * r = (MeshlinkAddrRequest *) data;
       size_t i;
 
       r->name[sizeof (r->name) - 1] = '\0';
 
-      for (i = 0; i != sizeof (frida_kernel_addrs) / sizeof (frida_kernel_addrs[0]); i++)
+      for (i = 0; i != sizeof (meshlink_kernel_addrs) / sizeof (meshlink_kernel_addrs[0]); i++)
       {
-        if (strncmp (frida_kernel_addrs[i].name, r->name, sizeof (r->name)) == 0)
+        if (strncmp (meshlink_kernel_addrs[i].name, r->name, sizeof (r->name)) == 0)
         {
-          *frida_kernel_addrs[i].slot = (void *) (uintptr_t) r->address;
+          *meshlink_kernel_addrs[i].slot = (void *) (uintptr_t) r->address;
           return 0;
         }
       }
 
       return ENOENT;
     }
-    case FRIDA_IOC_GET_IMAGE:
+    case MESHLINK_IOC_GET_IMAGE:
     {
-      FridaImageInfo * info = (FridaImageInfo *) data;
+      MeshlinkImageInfo * info = (MeshlinkImageInfo *) data;
 
-      info->base = frida_own_base;
-      info->size = frida_own_size;
+      info->base = meshlink_own_base;
+      info->size = meshlink_own_size;
 
       return 0;
     }
-    case FRIDA_IOC_START:
+    case MESHLINK_IOC_START:
     {
-      if (frida_running)
+      if (meshlink_running)
         return EBUSY;
 
-      if (meshlink_agent_start (frida_own_base, frida_own_size) != 0)
+      if (meshlink_agent_start (meshlink_own_base, meshlink_own_size) != 0)
         return ENOMEM;
 
-      frida_running = true;
+      meshlink_running = true;
 
       return 0;
     }
