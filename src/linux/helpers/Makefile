@@ -14,6 +14,7 @@ KERNEL_MAKE ?= make
 KERNEL_SED ?= sed
 KERNEL_AWK ?= awk
 BPF_CLANG ?= clang
+BPF_CFLAGS ?= -ffreestanding -ffile-prefix-map=$(abspath $(top_srcdir))=/usr/src/meshlink-core
 endif
 
 ifdef FRIDA_HOST
@@ -96,6 +97,7 @@ endef
 
 define bpf_compile
 	$(BPF_CLANG) \
+		$(BPF_CFLAGS) \
 		-target $(1) \
 		-D__TARGET_ARCH_$(2) \
 		$(if $(call has_compat32,$(3)),-DFRIDA_HAS_COMPAT32=1,) \
