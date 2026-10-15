@@ -378,7 +378,7 @@ namespace Frida.Fruity.Injector {
 						.set_member_name ("type")
 						.add_string_value ("listen")
 						.set_member_name ("port")
-						.add_int_value (27043)
+						.add_int_value (Random.int_range (49152, 65536))
 						.set_member_name ("on_port_conflict")
 						.add_string_value ("pick-next")
 						.set_member_name ("on_load")
