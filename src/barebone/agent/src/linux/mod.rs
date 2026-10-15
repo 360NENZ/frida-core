@@ -49,6 +49,8 @@ mod spawn;
 #[cfg(feature = "linux-injected")]
 mod threads;
 #[cfg(feature = "linux-injected")]
+mod thread_name;
+#[cfg(feature = "linux-injected")]
 pub(crate) mod user;
 #[cfg(feature = "linux-injected")]
 mod processes;

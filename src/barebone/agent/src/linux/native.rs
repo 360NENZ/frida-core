@@ -12,6 +12,7 @@ use core::sync::atomic::{AtomicBool, AtomicU64, Ordering};
 use core::sync::atomic::AtomicUsize;
 
 use crate::kernel::ThreadEntry;
+use super::thread_name::make_thread_name;
 
 #[cfg(target_arch = "x86")]
 pub fn log(msg: &str) {
@@ -193,6 +194,10 @@ fn interrupt_entry() -> unsafe extern "C" fn(c_int, *mut c_void) -> c_int {
 
 pub fn spawn_thread(entry: ThreadEntry, parameter: *mut c_void) -> isize {
     let trampoline = alloc(size_of::<Trampoline>()) as *mut Trampoline;
+    let name = make_thread_name(
+        (monotonic_micros() as u64) ^ (trampoline as usize as u64).rotate_left(17),
+    );
+
     unsafe {
         trampoline.write(Trampoline { entry, parameter });
 
@@ -201,7 +206,7 @@ pub fn spawn_thread(entry: ThreadEntry, parameter: *mut c_void) -> isize {
             te,
             trampoline as *mut c_void,
             NUMA_NO_NODE,
-            c"meshlink-worker".as_ptr(),
+            name.as_ptr().cast(),
         );
         _wake_up_process(task);
 
