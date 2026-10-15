@@ -1,5 +1,5 @@
 // The agent as a kernel module: every primitive is an ordinary call into
-// linux/frida-kmod.c, compiled by kbuild against the target kernel's headers,
+// linux/meshlink-kmod.c, compiled by kbuild against the target kernel's headers,
 // which is what keeps us out of the business of guessing struct layouts,
 // config-dependent macros and per-version symbol names.
 

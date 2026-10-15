@@ -3,7 +3,7 @@
 #
 #   1. Collapse the Rust staticlib plus everything it needs — the GumJS devkit and
 #      the C library — into one relocatable object, and localize every symbol except
-#      the entry points frida-kmod.c calls. Localizing matters: Gum and the C library
+#      the entry points meshlink-kmod.c calls. Localizing matters: Gum and the C library
 #      define names like memcpy and malloc that must not leak into the kernel's
 #      namespace.
 #   2. Hand that object to kbuild as a shipped object, so vermagic, modinfo and
@@ -112,7 +112,7 @@ LIBBUILTINS = $(FRIDA_SDK)/lib/libclang_rt.builtins.a
 # version, and on x86_64 the soft-float ABI is reachable only as an -Xclang feature.
 AGENT_CC ?= clang
 
-PRELINKED := frida-agent-prelinked.o.bin
+PRELINKED := meshlink-agent-prelinked.o.bin
 
 AGENT_LIB_SOFTFLOAT := $(AGENT_TARGET_DIR)/libfrida-barebone-agent-softfloat.a
 
@@ -146,7 +146,7 @@ ENTRY_POINTS := frida_agent_start frida_agent_stop \
 KEEP_GLOBAL := $(foreach s,$(ENTRY_POINTS),--keep-global-symbol=$(s))
 
 # Two structures the reparenting path reaches into lost a member upstream, and
-# neither change announces itself as anything frida-kmod.c could test for. The
+# neither change announces itself as anything meshlink-kmod.c could test for. The
 # headers it is compiled against are the authority on both, so ask them.
 FRIDA_KMOD_DEFS := \
 	$(if $(shell grep -l 'list_head[[:space:]]*thread_group;' \

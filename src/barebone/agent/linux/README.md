@@ -8,7 +8,7 @@ loaded from the inside as an ordinary kernel module.
 |                   | XNU                                              | Linux                                     |
 |-------------------|--------------------------------------------------|-------------------------------------------|
 | Delivery          | remote stub injects a freestanding ELF           | `insmod meshlink-agent.ko`                |
-| Kernel primitives | addresses patched into `.kernel_addrs` by the host | direct calls into `frida-kmod.c`        |
+| Kernel primitives | addresses patched into `.kernel_addrs` by the host | direct calls into `meshlink-kmod.c`     |
 | Bootstrap config  | GVariant blob written into guest memory          | module parameters                         |
 | Transport         | virtio hostlink or vsock                         | `/dev/meshlink` character device          |
 | Page permissions  | host rewrites descriptors over the hostlink      | `set_memory_*()`                          |

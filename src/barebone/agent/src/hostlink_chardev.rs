@@ -2,7 +2,7 @@
 // little-endian length prefix) so the host-side (yqv) protocol is identical across
 // every transport.
 //
-// The character device itself lives in linux/frida-kmod.c and hands us a byte
+// The character device itself lives in linux/meshlink-kmod.c and hands us a byte
 // stream; whoever opens the device decides how it reaches the host.
 
 use core::cell::UnsafeCell;
