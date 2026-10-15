@@ -9,4 +9,4 @@
 #![no_std]
 #![no_main]
 
-use frida_barebone_agent as _;
+use meshlink_barebone_agent as _;

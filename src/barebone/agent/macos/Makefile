@@ -15,7 +15,7 @@ endif
 
 AGENT_DIR := $(CURDIR)/..
 AGENT_TARGET_DIR := $(AGENT_DIR)/target-xnu-kext
-AGENT_LIB := $(AGENT_TARGET_DIR)/$(RUST_TARGET)/$(PROFILE)/libfrida_barebone_agent.a
+AGENT_LIB := $(AGENT_TARGET_DIR)/$(RUST_TARGET)/$(PROFILE)/libmeshlink_barebone_agent.a
 
 SDK ?= $(shell xcrun --sdk macosx --show-sdk-path)
 KERNEL_HEADERS := $(SDK)/System/Library/Frameworks/Kernel.framework/Headers

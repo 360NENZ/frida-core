@@ -9,7 +9,7 @@
     "free_function": "0xfffffff007a3c338"
   },
   "agent": {
-    "path": "/Users/oleavr/src/frida-core/src/barebone/agent/target/aarch64-unknown-none/release/frida-barebone-agent",
+    "path": "/Users/oleavr/src/frida-core/src/barebone/agent/target/aarch64-unknown-none/release/meshlink-barebone-agent",
     "transport": {
       "type": "hostlink",
       "qmp": "unix:/Users/oleavr/src/frida-barebone-ios/qmp.sock"

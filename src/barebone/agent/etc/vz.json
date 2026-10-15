@@ -12,7 +12,7 @@
     "alloc_flags": 512
   },
   "agent": {
-    "path": "/Users/oleavr/src/frida-core/src/barebone/agent/target/aarch64-unknown-none/release/frida-barebone-agent",
+    "path": "/Users/oleavr/src/frida-core/src/barebone/agent/target/aarch64-unknown-none/release/meshlink-barebone-agent",
     "transport": {
       "type": "vsock",
       "socket_path": "/tmp/claude-501/vphone-frida-21528.sock",

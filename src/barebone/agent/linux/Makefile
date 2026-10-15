@@ -47,7 +47,7 @@ AGENT_TARGET_FLAGS ?= --target $(RUST_TARGET)
 
 AGENT_DIR := $(CURDIR)/..
 AGENT_TARGET_DIR := $(AGENT_DIR)/target-linux
-AGENT_LIB := $(AGENT_TARGET_DIR)/$(RUST_TARGET)/$(PROFILE)/libfrida_barebone_agent.a
+AGENT_LIB := $(AGENT_TARGET_DIR)/$(RUST_TARGET)/$(PROFILE)/libmeshlink_barebone_agent.a
 
 GUMJS_DEVKIT_DIR ?= $(error Set GUMJS_DEVKIT_DIR to the directory holding libfrida-gumjs.a)
 
@@ -114,7 +114,7 @@ AGENT_CC ?= clang
 
 PRELINKED := meshlink-agent-prelinked.o.bin
 
-AGENT_LIB_SOFTFLOAT := $(AGENT_TARGET_DIR)/libfrida-barebone-agent-softfloat.a
+AGENT_LIB_SOFTFLOAT := $(AGENT_TARGET_DIR)/libmeshlink-barebone-agent-softfloat.a
 
 # On arm64 the toolchain's own compiler_builtins is compiled for the ordinary AAPCS,
 # where a double travels in d0: its __muldf3 opens with "fmov x14, d0". Everything

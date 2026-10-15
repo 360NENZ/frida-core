@@ -2254,7 +2254,7 @@ namespace Frida {
 	 * 5. Injecting a remote agent:
 	 *  {
 	 *    "agent": {
-	 *      "path": "/path/to/target/aarch64-unknown-none/release/frida-barebone-agent",
+	 *      "path": "/path/to/target/aarch64-unknown-none/release/meshlink-barebone-agent",
 	 *      "transport": {
 	 *        "type": "hostlink",
 	 *        "qmp": "unix:/path/to/qmp.sock",

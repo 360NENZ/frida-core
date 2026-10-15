@@ -1,18 +1,18 @@
 [package]
-name = "frida-barebone-agent"
+name = "meshlink-barebone-agent"
 version = "1.0.0"
 edition = "2024"
 build = "build.rs"
 
 [lib]
-name = "frida_barebone_agent"
+name = "meshlink_barebone_agent"
 path = "src/lib.rs"
 crate-type = ["rlib", "staticlib"]
 
 # The XNU flavour is a freestanding executable the host injects and calls into.
 # The Linux flavour is the staticlib above, linked into a .ko by linux/Kbuild.
 [[bin]]
-name = "frida-barebone-agent"
+name = "meshlink-barebone-agent"
 path = "src/main.rs"
 required-features = ["blob"]
 
