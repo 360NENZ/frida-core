@@ -25,7 +25,7 @@ pub use crate::win9x_user::{
     spawn_process, thread_entry_points, thread_exit_slot, thread_start, thread_start_slot,
 };
 
-pub use frida_win9x_thread_start_thunk as on_thread_start;
+pub use meshlink_win9x_thread_start_thunk as on_thread_start;
 
 pub const MODULE_DIRECTORY: &str = "/WINDOWS/SYSTEM/VMM32/";
 
@@ -148,12 +148,12 @@ pub fn spawn_thread(entry: ThreadEntry, parameter: *mut c_void) -> isize {
 pub fn run_when_ready(action: fn()) {
     unsafe {
         READY_ACTION = Some(action);
-        schedule_global_event(frida_win9x_event_thunk);
+        schedule_global_event(meshlink_win9x_event_thunk);
     }
 }
 
 #[unsafe(no_mangle)]
-extern "C" fn frida_win9x_on_event() {
+extern "C" fn meshlink_win9x_on_event() {
     if let Some(action) = unsafe { READY_ACTION } {
         action();
     }
@@ -162,7 +162,7 @@ extern "C" fn frida_win9x_on_event() {
 static mut READY_ACTION: Option<fn()> = None;
 
 #[unsafe(no_mangle)]
-extern "C" fn frida_win9x_thread_start() {
+extern "C" fn meshlink_win9x_thread_start() {
     unsafe {
         if let Some(entry) = THREAD_ENTRY {
             entry(THREAD_PARAMETER, 0);
@@ -1234,7 +1234,7 @@ mod kernel {
             vwin32_create_ring0_thread(
                 THREAD_STACK_SIZE as u32,
                 0,
-                frida_win9x_thread_thunk as *const () as u32,
+                meshlink_win9x_thread_thunk as *const () as u32,
                 0,
             ) as isize
         }
@@ -1263,7 +1263,7 @@ mod kernel {
     pub fn wake(token: *const u8) {
         if unsafe { super::IN_INTERRUPT } {
             super::WAKE_WANTED.store(token as usize, Ordering::Release);
-            unsafe { schedule_global_event(frida_win9x_wake_event_thunk) };
+            unsafe { schedule_global_event(meshlink_win9x_wake_event_thunk) };
 
             return;
         }
@@ -1752,7 +1752,7 @@ pub fn install_interrupt_handler(
         IRQ_DESCRIPTOR = VpicdIrqDescriptor {
             irq_number: irq as u16,
             options: VPICD_OPT_REF_DATA | VPICD_OPT_CAN_SHARE,
-            hw_int_proc: frida_win9x_hw_int_thunk,
+            hw_int_proc: meshlink_win9x_hw_int_thunk,
             virt_int_proc: 0,
             eoi_proc: 0,
             mask_change_proc: 0,
@@ -2344,7 +2344,7 @@ pub fn hear_from_vmm() {
         ddb[DDB_SDK_VERSION / 4] = SDK_VERSION;
         ddb[DDB_NAME / 4] = u32::from_le_bytes(*b"FRID");
         ddb[DDB_NAME / 4 + 1] = u32::from_le_bytes(*b"A   ");
-        ddb[DDB_CONTROL_PROC / 4] = frida_win9x_control_thunk as *const () as u32;
+        ddb[DDB_CONTROL_PROC / 4] = meshlink_win9x_control_thunk as *const () as u32;
 
         vmm_add_ddb(ddb.as_mut_ptr() as u32);
     }
@@ -2369,7 +2369,7 @@ static mut HEARING: bool = false;
 // which is the eight registers, the flags, the room it keeps for the original, and the place the
 // replacement of the Interceptor returns to.
 #[unsafe(no_mangle)]
-extern "C" fn frida_win9x_on_thread_start(frame: *const u32) -> usize {
+extern "C" fn meshlink_win9x_on_thread_start(frame: *const u32) -> usize {
     let routine = unsafe { frame.add(START_ROUTINE).read() } as usize;
     let parameter = unsafe { frame.add(START_PARAMETER).read() } as usize;
 
@@ -2382,7 +2382,7 @@ const START_ROUTINE: usize = 11;
 const START_PARAMETER: usize = 12;
 
 #[unsafe(no_mangle)]
-extern "C" fn frida_win9x_on_control(message: u32, thread: u32) {
+extern "C" fn meshlink_win9x_on_control(message: u32, thread: u32) {
     if message == TERMINATE_THREAD {
         tell_the_copy_of_a_departure(thread);
     }
@@ -2451,9 +2451,9 @@ const DESTROY_THREAD: u32 = 0x21;
 pub fn install_fault_reporter() {
     unsafe {
         for (fault, thunk) in [
-            (INVALID_OPCODE, frida_win9x_fault_thunk_ud as unsafe extern "C" fn()),
-            (GENERAL_PROTECTION, frida_win9x_fault_thunk_gp as unsafe extern "C" fn()),
-            (PAGE_FAULT, frida_win9x_fault_thunk_pf as unsafe extern "C" fn()),
+            (INVALID_OPCODE, meshlink_win9x_fault_thunk_ud as unsafe extern "C" fn()),
+            (GENERAL_PROTECTION, meshlink_win9x_fault_thunk_gp as unsafe extern "C" fn()),
+            (PAGE_FAULT, meshlink_win9x_fault_thunk_pf as unsafe extern "C" fn()),
         ] {
             FAULT_CHAIN[fault as usize] = fault_handler(fault);
             (thunk as *mut u32).sub(2).write_volatile(thunk as u32);
@@ -2481,9 +2481,9 @@ fn set_fault_handler(fault: u32, handler: u32) {
 pub fn release_fault_reporter() {
     unsafe {
         for (fault, thunk) in [
-            (INVALID_OPCODE, frida_win9x_fault_thunk_ud as unsafe extern "C" fn()),
-            (GENERAL_PROTECTION, frida_win9x_fault_thunk_gp as unsafe extern "C" fn()),
-            (PAGE_FAULT, frida_win9x_fault_thunk_pf as unsafe extern "C" fn()),
+            (INVALID_OPCODE, meshlink_win9x_fault_thunk_ud as unsafe extern "C" fn()),
+            (GENERAL_PROTECTION, meshlink_win9x_fault_thunk_gp as unsafe extern "C" fn()),
+            (PAGE_FAULT, meshlink_win9x_fault_thunk_pf as unsafe extern "C" fn()),
         ] {
             let previous = FAULT_CHAIN[fault as usize];
             if previous == 0 {
@@ -2507,7 +2507,7 @@ pub fn release_fault_reporter() {
 const SLOT_JUMPS_OVER_ITSELF: u32 = 0x9090_02eb;
 
 #[unsafe(no_mangle)]
-extern "C" fn frida_win9x_on_fault(fault: u32, frame: *mut u32) -> u32 {
+extern "C" fn meshlink_win9x_on_fault(fault: u32, frame: *mut u32) -> u32 {
     let Some(registers) = our_fault_frame(frame) else {
         return unsafe { FAULT_CHAIN[fault as usize] };
     };
@@ -2541,11 +2541,11 @@ extern "C" fn frida_win9x_on_fault(fault: u32, frame: *mut u32) -> u32 {
         }
 
         report_unhandled_fault(fault, cpu_context.eip);
-        cpu_context.eip = frida_win9x_park as *const () as u32;
+        cpu_context.eip = meshlink_win9x_park as *const () as u32;
     }
 
     unsafe {
-        frida_win9x_resume = [
+        meshlink_win9x_resume = [
             cpu_context.eip,
             cpu_context.edi,
             cpu_context.esi,
@@ -2597,7 +2597,7 @@ fn report_unhandled_fault(fault: u32, eip: u32) {
 }
 
 // Nothing can recover from this, thus the thread stops here.
-extern "C" fn frida_win9x_park() -> ! {
+extern "C" fn meshlink_win9x_park() -> ! {
     loop {
         wait(core::ptr::addr_of!(PARK_TOKEN), Some(PARK_SLICE_US), &mut || false);
     }
@@ -2606,7 +2606,7 @@ extern "C" fn frida_win9x_park() -> ! {
 static mut PARK_TOKEN: u8 = 0;
 
 #[unsafe(no_mangle)]
-static mut frida_win9x_resume: [u32; 9] = [0; 9];
+static mut meshlink_win9x_resume: [u32; 9] = [0; 9];
 
 fn exception_type_for(fault: u32) -> crate::bindings::GumExceptionType {
     use crate::bindings::*;
@@ -2653,7 +2653,7 @@ const GENERAL_PROTECTION: u32 = 13;
 const PAGE_FAULT: u32 = 14;
 
 #[unsafe(no_mangle)]
-extern "C" fn frida_win9x_on_hw_int(_ref_data: *mut c_void) {
+extern "C" fn meshlink_win9x_on_hw_int(_ref_data: *mut c_void) {
     unsafe {
         IN_INTERRUPT = true;
         if let Some(handler) = HW_INT_HANDLER {
@@ -2665,7 +2665,7 @@ extern "C" fn frida_win9x_on_hw_int(_ref_data: *mut c_void) {
 }
 
 #[unsafe(no_mangle)]
-extern "C" fn frida_win9x_on_wake_event() {
+extern "C" fn meshlink_win9x_on_wake_event() {
     let token = WAKE_WANTED.swap(0, Ordering::AcqRel);
     if token != 0 {
         crate::nudge_the_loop(token as *const u8);
@@ -2680,7 +2680,7 @@ static mut IRQ_HANDLE: u32 = 0;
 static mut IRQ_DESCRIPTOR: VpicdIrqDescriptor = VpicdIrqDescriptor {
     irq_number: 0,
     options: 0,
-    hw_int_proc: frida_win9x_hw_int_thunk,
+    hw_int_proc: meshlink_win9x_hw_int_thunk,
     virt_int_proc: 0,
     eoi_proc: 0,
     mask_change_proc: 0,
@@ -2787,22 +2787,22 @@ unsafe extern "C" {
     fn hook_vmm_fault(fault: u32, handler: unsafe extern "C" fn()) -> u32;
     fn vmm_add_ddb(ddb: u32) -> u32;
     fn vmm_remove_ddb(ddb: u32);
-    fn frida_win9x_control_thunk();
-    pub fn frida_win9x_thread_start_thunk();
+    fn meshlink_win9x_control_thunk();
+    pub fn meshlink_win9x_thread_start_thunk();
     fn unhook_vmm_fault(fault: u32, handler: u32);
-    fn frida_win9x_fault_thunk_ud();
-    fn frida_win9x_fault_thunk_gp();
-    fn frida_win9x_fault_thunk_pf();
+    fn meshlink_win9x_fault_thunk_ud();
+    fn meshlink_win9x_fault_thunk_gp();
+    fn meshlink_win9x_fault_thunk_pf();
     fn get_sys_vm_handle() -> u32;
     fn schedule_global_event(callback: unsafe extern "C" fn()) -> u32;
-    fn frida_win9x_event_thunk();
-    fn frida_win9x_wake_event_thunk();
+    fn meshlink_win9x_event_thunk();
+    fn meshlink_win9x_wake_event_thunk();
     fn get_initial_thread_handle(vm: u32) -> u32;
     fn get_next_thread_handle(thread: u32) -> u32;
     fn ifsmgr_ring0_file_io(function: u32, ebx: u32, ecx: u32, edx: u32, esi: u32, edi: u32) -> u32;
     fn vwin32_create_ring0_thread(stack_size: u32, parameter: u32, entry: u32, event: u32) -> u32;
-    fn frida_win9x_hw_int_thunk();
-    fn frida_win9x_thread_thunk();
+    fn meshlink_win9x_hw_int_thunk();
+    fn meshlink_win9x_thread_thunk();
 }
 
 core::arch::global_asm!(
@@ -2810,17 +2810,17 @@ core::arch::global_asm!(
 // A position-independent image cannot name its data in an instruction. Thus the code reads the
 // program counter, from which the offset to the data is known, and adds the offset. The frame
 // pointer holds the result, because no service reads that register.
-frida_win9x_get_pc_ebp:
+meshlink_win9x_get_pc_ebp:
     mov ebp, [esp]
     ret
 
-frida_win9x_get_pc_ebx:
+meshlink_win9x_get_pc_ebx:
     mov ebx, [esp]
     ret
 
 .macro CALL_SERVICE slot
     push ebp
-    call frida_win9x_get_pc_ebp
+    call meshlink_win9x_get_pc_ebp
     add ebp, offset _GLOBAL_OFFSET_TABLE_
     call dword ptr [ebp + \slot@GOTOFF]
     pop ebp
@@ -2922,17 +2922,17 @@ schedule_global_event:
     pop ebp
     ret
 
-.global frida_win9x_event_thunk
-frida_win9x_event_thunk:
+.global meshlink_win9x_event_thunk
+meshlink_win9x_event_thunk:
     pushad
-    call frida_win9x_on_event
+    call meshlink_win9x_on_event
     popad
     ret
 
-.global frida_win9x_wake_event_thunk
-frida_win9x_wake_event_thunk:
+.global meshlink_win9x_wake_event_thunk
+meshlink_win9x_wake_event_thunk:
     pushad
-    call frida_win9x_on_wake_event
+    call meshlink_win9x_on_wake_event
     popad
     ret
 
@@ -3063,25 +3063,25 @@ vmm_remove_ddb:
     pop ebp
     ret
 
-.global frida_win9x_thread_start_thunk
-frida_win9x_thread_start_thunk:
+.global meshlink_win9x_thread_start_thunk
+meshlink_win9x_thread_start_thunk:
     push eax
     pushfd
     pushad
     push esp
-    call frida_win9x_on_thread_start
+    call meshlink_win9x_on_thread_start
     add esp, 4
     mov [esp + 36], eax
     popad
     popfd
     ret
 
-.global frida_win9x_control_thunk
-frida_win9x_control_thunk:
+.global meshlink_win9x_control_thunk
+meshlink_win9x_control_thunk:
     pushad
     push edi
     push eax
-    call frida_win9x_on_control
+    call meshlink_win9x_on_control
     add esp, 8
     popad
     clc
@@ -3138,29 +3138,29 @@ hook_vmm_fault:
 \name:
     .byte 0xeb, 0x02, 0x90, 0x90
     push \fault
-    jmp frida_win9x_fault_common
+    jmp meshlink_win9x_fault_common
 .endm
 
-FAULT_THUNK frida_win9x_fault_thunk_ud, 6
-FAULT_THUNK frida_win9x_fault_thunk_gp, 13
-FAULT_THUNK frida_win9x_fault_thunk_pf, 14
+FAULT_THUNK meshlink_win9x_fault_thunk_ud, 6
+FAULT_THUNK meshlink_win9x_fault_thunk_gp, 13
+FAULT_THUNK meshlink_win9x_fault_thunk_pf, 14
 
-frida_win9x_fault_common:
+meshlink_win9x_fault_common:
     pushad
     mov eax, [esp + 32]
     push esp
     push eax
-    call frida_win9x_on_fault
+    call meshlink_win9x_on_fault
     add esp, 8
     test eax, eax
-    jz frida_win9x_fault_resume
+    jz meshlink_win9x_fault_resume
     mov [esp + 32], eax
     popad
     ret
-frida_win9x_fault_resume:
-    call frida_win9x_get_pc_ebx
+meshlink_win9x_fault_resume:
+    call meshlink_win9x_get_pc_ebx
     add ebx, offset _GLOBAL_OFFSET_TABLE_
-    lea ebx, [ebx + frida_win9x_resume@GOTOFF]
+    lea ebx, [ebx + meshlink_win9x_resume@GOTOFF]
     mov esp, [ebx + 16]
     push dword ptr [ebx]
     push dword ptr [ebx + 32]
@@ -3183,9 +3183,9 @@ set_global_time_out:
     push edi
     mov eax, [ebp + 8]
     mov edx, [ebp + 12]
-    call frida_win9x_get_pc_ebp
+    call meshlink_win9x_get_pc_ebp
     add ebp, offset _GLOBAL_OFFSET_TABLE_
-    lea esi, [ebp + frida_win9x_time_out_thunk@GOTOFF]
+    lea esi, [ebp + meshlink_win9x_time_out_thunk@GOTOFF]
     call dword ptr [ebp + _Set_Global_Time_Out@GOTOFF]
     mov eax, esi
     pop edi
@@ -3209,8 +3209,8 @@ cancel_time_out:
     pop ebp
     ret
 
-.global frida_win9x_time_out_thunk
-frida_win9x_time_out_thunk:
+.global meshlink_win9x_time_out_thunk
+meshlink_win9x_time_out_thunk:
     pushad
     mov eax, edx
     CALL_SERVICE _Signal_Semaphore
@@ -3283,16 +3283,16 @@ vpicd_virtualize_irq:
     pop ebp
     ret
 
-.global frida_win9x_thread_thunk
-frida_win9x_thread_thunk:
-    call frida_win9x_thread_start
+.global meshlink_win9x_thread_thunk
+meshlink_win9x_thread_thunk:
+    call meshlink_win9x_thread_start
     ret
 
-.global frida_win9x_hw_int_thunk
-frida_win9x_hw_int_thunk:
+.global meshlink_win9x_hw_int_thunk
+meshlink_win9x_hw_int_thunk:
     pushad
     push edx
-    call frida_win9x_on_hw_int
+    call meshlink_win9x_on_hw_int
     add esp, 4
     popad
     clc
