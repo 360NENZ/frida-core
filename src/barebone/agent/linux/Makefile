@@ -150,9 +150,9 @@ KEEP_GLOBAL := $(foreach s,$(ENTRY_POINTS),--keep-global-symbol=$(s))
 # headers it is compiled against are the authority on both, so ask them.
 FRIDA_KMOD_DEFS := \
 	$(if $(shell grep -l 'list_head[[:space:]]*thread_group;' \
-		$(KDIR)/include/linux/sched.h),-DFRIDA_HAVE_TASK_THREAD_GROUP) \
+		$(KDIR)/include/linux/sched.h),-DMESHLINK_HAVE_TASK_THREAD_GROUP) \
 	$(if $(shell grep -l 'spinlock_t[[:space:]]*lock;' \
-		$(KDIR)/include/linux/fs_struct.h),-DFRIDA_HAVE_FS_STRUCT_LOCK)
+		$(KDIR)/include/linux/fs_struct.h),-DMESHLINK_HAVE_FS_STRUCT_LOCK)
 
 all: modules
 
