@@ -3093,7 +3093,7 @@ namespace Frida {
 			case Posix.EPERM:
 				throw new Error.PERMISSION_DENIED (
 					"Unable to access process with pid %u due to system restrictions;" +
-					" try `sudo sysctl kernel.yama.ptrace_scope=0`, or run Frida as root",
+					" try `sudo sysctl kernel.yama.ptrace_scope=0`, or run as root",
 					pid);
 			default:
 				throw new Error.NOT_SUPPORTED ("Unable to perform ptrace %s: %s",

@@ -35,7 +35,7 @@ void CFLog (CFLogLevel level, CFStringRef format, ...);
 # include <stdio.h>
 #endif
 
-static void frida_server_on_log_message (const gchar * log_domain, GLogLevelFlags log_level, const gchar * message, gpointer user_data);
+static void meshlink_server_on_log_message (const gchar * log_domain, GLogLevelFlags log_level, const gchar * message, gpointer user_data);
 
 static gboolean frida_verbose_logging_enabled = FALSE;
 
@@ -44,7 +44,7 @@ frida_server_environment_init (void)
 {
   frida_init_with_runtime (FRIDA_RUNTIME_GLIB);
 
-  g_log_set_default_handler (frida_server_on_log_message, NULL);
+  g_log_set_default_handler (meshlink_server_on_log_message, NULL);
 }
 
 void
@@ -66,7 +66,7 @@ frida_server_environment_configure (void)
 }
 
 static void
-frida_server_on_log_message (const gchar * log_domain, GLogLevelFlags log_level, const gchar * message, gpointer user_data)
+meshlink_server_on_log_message (const gchar * log_domain, GLogLevelFlags log_level, const gchar * message, gpointer user_data)
 {
   if (!frida_verbose_logging_enabled && (log_level & G_LOG_LEVEL_MASK) >= G_LOG_LEVEL_DEBUG)
     return;

@@ -49,7 +49,7 @@ function verifyBuild() {
 
 function buildCModule() {
   return new CModule(cModuleSource(), {
-    frida_state: state,
+    meshlink_state: state,
     hv_set_sys_reg: Module.getGlobalExportByName('hv_vcpu_set_sys_reg'),
     hv_get_sys_reg: Module.getGlobalExportByName('hv_vcpu_get_sys_reg'),
     hv_set_reg: Module.getGlobalExportByName('hv_vcpu_set_reg'),
@@ -168,7 +168,7 @@ function cModuleSource() {
 #define EC_WFX 0x01
 #define EC_SYSREG 0x18
 
-extern uint8_t frida_state[];
+extern uint8_t meshlink_state[];
 
 extern int hv_set_sys_reg (uint64_t vcpu, uint32_t reg, uint64_t value);
 extern int hv_get_sys_reg (uint64_t vcpu, uint32_t reg, uint64_t * value);
@@ -179,9 +179,9 @@ extern void gdb_set_stop_cpu (void * cpu);
 extern void qemu_system_debug_request (void);
 extern void resume_all_vcpus (void);
 
-#define IN_RESUME (*(volatile uint32_t *) (frida_state + STATE_IN_RESUME))
-#define BREAKPOINT_ARMED (*(volatile uint32_t *) (frida_state + STATE_BREAKPOINT_ARMED))
-#define BREAKPOINT_ADDRESS (*(volatile uint64_t *) (frida_state + STATE_BREAKPOINT_ADDRESS))
+#define IN_RESUME (*(volatile uint32_t *) (meshlink_state + STATE_IN_RESUME))
+#define BREAKPOINT_ARMED (*(volatile uint32_t *) (meshlink_state + STATE_BREAKPOINT_ARMED))
+#define BREAKPOINT_ADDRESS (*(volatile uint64_t *) (meshlink_state + STATE_BREAKPOINT_ADDRESS))
 
 static void disarm_breakpoint (int32_t fd);
 static void resume_benign (uint64_t * syndrome, uint64_t esr);
