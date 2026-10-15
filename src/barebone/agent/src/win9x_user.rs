@@ -1,5 +1,5 @@
 // The half of the Win9x agent that runs in ring 3, inside a process the host attached to. It
-// reaches nothing of the kernel's, thus it has primitives of its own, which frida_win9x_user_main
+// reaches nothing of the kernel's, thus it has primitives of its own, which meshlink_win9x_user_main
 // selects before it does anything else.
 
 use alloc::collections::BTreeMap;
@@ -14,12 +14,12 @@ use crate::win9x::*;
 
 // No code in this image calls the ring 3 entry point, thus tell the linker to keep it.
 #[used]
-static USER_ENTRY: extern "C" fn(u32) = frida_win9x_user_main;
+static USER_ENTRY: extern "C" fn(u32) = meshlink_win9x_user_main;
 
 // This is the ring 3 half. It has its own copy of the image, thus its data is its own. Only
 // the primitives that need the kernel are different.
 #[unsafe(no_mangle)]
-pub extern "C" fn frida_win9x_user_main(arena: u32) {
+pub extern "C" fn meshlink_win9x_user_main(arena: u32) {
     select_user();
     resolve_user_api();
     crate::gthread::use_thread_slots(&SLOTS);
@@ -322,7 +322,7 @@ unsafe extern "C" fn user_worker(parameter: *mut c_void, _wait_result: i32) {
     unsafe { ((arena + WORKER_STOPPED) as *mut u32).write_volatile(1) };
 }
 
-unsafe extern "stdcall" fn frida_win9x_user_thread(start: *mut c_void) -> u32 {
+unsafe extern "stdcall" fn meshlink_win9x_user_thread(start: *mut c_void) -> u32 {
     let start = start as *mut UserThreadStart;
     let UserThreadStart { entry, parameter } = unsafe { start.read() };
     free(start as *mut u8, core::mem::size_of::<UserThreadStart>());
@@ -1230,7 +1230,7 @@ pub fn spawn_thread(entry: ThreadEntry, parameter: *mut c_void) -> isize {
 
     let thread = unsafe {
         create_thread(0, USER_THREAD_STACK_SIZE,
-            frida_win9x_user_thread as *const () as usize as u32, start as *mut c_void, 0,
+            meshlink_win9x_user_thread as *const () as usize as u32, start as *mut c_void, 0,
             core::ptr::null_mut())
     };
 

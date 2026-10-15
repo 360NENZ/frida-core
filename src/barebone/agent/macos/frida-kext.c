@@ -162,7 +162,7 @@ static uint64_t frida_own_base = 0;
 static uint64_t frida_own_size = 0;
 
 kern_return_t
-frida_kext_start (kmod_info_t * ki, void * d)
+meshlink_kext_start (kmod_info_t * ki, void * d)
 {
   frida_own_base = ki->address;
   frida_own_size = ki->size;
@@ -189,7 +189,7 @@ frida_kext_start (kmod_info_t * ki, void * d)
 }
 
 kern_return_t
-frida_kext_stop (kmod_info_t * ki, void * d)
+meshlink_kext_stop (kmod_info_t * ki, void * d)
 {
   if (frida_running)
   {
@@ -212,7 +212,7 @@ frida_kext_stop (kmod_info_t * ki, void * d)
   return KERN_SUCCESS;
 }
 
-KMOD_EXPLICIT_DECL (re.meshlink.agent, "1.0", frida_kext_start, frida_kext_stop)
+KMOD_EXPLICIT_DECL (re.meshlink.agent, "1.0", meshlink_kext_start, meshlink_kext_stop)
 
 static int
 frida_dev_open (dev_t dev, int flags, int devtype, struct proc * p)

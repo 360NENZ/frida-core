@@ -1,5 +1,5 @@
 // The half of the NT agent that runs in ring 3, inside a process the host attached to. It reaches
-// nothing of the kernel's, thus it has primitives of its own, which frida_winnt_user_main selects
+// nothing of the kernel's, thus it has primitives of its own, which meshlink_winnt_user_main selects
 // before it does anything else.
 
 use alloc::collections::BTreeMap;
@@ -25,17 +25,17 @@ use crate::winnt::{
 
 // No code in this image calls the ring 3 entry point, thus tell the linker to keep it.
 #[used]
-static USER_ENTRY: extern "C" fn(usize) = frida_winnt_user_main;
+static USER_ENTRY: extern "C" fn(usize) = meshlink_winnt_user_main;
 
 // This is the half that runs in a process. It has its own copy of the image, thus its data is
 // its own. The ring selects which primitives it uses.
 // The thread that descends has no block of its own, thus it can only make syscalls: ntdll's
 // stubs need none. It asks for a real thread, which the kernel gives a block, and then retires.
 #[used]
-static BOOTSTRAP_ENTRY: extern "C" fn(usize) -> ! = frida_winnt_user_bootstrap;
+static BOOTSTRAP_ENTRY: extern "C" fn(usize) -> ! = meshlink_winnt_user_bootstrap;
 
 #[unsafe(no_mangle)]
-pub extern "C" fn frida_winnt_user_bootstrap(arena: usize) -> ! {
+pub extern "C" fn meshlink_winnt_user_bootstrap(arena: usize) -> ! {
     unsafe {
         let create: windows_fn!(
             *mut *mut c_void, u32, *mut c_void, *mut c_void, *mut c_void, *mut u8, *mut c_void,
@@ -66,7 +66,7 @@ const THREAD_ALL_ACCESS: u32 = 0x1f_03ff;
 const CURRENT_THREAD: *mut c_void = -2isize as *mut c_void;
 
 #[unsafe(no_mangle)]
-pub extern "C" fn frida_winnt_user_main(arena: usize) {
+pub extern "C" fn meshlink_winnt_user_main(arena: usize) {
     select_user();
 
     unsafe {

@@ -765,7 +765,7 @@ fn place_shared_agent() -> (u32, u32) {
         crate::install_writable_half(base as usize, (base + private_offset as u32) as usize);
     }
 
-    let entry = base + (crate::win9x_user::frida_win9x_user_main as *const () as usize
+    let entry = base + (crate::win9x_user::meshlink_win9x_user_main as *const () as usize
         - own.base_address as usize) as u32;
 
     (base, entry)

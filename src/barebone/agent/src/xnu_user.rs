@@ -1,9 +1,9 @@
 
 pub fn entry_offset() -> usize {
-    (frida_xnu_user_entry as *const () as usize) - crate::own_range().0
+    (meshlink_xnu_user_entry as *const () as usize) - crate::own_range().0
 }
 
-pub extern "C" fn frida_xnu_user_entry(arena: usize) -> ! {
+pub extern "C" fn meshlink_xnu_user_entry(arena: usize) -> ! {
     let arena = arena as u64;
     unsafe { ARENA = arena };
 

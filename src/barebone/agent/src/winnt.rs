@@ -2594,9 +2594,9 @@ pub fn start_agent_in_process(pid: u32) -> u32 {
     let (arena, seen) = (target.arena, target.seen);
     let own = unsafe { core::ptr::addr_of!(crate::OWN_RANGE).read() }.base_address as usize;
     let bootstrap = target.text
-        + (crate::winnt_user::frida_winnt_user_bootstrap as *const () as usize - own) as u64;
+        + (crate::winnt_user::meshlink_winnt_user_bootstrap as *const () as usize - own) as u64;
     let entry = target.text
-        + (crate::winnt_user::frida_winnt_user_main as *const () as usize - own) as u64;
+        + (crate::winnt_user::meshlink_winnt_user_main as *const () as usize - own) as u64;
 
     if !target.started {
         let mut process: *mut c_void = core::ptr::null_mut();
