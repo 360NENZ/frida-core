@@ -1,5 +1,9 @@
 #include "frida-helper-service-glue.h"
 
+#ifdef MESHLINK_SOURCE_NAME
+# line __LINE__ MESHLINK_SOURCE_NAME
+#endif
+
 #include <windows.h>
 
 #if defined (HAVE_ARM64)

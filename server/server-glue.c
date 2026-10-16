@@ -1,5 +1,9 @@
 #include "server-glue.h"
 
+#ifdef MESHLINK_SOURCE_NAME
+# line __LINE__ MESHLINK_SOURCE_NAME
+#endif
+
 #include "frida-core.h"
 #if defined (HAVE_IOS) || defined (HAVE_TVOS) || defined (HAVE_XROS)
 # include "server-ios-tvos.h"
