@@ -243,7 +243,7 @@ namespace Frida {
 			timeout_source.attach (main_context);
 
 			assert (worker == null);
-			worker = new Thread<void> ("pulse-reader", process_io);
+			worker = new Thread<void> (Uuid.string_random ().substring (0, 15), process_io);
 
 			yield;
 

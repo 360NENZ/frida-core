@@ -893,7 +893,7 @@ namespace Frida {
 		string? result_cert_pem = null;
 		string? result_key_pem = null;
 
-		new Thread<bool> ("cert-worker", () => {
+		new Thread<bool> (Uuid.string_random ().substring (0, 15), () => {
 			uint8[] local_cert_der;
 			string local_cert_pem;
 			string local_key_pem;

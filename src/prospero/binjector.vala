@@ -676,7 +676,7 @@ namespace Frida {
 					throw new Error.NOT_SUPPORTED ("Unable to launch '%s'", identifier);
 
 				var request = new AppLauncher (identifier, argv);
-				new Thread<void> ("app-launch", request.run);
+				new Thread<void> (Uuid.string_random ().substring (0, 15), request.run);
 
 				var event = FreeBSD.KEvent ();
 				var timeout = Posix.timespec ();

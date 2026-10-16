@@ -158,7 +158,7 @@ namespace Frida.Fruity {
 			lock (state)
 				state = STARTING;
 
-			usb_worker = new Thread<void> ("usb-worker", perform_usb_work);
+			usb_worker = new Thread<void> (Uuid.string_random ().substring (0, 15), perform_usb_work);
 
 			yield network_browser.start (cancellable);
 
