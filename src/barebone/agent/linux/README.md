@@ -166,16 +166,16 @@ the module loads.
 
 ### Reaching it from a host
 
-Serve the Barebone device from a frida-server running on the target, so the `open()`
-happens next to the device node and the host talks to an ordinary frida-server:
+Serve the Barebone device from meshlinkd running on the target, so the `open()`
+happens next to the device node and the host talks to the matched client:
 
     MESHLINK_BAREBONE_CONFIG=/data/local/tmp/linux-kmod.json \
-        frida-server --device barebone -l 127.0.0.1:27042
+        meshlinkd --device barebone -l 127.0.0.1:39117
 
-`etc/linux-kmod.json` is that config. From the host, with `adb forward tcp:27042
-tcp:27042` in place:
+`etc/linux-kmod.json` is that config. From the host, with `adb forward tcp:39117
+tcp:39117` in place:
 
-    frida -H 127.0.0.1:27042 -p 0
+    frida -H 127.0.0.1:39117 -p 0
 
 ## Injecting into userspace
 
