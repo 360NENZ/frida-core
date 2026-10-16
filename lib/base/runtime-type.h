@@ -1,0 +1,12 @@
+#ifndef FRIDA_RUNTIME_TYPE_H
+#define FRIDA_RUNTIME_TYPE_H
+
+#ifndef FRIDA_RUNTIME_TYPE_PREFIX
+#define FRIDA_RUNTIME_TYPE_PREFIX Meshlink
+#endif
+
+#define FRIDA_RUNTIME_TYPE_JOIN(prefix, name) prefix##name
+#define FRIDA_RUNTIME_TYPE_EXPAND(prefix, name) FRIDA_RUNTIME_TYPE_JOIN(prefix, name)
+#define FRIDA_RUNTIME_TYPE(name) FRIDA_RUNTIME_TYPE_EXPAND(FRIDA_RUNTIME_TYPE_PREFIX, name)
+
+#endif

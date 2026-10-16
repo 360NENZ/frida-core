@@ -1,4 +1,5 @@
 #include "pipe-glue.h"
+#include "../base/runtime-type.h"
 
 #include "pipe-sddl.h"
 
@@ -18,6 +19,10 @@ typedef FridaWindowsPipeInputStream MeshlinkWindowsPipeInputStream;
 typedef FridaWindowsPipeInputStreamClass MeshlinkWindowsPipeInputStreamClass;
 typedef FridaWindowsPipeOutputStream MeshlinkWindowsPipeOutputStream;
 typedef FridaWindowsPipeOutputStreamClass MeshlinkWindowsPipeOutputStreamClass;
+typedef FridaWindowsPipeInputStream FRIDA_RUNTIME_TYPE (WindowsPipeInputStream);
+typedef FridaWindowsPipeInputStreamClass FRIDA_RUNTIME_TYPE (WindowsPipeInputStreamClass);
+typedef FridaWindowsPipeOutputStream FRIDA_RUNTIME_TYPE (WindowsPipeOutputStream);
+typedef FridaWindowsPipeOutputStreamClass FRIDA_RUNTIME_TYPE (WindowsPipeOutputStreamClass);
 
 typedef struct _FridaPipeBackend FridaPipeBackend;
 typedef guint FridaWindowsPipeRole;
@@ -67,8 +72,8 @@ static WCHAR * frida_pipe_path_from_name (const gchar * name);
 static gboolean frida_windows_pipe_backend_await (FridaPipeBackend * self, HANDLE complete, HANDLE cancel, GCancellable * cancellable, GError ** error);
 static void frida_windows_pipe_backend_on_cancel (GCancellable * cancellable, gpointer user_data);
 
-G_DEFINE_TYPE (MeshlinkWindowsPipeInputStream, frida_windows_pipe_input_stream, G_TYPE_INPUT_STREAM)
-G_DEFINE_TYPE (MeshlinkWindowsPipeOutputStream, frida_windows_pipe_output_stream, G_TYPE_OUTPUT_STREAM)
+G_DEFINE_TYPE (FRIDA_RUNTIME_TYPE (WindowsPipeInputStream), frida_windows_pipe_input_stream, G_TYPE_INPUT_STREAM)
+G_DEFINE_TYPE (FRIDA_RUNTIME_TYPE (WindowsPipeOutputStream), frida_windows_pipe_output_stream, G_TYPE_OUTPUT_STREAM)
 
 void
 frida_pipe_transport_set_temp_directory (const gchar * path)

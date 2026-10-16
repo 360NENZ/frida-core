@@ -1,4 +1,5 @@
 #include "frida-base.h"
+#include "runtime-type.h"
 
 #include <windows.h>
 
@@ -22,6 +23,12 @@ typedef FridaWindowsHandleInputStream MeshlinkWindowsHandleInputStream;
 typedef FridaWindowsHandleInputStreamClass MeshlinkWindowsHandleInputStreamClass;
 typedef FridaWindowsHandleOutputStream MeshlinkWindowsHandleOutputStream;
 typedef FridaWindowsHandleOutputStreamClass MeshlinkWindowsHandleOutputStreamClass;
+typedef FridaWindowsHandleStream FRIDA_RUNTIME_TYPE (WindowsHandleStream);
+typedef FridaWindowsHandleStreamClass FRIDA_RUNTIME_TYPE (WindowsHandleStreamClass);
+typedef FridaWindowsHandleInputStream FRIDA_RUNTIME_TYPE (WindowsHandleInputStream);
+typedef FridaWindowsHandleInputStreamClass FRIDA_RUNTIME_TYPE (WindowsHandleInputStreamClass);
+typedef FridaWindowsHandleOutputStream FRIDA_RUNTIME_TYPE (WindowsHandleOutputStream);
+typedef FridaWindowsHandleOutputStreamClass FRIDA_RUNTIME_TYPE (WindowsHandleOutputStreamClass);
 
 struct _FridaWindowsHandleStream
 {
@@ -86,9 +93,9 @@ static gboolean frida_windows_handle_stream_await (FridaWindowsHandleStream * se
     GCancellable * cancellable, GError ** error);
 static void frida_windows_handle_stream_on_cancel (GCancellable * cancellable, gpointer user_data);
 
-G_DEFINE_TYPE (MeshlinkWindowsHandleStream, frida_windows_handle_stream, G_TYPE_IO_STREAM)
-G_DEFINE_TYPE (MeshlinkWindowsHandleInputStream, frida_windows_handle_input_stream, G_TYPE_INPUT_STREAM)
-G_DEFINE_TYPE (MeshlinkWindowsHandleOutputStream, frida_windows_handle_output_stream, G_TYPE_OUTPUT_STREAM)
+G_DEFINE_TYPE (FRIDA_RUNTIME_TYPE (WindowsHandleStream), frida_windows_handle_stream, G_TYPE_IO_STREAM)
+G_DEFINE_TYPE (FRIDA_RUNTIME_TYPE (WindowsHandleInputStream), frida_windows_handle_input_stream, G_TYPE_INPUT_STREAM)
+G_DEFINE_TYPE (FRIDA_RUNTIME_TYPE (WindowsHandleOutputStream), frida_windows_handle_output_stream, G_TYPE_OUTPUT_STREAM)
 
 GIOStream *
 frida_windows_named_pipe_open_client (const gchar * path, GError ** error)

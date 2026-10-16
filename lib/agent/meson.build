@@ -81,7 +81,7 @@ if build_agent
   )
 
   if host_os_family == 'darwin'
-    identity = 'MeshlinkAgent'
+    identity = runtime_type_prefix + 'Agent'
   else
     identity = agent_name
   endif

@@ -147,6 +147,8 @@ endif
 vala_flags = []
 
 frida_component_cflags = []
+runtime_type_prefix = meson.get_external_property('runtime_type_prefix', 'Meshlink')
+frida_component_cflags += '-DFRIDA_RUNTIME_TYPE_PREFIX=' + runtime_type_prefix
 ndebug = get_option('b_ndebug')
 optimize_for_prod = ndebug == 'true' or (ndebug == 'if-release' and not get_option('debug'))
 if optimize_for_prod
