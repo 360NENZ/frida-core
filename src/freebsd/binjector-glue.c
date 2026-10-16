@@ -477,7 +477,7 @@ permission_denied:
         FRIDA_ERROR,
         FRIDA_ERROR_PERMISSION_DENIED,
         "Unable to access process with pid %u due to system restrictions;"
-        " try running Frida as root",
+        " try running as root",
         pid);
     return;
   }
@@ -897,7 +897,7 @@ os_failure:
           FRIDA_ERROR,
           FRIDA_ERROR_PERMISSION_DENIED,
           "Unable to access process with pid %u due to system restrictions;"
-          " try running Frida as root",
+          " try running as root",
           pid);
     }
     else

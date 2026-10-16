@@ -1491,7 +1491,7 @@ frida_kill_application (NSString * identifier)
       [service terminateApplication:identifier
                           forReason:FBProcessKillReasonUser
                           andReport:NO
-                    withDescription:@"killed from Frida"];
+                    withDescription:@"process termination requested"];
 
     }
 

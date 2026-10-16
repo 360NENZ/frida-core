@@ -33,7 +33,7 @@ namespace Frida.Barebone {
 			if (Gum.Darwin.task_for_pid (Gum.Darwin.mach_task_self (), (int) pid, out memory.task) != Gum.Darwin.Status.SUCCESS) {
 				throw new Error.PERMISSION_DENIED (
 					"Unable to acquire the task port for the Virtualization daemon (pid %u); " +
-					"frida-core needs root or the com.apple.system-task-ports entitlement", pid);
+					"the service needs root or the com.apple.system-task-ports entitlement", pid);
 			}
 
 			for (uint attempt = 0; true; attempt++) {
