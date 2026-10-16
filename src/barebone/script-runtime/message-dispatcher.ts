@@ -3,8 +3,10 @@ export class MessageDispatcher {
     #operations = new Map<string, MessageHandler[]>();
 
     dispatch(message: any, data: ArrayBuffer | null) {
-        if (message instanceof Array && message[0] === "meshlink:rpc") {
-            this.#handleRpcMessage(message[1], message[2], message.slice(3));
+        if (message instanceof Array && message.length >= 2 &&
+            (typeof message[0] === "number" || typeof message[0] === "string") &&
+            (message[1] === "call" || message[1] === "list")) {
+            this.#handleRpcMessage(message[0], message[1], message.slice(2));
         } else {
             this.#messages.push([message, data]);
             this.#dispatchMessages();
@@ -63,9 +65,9 @@ export class MessageDispatcher {
 
     #reply(id: number, type: RpcMessageType, result: any, params: any[] = []) {
         if (result instanceof ArrayBuffer)
-            send(["meshlink:rpc", id, type, {}].concat(params), result);
+            send([id, type, {}].concat(params), result);
         else
-            send(["meshlink:rpc", id, type, result].concat(params));
+            send([id, type, result].concat(params));
     }
 
     #dispatchMessages() {

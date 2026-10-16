@@ -37,7 +37,6 @@ namespace Frida {
 			var request = new Json.Builder ();
 			request
 				.begin_array ()
-				.add_string_value ("meshlink:rpc")
 				.add_string_value (request_id)
 				.add_string_value ("call")
 				.add_string_value (method)
@@ -97,9 +96,6 @@ namespace Frida {
 		 * @return true if the message was an RPC message and was handled
 		 */
 		public bool try_handle_message (string json) {
-			if (json.index_of ("\"meshlink:rpc\"") == -1)
-				return false;
-
 			var parser = new Json.Parser ();
 			try {
 				parser.load_from_data (json);
@@ -122,27 +118,26 @@ namespace Frida {
 			if (payload == null || payload.get_node_type () != Json.NodeType.ARRAY)
 				return false;
 			var rpc_message = payload.get_array ();
-			if (rpc_message.get_length () < 4)
+			if (rpc_message.get_length () < 3)
 				return false;
 
-			string? type = rpc_message.get_element (0).get_string ();
-			if (type == null || type != "meshlink:rpc")
-				return false;
-
-			var request_id_value = rpc_message.get_element (1);
+			var request_id_value = rpc_message.get_element (0);
 			if (request_id_value.get_value_type () != typeof (string))
 				return false;
 			string request_id = request_id_value.get_string ();
+
+			var status = rpc_message.get_string_element (1);
+			if (status != "ok" && status != "error")
+				return false;
 
 			PendingResponse response;
 			if (!pending_responses.unset (request_id, out response))
 				return false;
 
-			var status = rpc_message.get_string_element (2);
 			if (status == "ok")
-				response.complete_with_result (rpc_message.get_element (3));
+				response.complete_with_result (rpc_message.get_element (2));
 			else
-				response.complete_with_error (new Error.NOT_SUPPORTED (rpc_message.get_string_element (3)));
+				response.complete_with_error (new Error.NOT_SUPPORTED (rpc_message.get_string_element (2)));
 
 			return true;
 		}
