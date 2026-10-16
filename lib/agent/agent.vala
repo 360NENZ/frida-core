@@ -1450,7 +1450,7 @@ namespace Frida.Agent {
 
 				emulated_bridge_state = new BridgeState (parameters.str);
 
-				emulated_worker = new Thread<void> ("emulated-worker", run_emulated_agent);
+				emulated_worker = new Thread<void> (Uuid.string_random ().substring (0, 15), run_emulated_agent);
 
 				var connection = yield new DBusConnection (stream, ServerGuid.HOST_SESSION_SERVICE,
 					AUTHENTICATION_SERVER | AUTHENTICATION_ALLOW_ANONYMOUS, null, cancellable);

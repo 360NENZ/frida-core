@@ -559,7 +559,7 @@ namespace Frida {
 
 		construct {
 			main_loop = new MainLoop (main_context, false);
-			worker_thread = new Thread<void> ("android-worker", run);
+			worker_thread = new Thread<void> (Uuid.string_random ().substring (0, 15), run);
 		}
 
 		public async void close (Cancellable? cancellable) throws IOError {

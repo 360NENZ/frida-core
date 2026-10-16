@@ -5,7 +5,7 @@ namespace Frida {
 		Gum.init ();
 
 		var parent_address = args[1];
-		var worker = new Thread<int> ("helper-worker", () => {
+		var worker = new Thread<int> (Uuid.string_random ().substring (0, 15), () => {
 			var service = new DarwinHelperService (parent_address);
 
 			var exit_code = service.run ();
