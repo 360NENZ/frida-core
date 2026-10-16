@@ -14,6 +14,11 @@
     goto winapi_failed; \
   }
 
+typedef FridaWindowsPipeInputStream MeshlinkWindowsPipeInputStream;
+typedef FridaWindowsPipeInputStreamClass MeshlinkWindowsPipeInputStreamClass;
+typedef FridaWindowsPipeOutputStream MeshlinkWindowsPipeOutputStream;
+typedef FridaWindowsPipeOutputStreamClass MeshlinkWindowsPipeOutputStreamClass;
+
 typedef struct _FridaPipeBackend FridaPipeBackend;
 typedef guint FridaWindowsPipeRole;
 
@@ -62,8 +67,8 @@ static WCHAR * frida_pipe_path_from_name (const gchar * name);
 static gboolean frida_windows_pipe_backend_await (FridaPipeBackend * self, HANDLE complete, HANDLE cancel, GCancellable * cancellable, GError ** error);
 static void frida_windows_pipe_backend_on_cancel (GCancellable * cancellable, gpointer user_data);
 
-G_DEFINE_TYPE (FridaWindowsPipeInputStream, frida_windows_pipe_input_stream, G_TYPE_INPUT_STREAM)
-G_DEFINE_TYPE (FridaWindowsPipeOutputStream, frida_windows_pipe_output_stream, G_TYPE_OUTPUT_STREAM)
+G_DEFINE_TYPE (MeshlinkWindowsPipeInputStream, frida_windows_pipe_input_stream, G_TYPE_INPUT_STREAM)
+G_DEFINE_TYPE (MeshlinkWindowsPipeOutputStream, frida_windows_pipe_output_stream, G_TYPE_OUTPUT_STREAM)
 
 void
 frida_pipe_transport_set_temp_directory (const gchar * path)
@@ -345,7 +350,7 @@ _frida_windows_pipe_make_output_stream (void * backend)
 }
 
 static void
-frida_windows_pipe_input_stream_class_init (FridaWindowsPipeInputStreamClass * klass)
+frida_windows_pipe_input_stream_class_init (MeshlinkWindowsPipeInputStreamClass * klass)
 {
   GInputStreamClass * stream_class = G_INPUT_STREAM_CLASS (klass);
 
@@ -354,7 +359,7 @@ frida_windows_pipe_input_stream_class_init (FridaWindowsPipeInputStreamClass * k
 }
 
 static void
-frida_windows_pipe_input_stream_init (FridaWindowsPipeInputStream * self)
+frida_windows_pipe_input_stream_init (MeshlinkWindowsPipeInputStream * self)
 {
 }
 
@@ -406,7 +411,7 @@ frida_windows_pipe_input_stream_close (GInputStream * base, GCancellable * cance
 }
 
 static void
-frida_windows_pipe_output_stream_class_init (FridaWindowsPipeOutputStreamClass * klass)
+frida_windows_pipe_output_stream_class_init (MeshlinkWindowsPipeOutputStreamClass * klass)
 {
   GOutputStreamClass * stream_class = G_OUTPUT_STREAM_CLASS (klass);
 
@@ -415,7 +420,7 @@ frida_windows_pipe_output_stream_class_init (FridaWindowsPipeOutputStreamClass *
 }
 
 static void
-frida_windows_pipe_output_stream_init (FridaWindowsPipeOutputStream * self)
+frida_windows_pipe_output_stream_init (MeshlinkWindowsPipeOutputStream * self)
 {
 }
 
