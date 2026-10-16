@@ -54,7 +54,7 @@ namespace Frida.Server {
 		Environment.init ();
 
 #if DARWIN
-		if (Path.get_basename (args[0]) == "frida-policyd") {
+		if (Path.get_basename (args[0]) == "meshlink-policyd") {
 			return Policyd._main ();
 		}
 #endif

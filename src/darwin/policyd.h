@@ -3,7 +3,7 @@
 
 #include "policyd-client.h"
 
-#define FRIDA_POLICYD_SERVICE_NAME "re.frida.policyd"
+#define FRIDA_POLICYD_SERVICE_NAME "io.meshlink.policyd"
 
 int frida_policyd_main (void);
 
