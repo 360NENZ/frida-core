@@ -1569,7 +1569,7 @@ namespace Frida {
 			ensure_request = new Promise<bool> ();
 
 			if (server_name == null) {
-				string name = "/runtime-worker-" + Uuid.string_random ().replace ("-", "");
+				string name = "/" + Uuid.string_random ().replace ("-", "");
 				var address = new UnixSocketAddress.with_type (name, -1, UnixSocketAddressType.ABSTRACT);
 
 				try {
