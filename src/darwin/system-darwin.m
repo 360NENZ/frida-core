@@ -79,7 +79,7 @@ static void frida_collect_application_info_from_id_cstring (const gchar * identi
 static void frida_collect_application_info_from_id_nsstring (NSString * identifier, FridaEnumerateApplicationsOperation * op);
 #endif
 
-static void frida_collect_process_info_from_pid (guint pid, FridaEnumerateProcessesOperation * op);
+static void relay_collect_process_info_from_pid (guint pid, FridaEnumerateProcessesOperation * op);
 static void frida_collect_process_info_from_kinfo (struct kinfo_proc * process, FridaEnumerateProcessesOperation * op);
 
 #if defined (HAVE_MACOS) || defined (HAVE_IOS) || defined (HAVE_TVOS) || defined (HAVE_XROS)
@@ -501,7 +501,7 @@ frida_system_enumerate_processes (FridaProcessQueryOptions * options, int * resu
 
   if (frida_process_query_options_has_selected_pids (options))
   {
-    frida_process_query_options_enumerate_selected_pids (options, (GFunc) frida_collect_process_info_from_pid, &op);
+    frida_process_query_options_enumerate_selected_pids (options, (GFunc) relay_collect_process_info_from_pid, &op);
   }
   else
   {
@@ -524,7 +524,7 @@ frida_system_enumerate_processes (FridaProcessQueryOptions * options, int * resu
 }
 
 static void
-frida_collect_process_info_from_pid (guint pid, FridaEnumerateProcessesOperation * op)
+relay_collect_process_info_from_pid (guint pid, FridaEnumerateProcessesOperation * op)
 {
   struct kinfo_proc process;
   size_t size;

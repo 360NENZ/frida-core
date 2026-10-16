@@ -31,7 +31,7 @@ struct _FridaSimmyContext
 };
 
 static void frida_simmy_context_destroy (FridaSimmyContext * self);
-static void frida_simmy_context_emit_devices (FridaSimmyContext * self);
+static void relay_simmy_context_emit_devices (FridaSimmyContext * self);
 
 static NSArray * frida_argv_to_arguments_array (gchar * const * argv, gint argv_length, gint start_index);
 static NSDictionary * frida_envp_to_environment_dictionary (gchar * const * envp, gint envp_length);
@@ -90,7 +90,7 @@ _frida_simmy_host_session_backend_start (FridaSimmyHostSessionBackendDeviceAdded
 
   dispatch_async (ctx->dispatch_queue, ^
   {
-    frida_simmy_context_emit_devices (ctx);
+    relay_simmy_context_emit_devices (ctx);
 
     on_complete (on_complete_target);
 
@@ -128,7 +128,7 @@ frida_simmy_context_destroy (FridaSimmyContext * self)
 }
 
 static void
-frida_simmy_context_emit_devices (FridaSimmyContext * self)
+relay_simmy_context_emit_devices (FridaSimmyContext * self)
 {
   void * xcselect_module;
   bool (* xcselect_get_developer_dir_path) (char *, size_t, bool *, bool *, bool *);

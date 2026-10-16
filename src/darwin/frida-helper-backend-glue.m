@@ -42,7 +42,7 @@
 #endif
 
 #define FRIDA_PSR_THUMB                  0x20
-#define FRIDA_MAX_BREAKPOINTS            4
+#define RELAY_MAX_BREAKPOINTS            4
 #define FRIDA_MAX_PAGE_POOL              8
 
 #if (defined (HAVE_ARM) || defined (HAVE_ARM64)) && !defined (__darwin_arm_thread_state64_get_pc)
@@ -171,7 +171,7 @@ struct _FridaSpawnInstance
   FridaDyldFlavor dyld_flavor;
 
   FridaBreakpointPhase breakpoint_phase;
-  FridaBreakpoint breakpoints[FRIDA_MAX_BREAKPOINTS];
+  FridaBreakpoint breakpoints[RELAY_MAX_BREAKPOINTS];
   FridaPagePoolEntry page_pool[FRIDA_MAX_PAGE_POOL];
   gint single_stepping;
 
@@ -383,32 +383,32 @@ static void frida_spawn_instance_resume (FridaSpawnInstance * self);
 
 static void frida_spawn_instance_on_server_cancel (void * context);
 static void frida_spawn_instance_on_server_recv (void * context);
-static gboolean frida_spawn_instance_handle_breakpoint (FridaSpawnInstance * self, FridaBreakpoint * breakpoint, GumDarwinUnifiedThreadState * state);
+static gboolean relay_spawn_instance_handle_breakpoint (FridaSpawnInstance * self, FridaBreakpoint * breakpoint, GumDarwinUnifiedThreadState * state);
 static gboolean frida_spawn_instance_handle_dyld_restart (FridaSpawnInstance * self);
 static gboolean frida_spawn_instance_handle_modinit (FridaSpawnInstance * self, GumDarwinUnifiedThreadState * state, GumAddress pc);
 static void frida_spawn_instance_receive_breakpoint_request (FridaSpawnInstance * self);
 static void frida_spawn_instance_send_breakpoint_response (FridaSpawnInstance * self);
-static gboolean frida_spawn_instance_is_libc_initialized (FridaSpawnInstance * self);
-static void frida_spawn_instance_set_libc_initialized (FridaSpawnInstance * self);
-static kern_return_t frida_spawn_instance_create_dyld_data (FridaSpawnInstance * self);
+static gboolean relay_spawn_instance_is_libc_initialized (FridaSpawnInstance * self);
+static void relay_spawn_instance_set_libc_initialized (FridaSpawnInstance * self);
+static kern_return_t relay_spawn_instance_create_dyld_data (FridaSpawnInstance * self);
 static void frida_spawn_instance_destroy_dyld_data (FridaSpawnInstance * self);
 #if defined (HAVE_IOS) || defined (HAVE_TVOS) || defined (HAVE_XROS)
 static gboolean frida_pick_ios_tvos_bootstrapper (GumModule * module, gpointer user_data);
 #endif
-static void frida_spawn_instance_unset_helpers (FridaSpawnInstance * self);
+static void relay_spawn_instance_unset_helpers (FridaSpawnInstance * self);
 static void frida_spawn_instance_call_set_helpers (FridaSpawnInstance * self, GumDarwinUnifiedThreadState * state, mach_vm_address_t helpers);
 static void frida_spawn_instance_call_dlopen (FridaSpawnInstance * self, GumDarwinUnifiedThreadState * state, mach_vm_address_t lib_name, int mode);
 static gboolean frida_find_cf_initialize (GumModule * module, gpointer user_data);
 static void frida_spawn_instance_call_cf_initialize (FridaSpawnInstance * self, GumDarwinUnifiedThreadState * state);
-static void frida_spawn_instance_set_nth_breakpoint (FridaSpawnInstance * self, guint n, GumAddress break_at, FridaBreakpointRepeat repeat);
+static void relay_spawn_instance_set_nth_breakpoint (FridaSpawnInstance * self, guint n, GumAddress break_at, FridaBreakpointRepeat repeat);
 static void frida_spawn_instance_enable_nth_breakpoint (FridaSpawnInstance * self, guint n);
-static void frida_spawn_instance_unset_nth_breakpoint (FridaSpawnInstance * self, guint n);
-static void frida_spawn_instance_disable_nth_breakpoint (FridaSpawnInstance * self, guint n);
+static void relay_spawn_instance_unset_nth_breakpoint (FridaSpawnInstance * self, guint n);
+static void relay_spawn_instance_disable_nth_breakpoint (FridaSpawnInstance * self, guint n);
 static guint32 frida_spawn_instance_put_software_breakpoint (FridaSpawnInstance * self, GumAddress where, guint index);
 static guint32 frida_spawn_instance_overwrite_arm64_instruction (FridaSpawnInstance * self, GumAddress address, guint32 new_instruction);
 
 static FridaInjectInstance * frida_inject_instance_new (FridaDarwinHelperBackend * backend, guint id, guint pid);
-static FridaInjectInstance * frida_inject_instance_clone (const FridaInjectInstance * instance, guint id);
+static FridaInjectInstance * relay_inject_instance_clone (const FridaInjectInstance * instance, guint id);
 static void frida_inject_instance_close (FridaInjectInstance * instance);
 static gboolean frida_inject_instance_task_did_not_exec (FridaInjectInstance * instance);
 
@@ -418,7 +418,7 @@ static void frida_inject_instance_on_mach_thread_dead (void * context);
 static void frida_inject_instance_join_posix_thread (FridaInjectInstance * self, mach_port_t posix_thread);
 static void frida_inject_instance_on_posix_thread_dead (void * context);
 
-static gboolean frida_agent_context_init (FridaAgentContext * self, const FridaAgentDetails * details, const FridaInjectPayloadLayout * layout,
+static gboolean relay_agent_context_init (FridaAgentContext * self, const FridaAgentDetails * details, const FridaInjectPayloadLayout * layout,
     mach_vm_address_t payload_base, mach_vm_size_t payload_size, GumDarwinModuleResolver * resolver, GumDarwinMapper * mapper, GError ** error);
 static gboolean frida_agent_context_init_functions (FridaAgentContext * self, GumDarwinModuleResolver * resolver, GumDarwinMapper * mapper,
     GError ** error);
@@ -435,11 +435,11 @@ static kern_return_t frida_get_thread_state (mach_port_t thread, thread_state_fl
     mach_msg_type_number_t * count);
 static kern_return_t frida_set_thread_state (mach_port_t thread, thread_state_flavor_t flavor, gconstpointer state,
     mach_msg_type_number_t count);
-static kern_return_t frida_get_debug_state (mach_port_t thread, gpointer state, GumCpuType cpu_type);
-static kern_return_t frida_set_debug_state (mach_port_t thread, gconstpointer state, GumCpuType cpu_type);
+static kern_return_t relay_get_debug_state (mach_port_t thread, gpointer state, GumCpuType cpu_type);
+static kern_return_t relay_set_debug_state (mach_port_t thread, gconstpointer state, GumCpuType cpu_type);
 static kern_return_t frida_convert_thread_state_inplace (mach_port_t thread, FridaConvertThreadStateDirection direction,
     thread_state_flavor_t flavor, gpointer state, mach_msg_type_number_t * count);
-static kern_return_t frida_convert_thread_state (mach_port_t thread, FridaConvertThreadStateDirection direction,
+static kern_return_t relay_convert_thread_state (mach_port_t thread, FridaConvertThreadStateDirection direction,
     thread_state_flavor_t flavor, gconstpointer in_state, mach_msg_type_number_t in_state_count,
     gpointer out_state, mach_msg_type_number_t * out_state_count);
 static void frida_set_nth_hardware_breakpoint (gpointer state, guint n, GumAddress break_at, GumCpuType cpu_type);
@@ -447,10 +447,10 @@ static void frida_set_hardware_single_step (gpointer debug_state, GumDarwinUnifi
 static gboolean frida_is_hardware_breakpoint_support_working (void);
 
 static gboolean frida_find_restart_with_dyld_in_cache (const GumDarwinSymbolDetails * details, gpointer user_data);
-static GumAddress frida_find_run_initializers_call (mach_port_t task, GumCpuType cpu_type, GumAddress start);
-static GHashTable * frida_find_modinit_strcmp_checks (mach_port_t task, GumDarwinModule * dyld);
-static GumAddress frida_find_function_end (mach_port_t task, GumCpuType cpu_type, GumAddress start, gsize max_size);
-static csh frida_create_capstone (GumCpuType cpu_type, GumAddress start);
+static GumAddress relay_find_run_initializers_call (mach_port_t task, GumCpuType cpu_type, GumAddress start);
+static GHashTable * relay_find_modinit_strcmp_checks (mach_port_t task, GumDarwinModule * dyld);
+static GumAddress relay_find_function_end (mach_port_t task, GumCpuType cpu_type, GumAddress start, gsize max_size);
+static csh relay_create_capstone (GumCpuType cpu_type, GumAddress start);
 
 static gboolean frida_parse_aslr_option (GVariant * value, FridaAslr * aslr, GError ** error);
 
@@ -2081,7 +2081,7 @@ _frida_darwin_helper_backend_prepare_spawn_instance_for_injection (FridaDarwinHe
 
     if (launch_with_closure_address != 0)
     {
-      modern_entry_address = frida_find_run_initializers_call (task, instance->cpu_type, launch_with_closure_address);
+      modern_entry_address = relay_find_run_initializers_call (task, instance->cpu_type, launch_with_closure_address);
     }
 
     instance->modern_entry_address = modern_entry_address;
@@ -2093,7 +2093,7 @@ _frida_darwin_helper_backend_prepare_spawn_instance_for_injection (FridaDarwinHe
     instance->dlerror_clear_address = gum_darwin_module_resolve_symbol_address (dyld, "__ZL12dlerrorClearv");
     instance->info_address = gum_darwin_module_resolve_symbol_address (dyld, "__ZN4dyld12gProcessInfoE");
     instance->helpers_ptr_address = gum_darwin_module_resolve_symbol_address (dyld, "__ZN4dyld17gLibSystemHelpersE");
-    instance->do_modinit_strcmp_checks = frida_find_modinit_strcmp_checks (task, dyld);
+    instance->do_modinit_strcmp_checks = relay_find_modinit_strcmp_checks (task, dyld);
 
     if (legacy_entry_address == 0 || instance->dlopen_address == 0 || instance->register_helpers_address == 0 ||
         instance->info_address == 0 || instance->do_modinit_strcmp_checks == NULL)
@@ -2107,7 +2107,7 @@ _frida_darwin_helper_backend_prepare_spawn_instance_for_injection (FridaDarwinHe
       instance->register_helpers_address |= 1;
     }
 
-    instance->ret_gadget = frida_find_function_end (task, instance->cpu_type, instance->register_helpers_address, 128);
+    instance->ret_gadget = relay_find_function_end (task, instance->cpu_type, instance->register_helpers_address, 128);
     if (instance->ret_gadget == 0)
       goto dyld_probe_failed;
 
@@ -2120,27 +2120,27 @@ _frida_darwin_helper_backend_prepare_spawn_instance_for_injection (FridaDarwinHe
 
   instance->ret_state = FRIDA_RET_FROM_HELPER;
 
-  kr = frida_get_debug_state (child_thread, &instance->previous_debug_state, instance->cpu_type);
-  CHECK_MACH_RESULT (kr, ==, KERN_SUCCESS, "frida_get_debug_state");
+  kr = relay_get_debug_state (child_thread, &instance->previous_debug_state, instance->cpu_type);
+  CHECK_MACH_RESULT (kr, ==, KERN_SUCCESS, "relay_get_debug_state");
 
   memcpy (&instance->breakpoint_debug_state, &instance->previous_debug_state, sizeof (instance->breakpoint_debug_state));
   i = 0;
   if (legacy_entry_address != 0)
-    frida_spawn_instance_set_nth_breakpoint (instance, i++, legacy_entry_address, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
+    relay_spawn_instance_set_nth_breakpoint (instance, i++, legacy_entry_address, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
   if (modern_entry_address != 0)
-    frida_spawn_instance_set_nth_breakpoint (instance, i++, modern_entry_address, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
+    relay_spawn_instance_set_nth_breakpoint (instance, i++, modern_entry_address, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
   if (sim_notify_address != 0)
-    frida_spawn_instance_set_nth_breakpoint (instance, i++, sim_notify_address, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
+    relay_spawn_instance_set_nth_breakpoint (instance, i++, sim_notify_address, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
   if (instance->dyld_flavor == FRIDA_DYLD_V4_PLUS)
   {
     GumAddress restart_with_dyld_in_cache = 0;
     gum_darwin_module_enumerate_symbols (dyld, frida_find_restart_with_dyld_in_cache, &restart_with_dyld_in_cache);
     if (restart_with_dyld_in_cache != 0)
-      frida_spawn_instance_set_nth_breakpoint (instance, i++, restart_with_dyld_in_cache, FRIDA_BREAKPOINT_REPEAT_NEVER);
+      relay_spawn_instance_set_nth_breakpoint (instance, i++, restart_with_dyld_in_cache, FRIDA_BREAKPOINT_REPEAT_NEVER);
   }
 
-  kr = frida_set_debug_state (child_thread, &instance->breakpoint_debug_state, instance->cpu_type);
-  CHECK_MACH_RESULT (kr, ==, KERN_SUCCESS, "frida_set_debug_state");
+  kr = relay_set_debug_state (child_thread, &instance->breakpoint_debug_state, instance->cpu_type);
+  CHECK_MACH_RESULT (kr, ==, KERN_SUCCESS, "relay_set_debug_state");
 
   kr = mach_port_allocate (self_task, MACH_PORT_RIGHT_RECEIVE, &instance->server_port);
   CHECK_MACH_RESULT (kr, ==, KERN_SUCCESS, "mach_port_allocate server");
@@ -2226,7 +2226,7 @@ _frida_darwin_helper_backend_close_spawn_instance (FridaDarwinHelperBackend * se
 }
 
 guint
-_frida_darwin_helper_backend_inject_into_task (FridaDarwinHelperBackend * self, guint pid, guint task, const gchar * path_or_name, FridaMappedLibraryBlob * blob,
+relay_darwin_helper_backend_inject_into_task (FridaDarwinHelperBackend * self, guint pid, guint task, const gchar * path_or_name, FridaMappedLibraryBlob * blob,
     const gchar * entrypoint, const gchar * data, GError ** error)
 {
   guint result = 0;
@@ -2340,7 +2340,7 @@ _frida_darwin_helper_backend_inject_into_task (FridaDarwinHelperBackend * self, 
   kr = mach_vm_protect (task, payload_address + layout.stack_guard_offset, layout.stack_guard_size, FALSE, VM_PROT_NONE);
   CHECK_MACH_RESULT (kr, ==, KERN_SUCCESS, "mach_vm_protect");
 
-  if (!frida_agent_context_init (&agent_ctx, &details, &layout, payload_address, instance->payload_size, resolver, mapper, error))
+  if (!relay_agent_context_init (&agent_ctx, &details, &layout, payload_address, instance->payload_size, resolver, mapper, error))
     goto failure;
 
   frida_agent_context_emit_mach_stub_code (&agent_ctx, mach_stub_code, resolver, mapper);
@@ -2545,7 +2545,7 @@ _frida_darwin_helper_backend_demonitor_and_clone_injectee_state (FridaDarwinHelp
   mach_port_deallocate (mach_task_self (), instance->thread);
   instance->thread = MACH_PORT_NULL;
 
-  clone = frida_inject_instance_clone (instance, self->next_id++);
+  clone = relay_inject_instance_clone (instance, self->next_id++);
 
   gee_abstract_map_set (GEE_ABSTRACT_MAP (self->inject_instances), GUINT_TO_POINTER (clone->id), clone);
 
@@ -2781,7 +2781,7 @@ frida_spawn_instance_new (FridaDarwinHelperBackend * backend)
 
   instance->breakpoint_phase = FRIDA_BREAKPOINT_DETECT_FLAVOR;
   instance->single_stepping = -1;
-  for (i = 0; i != FRIDA_MAX_BREAKPOINTS; i++)
+  for (i = 0; i != RELAY_MAX_BREAKPOINTS; i++)
   {
     instance->breakpoints[i].address = 0;
     instance->breakpoints[i].repeat = FRIDA_BREAKPOINT_REPEAT_NEVER;
@@ -2967,25 +2967,25 @@ frida_spawn_instance_on_server_recv (void * context)
     frida_set_hardware_single_step (&self->breakpoint_debug_state, &state, FALSE, self->cpu_type);
 
     if (bp->repeat != FRIDA_BREAKPOINT_REPEAT_ALWAYS)
-      frida_spawn_instance_unset_nth_breakpoint (self, self->single_stepping);
+      relay_spawn_instance_unset_nth_breakpoint (self, self->single_stepping);
     self->single_stepping = -1;
 
-    for (i = 0; i != FRIDA_MAX_BREAKPOINTS; i++)
+    for (i = 0; i != RELAY_MAX_BREAKPOINTS; i++)
     {
       FridaBreakpoint * bp = &self->breakpoints[i];
       if (bp->repeat != FRIDA_BREAKPOINT_REPEAT_NEVER)
-        frida_spawn_instance_set_nth_breakpoint (self, i, bp->address, bp->repeat);
+        relay_spawn_instance_set_nth_breakpoint (self, i, bp->address, bp->repeat);
     }
 
     frida_set_thread_state (self->thread, state_flavor, &state, state_count);
-    frida_set_debug_state (self->thread, &self->breakpoint_debug_state, self->cpu_type);
+    relay_set_debug_state (self->thread, &self->breakpoint_debug_state, self->cpu_type);
 
     frida_spawn_instance_send_breakpoint_response (self);
 
     return;
   }
 
-  for (i = 0; i != FRIDA_MAX_BREAKPOINTS; i++)
+  for (i = 0; i != RELAY_MAX_BREAKPOINTS; i++)
   {
     if ((self->breakpoints[i].address & ~1) == (pc & ~GUM_ADDRESS (1)))
     {
@@ -2998,7 +2998,7 @@ frida_spawn_instance_on_server_recv (void * context)
   if (breakpoint == NULL)
     goto unexpected_exception;
 
-  carry_on = frida_spawn_instance_handle_breakpoint (self, breakpoint, &state);
+  carry_on = relay_spawn_instance_handle_breakpoint (self, breakpoint, &state);
   if (!carry_on)
     return;
 
@@ -3016,8 +3016,8 @@ frida_spawn_instance_on_server_recv (void * context)
 
   if (!pc_changed)
   {
-    for (i = 0; i != FRIDA_MAX_BREAKPOINTS; i++)
-      frida_spawn_instance_disable_nth_breakpoint (self, i);
+    for (i = 0; i != RELAY_MAX_BREAKPOINTS; i++)
+      relay_spawn_instance_disable_nth_breakpoint (self, i);
 
     frida_set_hardware_single_step (&self->breakpoint_debug_state, &state, TRUE, self->cpu_type);
 
@@ -3025,11 +3025,11 @@ frida_spawn_instance_on_server_recv (void * context)
   }
   else if (breakpoint->repeat != FRIDA_BREAKPOINT_REPEAT_ALWAYS)
   {
-    frida_spawn_instance_unset_nth_breakpoint (self, current_bp_index);
+    relay_spawn_instance_unset_nth_breakpoint (self, current_bp_index);
   }
 
   frida_set_thread_state (self->thread, state_flavor, &state, state_count);
-  frida_set_debug_state (self->thread, &self->breakpoint_debug_state, self->cpu_type);
+  relay_set_debug_state (self->thread, &self->breakpoint_debug_state, self->cpu_type);
 
   frida_spawn_instance_send_breakpoint_response (self);
 
@@ -3138,7 +3138,7 @@ forward_to_system:
 }
 
 static gboolean
-frida_spawn_instance_handle_breakpoint (FridaSpawnInstance * self, FridaBreakpoint * breakpoint, GumDarwinUnifiedThreadState * state)
+relay_spawn_instance_handle_breakpoint (FridaSpawnInstance * self, FridaBreakpoint * breakpoint, GumDarwinUnifiedThreadState * state)
 {
   kern_return_t kr;
   GumAddress pc;
@@ -3252,7 +3252,7 @@ next_phase:
       }
       while (!falls_within_dyld);
 
-      frida_spawn_instance_set_nth_breakpoint (self, 1, libsystem_initializer_caller, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
+      relay_spawn_instance_set_nth_breakpoint (self, 1, libsystem_initializer_caller, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
 
       self->breakpoint_phase = FRIDA_BREAKPOINT_LIBSYSTEM_INITIALIZED;
 
@@ -3265,20 +3265,20 @@ next_phase:
       goto next_phase;
 
     case FRIDA_BREAKPOINT_SET_HELPERS:
-      frida_spawn_instance_create_dyld_data (self);
+      relay_spawn_instance_create_dyld_data (self);
 
       frida_spawn_instance_call_set_helpers (self, state, self->fake_helpers);
 
-      frida_spawn_instance_set_nth_breakpoint (self, 2, self->ret_gadget, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
+      relay_spawn_instance_set_nth_breakpoint (self, 2, self->ret_gadget, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
 
       self->breakpoint_phase = FRIDA_BREAKPOINT_DLOPEN_LIBC;
 
       return TRUE;
 
     case FRIDA_BREAKPOINT_DLOPEN_LIBC:
-      if (frida_spawn_instance_is_libc_initialized (self))
+      if (relay_spawn_instance_is_libc_initialized (self))
       {
-        frida_spawn_instance_unset_helpers (self);
+        relay_spawn_instance_unset_helpers (self);
       }
       else
       {
@@ -3294,7 +3294,7 @@ next_phase:
           if (avoid_breakpoint_conflict && breakpoint_index == 2)
             breakpoint_index++;
 
-          frida_spawn_instance_set_nth_breakpoint (self, breakpoint_index, GUM_ADDRESS (strcmp_check), FRIDA_BREAKPOINT_REPEAT_ALWAYS);
+          relay_spawn_instance_set_nth_breakpoint (self, breakpoint_index, GUM_ADDRESS (strcmp_check), FRIDA_BREAKPOINT_REPEAT_ALWAYS);
           breakpoint_index++;
         }
       }
@@ -3305,7 +3305,7 @@ next_phase:
 
       if (self->dlerror_clear_address != 0)
       {
-        frida_spawn_instance_set_nth_breakpoint (self, 3, self->dlerror_clear_address, FRIDA_BREAKPOINT_REPEAT_ONCE);
+        relay_spawn_instance_set_nth_breakpoint (self, 3, self->dlerror_clear_address, FRIDA_BREAKPOINT_REPEAT_ONCE);
         self->breakpoint_phase = FRIDA_BREAKPOINT_SKIP_CLEAR;
       }
       else
@@ -3336,8 +3336,8 @@ next_phase:
 #if defined (HAVE_IOS) || defined (HAVE_TVOS) || defined (HAVE_XROS)
       if (self->bootstrapper_name != 0)
       {
-        frida_spawn_instance_set_libc_initialized (self);
-        frida_spawn_instance_unset_nth_breakpoint (self, 1);
+        relay_spawn_instance_set_libc_initialized (self);
+        relay_spawn_instance_unset_nth_breakpoint (self, 1);
         memcpy (state, &self->previous_thread_state, sizeof (GumDarwinUnifiedThreadState));
 
         frida_spawn_instance_call_dlopen (self, state, self->bootstrapper_name, RTLD_GLOBAL | RTLD_LAZY);
@@ -3356,7 +3356,7 @@ next_phase:
         memcpy (state, &self->previous_thread_state, sizeof (GumDarwinUnifiedThreadState));
 
         if (self->dyld_flavor == FRIDA_DYLD_V3_MINUS && pc != self->modern_entry_address)
-          frida_spawn_instance_unset_nth_breakpoint (self, 1);
+          relay_spawn_instance_unset_nth_breakpoint (self, 1);
 
         frida_spawn_instance_call_cf_initialize (self, state);
 
@@ -3397,8 +3397,8 @@ next_phase:
 
       frida_spawn_instance_destroy_dyld_data (self);
 
-      for (i = 0; i != FRIDA_MAX_BREAKPOINTS; i++)
-        frida_spawn_instance_unset_nth_breakpoint (self, i);
+      for (i = 0; i != RELAY_MAX_BREAKPOINTS; i++)
+        relay_spawn_instance_unset_nth_breakpoint (self, i);
 
       for (i = 0; i != FRIDA_MAX_PAGE_POOL; i++)
       {
@@ -3406,10 +3406,10 @@ next_phase:
           mach_vm_deallocate (self->task, self->page_pool[i].scratch_page, page_size);
       }
 
-      frida_set_debug_state (self->thread, &self->previous_debug_state, self->cpu_type);
+      relay_set_debug_state (self->thread, &self->previous_debug_state, self->cpu_type);
 
       if (self->info_address != 0)
-        frida_spawn_instance_set_libc_initialized (self);
+        relay_spawn_instance_set_libc_initialized (self);
 
       self->breakpoint_phase = FRIDA_BREAKPOINT_DONE;
 
@@ -3454,7 +3454,7 @@ frida_spawn_instance_handle_dyld_restart (FridaSpawnInstance * self)
   g_object_unref (self->dyld);
   self->dyld = g_steal_pointer (&dyld);
 
-  frida_spawn_instance_set_nth_breakpoint (self, 0, self->modern_entry_address, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
+  relay_spawn_instance_set_nth_breakpoint (self, 0, self->modern_entry_address, FRIDA_BREAKPOINT_REPEAT_ALWAYS);
 
   handled = TRUE;
 
@@ -3530,7 +3530,7 @@ frida_spawn_instance_send_breakpoint_response (FridaSpawnInstance * self)
 }
 
 static gboolean
-frida_spawn_instance_is_libc_initialized (FridaSpawnInstance * self)
+relay_spawn_instance_is_libc_initialized (FridaSpawnInstance * self)
 {
   gboolean initialized;
   GumAddress initialized_address;
@@ -3574,7 +3574,7 @@ frida_spawn_instance_is_libc_initialized (FridaSpawnInstance * self)
 }
 
 static void
-frida_spawn_instance_set_libc_initialized (FridaSpawnInstance * self)
+relay_spawn_instance_set_libc_initialized (FridaSpawnInstance * self)
 {
   GumAddress initialized_address;
   gboolean write_succeeded;
@@ -3615,7 +3615,7 @@ frida_spawn_instance_set_libc_initialized (FridaSpawnInstance * self)
 }
 
 static kern_return_t
-frida_spawn_instance_create_dyld_data (FridaSpawnInstance * self)
+relay_spawn_instance_create_dyld_data (FridaSpawnInstance * self)
 {
   GumPtrauthSupport ptrauth_support;
   GumAddress ret_gadget;
@@ -3736,7 +3736,7 @@ frida_pick_ios_tvos_bootstrapper (GumModule * module, gpointer user_data)
 #endif
 
 static void
-frida_spawn_instance_unset_helpers (FridaSpawnInstance * self)
+relay_spawn_instance_unset_helpers (FridaSpawnInstance * self)
 {
   gboolean write_succeeded;
 
@@ -3961,12 +3961,12 @@ frida_spawn_instance_call_cf_initialize (FridaSpawnInstance * self, GumDarwinUni
 }
 
 static void
-frida_spawn_instance_set_nth_breakpoint (FridaSpawnInstance * self, guint n, GumAddress break_at, FridaBreakpointRepeat repeat)
+relay_spawn_instance_set_nth_breakpoint (FridaSpawnInstance * self, guint n, GumAddress break_at, FridaBreakpointRepeat repeat)
 {
-  g_assert (n < FRIDA_MAX_BREAKPOINTS);
+  g_assert (n < RELAY_MAX_BREAKPOINTS);
 
   if (self->breakpoints[n].address != 0 && self->breakpoints[n].address != break_at)
-    frida_spawn_instance_disable_nth_breakpoint (self, n);
+    relay_spawn_instance_disable_nth_breakpoint (self, n);
 
   self->breakpoints[n].address = break_at;
   self->breakpoints[n].repeat = repeat;
@@ -3979,7 +3979,7 @@ frida_spawn_instance_enable_nth_breakpoint (FridaSpawnInstance * self, guint n)
 {
   FridaBreakpoint * breakpoint;
 
-  g_assert (n < FRIDA_MAX_BREAKPOINTS);
+  g_assert (n < RELAY_MAX_BREAKPOINTS);
 
   breakpoint = &self->breakpoints[n];
 
@@ -3993,20 +3993,20 @@ frida_spawn_instance_enable_nth_breakpoint (FridaSpawnInstance * self, guint n)
 }
 
 static void
-frida_spawn_instance_unset_nth_breakpoint (FridaSpawnInstance * self, guint n)
+relay_spawn_instance_unset_nth_breakpoint (FridaSpawnInstance * self, guint n)
 {
-  g_assert (n < FRIDA_MAX_BREAKPOINTS);
+  g_assert (n < RELAY_MAX_BREAKPOINTS);
 
-  frida_spawn_instance_disable_nth_breakpoint (self, n);
+  relay_spawn_instance_disable_nth_breakpoint (self, n);
 
   self->breakpoints[n].address = 0;
   self->breakpoints[n].repeat = FRIDA_BREAKPOINT_REPEAT_NEVER;
 }
 
 static void
-frida_spawn_instance_disable_nth_breakpoint (FridaSpawnInstance * self, guint n)
+relay_spawn_instance_disable_nth_breakpoint (FridaSpawnInstance * self, guint n)
 {
-  g_assert (n < FRIDA_MAX_BREAKPOINTS);
+  g_assert (n < RELAY_MAX_BREAKPOINTS);
 
   if (frida_is_hardware_breakpoint_support_working ())
   {
@@ -4026,7 +4026,7 @@ frida_spawn_instance_put_software_breakpoint (FridaSpawnInstance * self, GumAddr
 {
   guint32 instr_data;
 
-  g_assert (index < FRIDA_MAX_BREAKPOINTS);
+  g_assert (index < RELAY_MAX_BREAKPOINTS);
 
   instr_data = 0xd4200000 | ((index & 0xffff) << 5);
 
@@ -4143,7 +4143,7 @@ frida_inject_instance_new (FridaDarwinHelperBackend * backend, guint id, guint p
 }
 
 static FridaInjectInstance *
-frida_inject_instance_clone (const FridaInjectInstance * instance, guint id)
+relay_inject_instance_clone (const FridaInjectInstance * instance, guint id)
 {
   FridaInjectInstance * clone;
   mach_port_t self_task;
@@ -4255,7 +4255,7 @@ frida_inject_instance_task_did_not_exec (FridaInjectInstance * instance)
 }
 
 static gboolean
-frida_agent_context_init (FridaAgentContext * self, const FridaAgentDetails * details, const FridaInjectPayloadLayout * layout,
+relay_agent_context_init (FridaAgentContext * self, const FridaAgentDetails * details, const FridaInjectPayloadLayout * layout,
     mach_vm_address_t payload_base, mach_vm_size_t payload_size, GumDarwinModuleResolver * resolver, GumDarwinMapper * mapper, GError ** error)
 {
   bzero (self, sizeof (FridaAgentContext));
@@ -5155,7 +5155,7 @@ frida_convert_thread_state_for_task (mach_port_t task, thread_state_flavor_t fla
   kr = task_threads (task, &threads, &thread_count);
   CHECK_MACH_RESULT (kr, ==, KERN_SUCCESS, "task_threads");
 
-  kr = frida_convert_thread_state (threads[0], FRIDA_CONVERT_THREAD_STATE_OUT, flavor, in_state, in_state_count,
+  kr = relay_convert_thread_state (threads[0], FRIDA_CONVERT_THREAD_STATE_OUT, flavor, in_state, in_state_count,
       out_state, out_state_count);
   CHECK_MACH_RESULT (kr, ==, KERN_SUCCESS, "thread_convert_thread_state");
 
@@ -5247,7 +5247,7 @@ frida_set_thread_state (mach_port_t thread, thread_state_flavor_t flavor, gconst
 
   remote_state = g_alloca (count * sizeof (integer_t));
 
-  kr = frida_convert_thread_state (thread, FRIDA_CONVERT_THREAD_STATE_OUT, flavor, state, count, remote_state, &count);
+  kr = relay_convert_thread_state (thread, FRIDA_CONVERT_THREAD_STATE_OUT, flavor, state, count, remote_state, &count);
   if (kr == KERN_SUCCESS)
     kr = thread_set_state (thread, flavor, remote_state, count);
 
@@ -5255,7 +5255,7 @@ frida_set_thread_state (mach_port_t thread, thread_state_flavor_t flavor, gconst
 }
 
 static kern_return_t
-frida_get_debug_state (mach_port_t thread, gpointer state, GumCpuType cpu_type)
+relay_get_debug_state (mach_port_t thread, gpointer state, GumCpuType cpu_type)
 {
   thread_state_flavor_t flavor;
   mach_msg_type_number_t count;
@@ -5280,7 +5280,7 @@ frida_get_debug_state (mach_port_t thread, gpointer state, GumCpuType cpu_type)
 }
 
 static kern_return_t
-frida_set_debug_state (mach_port_t thread, gconstpointer state, GumCpuType cpu_type)
+relay_set_debug_state (mach_port_t thread, gconstpointer state, GumCpuType cpu_type)
 {
   thread_state_flavor_t flavor;
   mach_msg_type_number_t count;
@@ -5308,11 +5308,11 @@ static kern_return_t
 frida_convert_thread_state_inplace (mach_port_t thread, FridaConvertThreadStateDirection direction, thread_state_flavor_t flavor,
     gpointer state, mach_msg_type_number_t * count)
 {
-  return frida_convert_thread_state (thread, direction, flavor, state, *count, state, count);
+  return relay_convert_thread_state (thread, direction, flavor, state, *count, state, count);
 }
 
 static kern_return_t
-frida_convert_thread_state (mach_port_t thread, FridaConvertThreadStateDirection direction, thread_state_flavor_t flavor,
+relay_convert_thread_state (mach_port_t thread, FridaConvertThreadStateDirection direction, thread_state_flavor_t flavor,
     gconstpointer in_state, mach_msg_type_number_t in_state_count,
     gpointer out_state, mach_msg_type_number_t * out_state_count)
 {
@@ -5508,7 +5508,7 @@ frida_find_restart_with_dyld_in_cache (const GumDarwinSymbolDetails * details, g
 }
 
 static GumAddress
-frida_find_run_initializers_call (mach_port_t task, GumCpuType cpu_type, GumAddress start)
+relay_find_run_initializers_call (mach_port_t task, GumCpuType cpu_type, GumAddress start)
 {
   GumAddress match = 0;
   const size_t max_size = 2048;
@@ -5520,7 +5520,7 @@ frida_find_run_initializers_call (mach_port_t task, GumCpuType cpu_type, GumAddr
   const uint8_t * code;
   size_t size;
 
-  capstone = frida_create_capstone (cpu_type, start);
+  capstone = relay_create_capstone (cpu_type, start);
 
   err = cs_option (capstone, CS_OPT_DETAIL, CS_OPT_ON);
   g_assert (err == CS_ERR_OK);
@@ -5586,7 +5586,7 @@ frida_find_run_initializers_call (mach_port_t task, GumCpuType cpu_type, GumAddr
 }
 
 static GHashTable *
-frida_find_modinit_strcmp_checks (mach_port_t task, GumDarwinModule * dyld)
+relay_find_modinit_strcmp_checks (mach_port_t task, GumDarwinModule * dyld)
 {
   GHashTable * checks;
   GumAddress modinit_start, modinit_end, dyld_strcmp;
@@ -5606,7 +5606,7 @@ frida_find_modinit_strcmp_checks (mach_port_t task, GumDarwinModule * dyld)
   address = modinit_start & ~G_GUINT64_CONSTANT (1);
   size = modinit_end - modinit_start;
 
-  capstone = frida_create_capstone (dyld->cpu_type, modinit_start);
+  capstone = relay_create_capstone (dyld->cpu_type, modinit_start);
 
   err = cs_option (capstone, CS_OPT_DETAIL, CS_OPT_ON);
   g_assert (err == CS_ERR_OK);
@@ -5683,7 +5683,7 @@ frida_find_modinit_strcmp_checks (mach_port_t task, GumDarwinModule * dyld)
 }
 
 static GumAddress
-frida_find_function_end (mach_port_t task, GumCpuType cpu_type, GumAddress start, gsize max_size)
+relay_find_function_end (mach_port_t task, GumCpuType cpu_type, GumAddress start, gsize max_size)
 {
   GumAddress match = 0;
   uint64_t address = start & ~G_GUINT64_CONSTANT (1);
@@ -5694,7 +5694,7 @@ frida_find_function_end (mach_port_t task, GumCpuType cpu_type, GumAddress start
   const uint8_t * code;
   size_t size;
 
-  capstone = frida_create_capstone (cpu_type, start);
+  capstone = relay_create_capstone (cpu_type, start);
 
   err = cs_option (capstone, CS_OPT_DETAIL, CS_OPT_ON);
   g_assert (err == CS_ERR_OK);
@@ -5786,7 +5786,7 @@ frida_find_function_end (mach_port_t task, GumCpuType cpu_type, GumAddress start
 }
 
 static csh
-frida_create_capstone (GumCpuType cpu_type, GumAddress start)
+relay_create_capstone (GumCpuType cpu_type, GumAddress start)
 {
   csh capstone;
   cs_err err;

@@ -687,6 +687,7 @@ namespace Frida {
 		protected extern void _resume_spawn_instance (void * instance);
 		protected extern void _close_spawn_instance (void * instance);
 
+		[CCode (cname = "relay_darwin_helper_backend_inject_into_task")]
 		protected extern uint _inject_into_task (uint pid, uint task, string path_or_name, MappedLibraryBlob? blob, string entrypoint, string data) throws Error;
 		protected extern void _demonitor (void * instance);
 		protected extern uint _demonitor_and_clone_injectee_state (void * instance);
