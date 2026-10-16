@@ -13,7 +13,8 @@ namespace Frida {
 
 		public static async AndroidHelperClient open (string serial, Cancellable? cancellable) throws Error, IOError {
 			string instance_id = Uuid.string_random ().replace ("-", "");
-			string helper_path = "/data/local/tmp/runtime-helper-" + instance_id + ".dex";
+			string helper_path = "/data/local/tmp/" + instance_id + ".dex";
+			string socket_name = "/" + instance_id;
 
 			var helper_dex = new MemoryInputStream.from_bytes (
 				new Bytes.static (Frida.Data.Android.get_helper_dex_blob ().data));
@@ -37,8 +38,8 @@ namespace Frida {
 					yield shell.open (serial, cancellable);
 
 					shell.send_command (("CLASSPATH=%s app_process /data/local/tmp " +
-							"--nice-name=android.worker org.tools.bridge.Helper %s; rm -f %s; echo BYE.")
-						.printf (helper_path, instance_id, helper_path));
+							"--nice-name=%s org.tools.bridge.Helper %s %s; rm -f %s; echo BYE.")
+						.printf (helper_path, instance_id, helper_path, socket_name, helper_path));
 
 					while (!output.str.has_prefix ("READY.\n")) {
 						waiting = true;
@@ -55,7 +56,7 @@ namespace Frida {
 				var client = yield AdbClient.open (cancellable);
 				try {
 					yield client.request ("host:transport:" + serial, cancellable);
-					yield client.request_protocol_change ("localabstract:/runtime-helper-" + instance_id,
+					yield client.request_protocol_change ("localabstract:" + socket_name,
 						cancellable);
 				} catch (GLib.Error e) {
 					client.close.begin ();

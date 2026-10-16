@@ -11,6 +11,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
+import java.util.UUID;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,19 +19,17 @@ import org.json.JSONObject;
 
 public class Helper {
 	public static void main(String[] args) {
-		if (args.length != 1) {
-			System.err.println("Usage: runtime-helper <instance-id>");
+		if (args.length != 2) {
+			System.err.println("Expected helper path and socket name");
 			System.exit(1);
 			return;
 		}
 
-		String instanceId = args[0];
-
-		new File("/data/local/tmp/runtime-helper-" + instanceId + ".dex").delete();
+		new File(args[0]).delete();
 
 		LocalServerSocket socket;
 		try {
-			socket = new LocalServerSocket("/runtime-helper-" + instanceId);
+			socket = new LocalServerSocket(args[1]);
 		} catch (IOException e) {
 			System.err.println(e);
 			System.exit(2);
@@ -49,7 +48,7 @@ public class Helper {
 	public Helper(LocalServerSocket socket) {
 		mBackend = new HelperBackend();
 		mSocket = socket;
-		mWorker = new Thread("Connection Listener") {
+		mWorker = new Thread(UUID.randomUUID().toString().substring(0, 15)) {
 			public void run() {
 				handleIncomingConnections();
 			}
@@ -67,7 +66,7 @@ public class Helper {
 		while (true) {
 			try {
 				LocalSocket client = mSocket.accept();
-				Thread handler = new Thread("Connection Handler") {
+				Thread handler = new Thread(UUID.randomUUID().toString().substring(0, 15)) {
 					public void run() {
 						handleConnection(client);
 					}

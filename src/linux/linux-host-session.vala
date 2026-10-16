@@ -482,7 +482,7 @@ namespace Frida {
 
 			try {
 				string instance_id = Uuid.string_random ().replace ("-", "");
-				string helper_path = "/data/local/tmp/runtime-helper-" + instance_id + ".dex";
+				string helper_path = "/data/local/tmp/" + instance_id + ".dex";
 				FileUtils.set_data (helper_path, Frida.Data.Android.get_helper_dex_blob ().data);
 				Posix.chmod (helper_path, 0644);
 
