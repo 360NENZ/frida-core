@@ -15,10 +15,6 @@
     goto winapi_failed; \
   }
 
-typedef FridaWindowsPipeInputStream MeshlinkWindowsPipeInputStream;
-typedef FridaWindowsPipeInputStreamClass MeshlinkWindowsPipeInputStreamClass;
-typedef FridaWindowsPipeOutputStream MeshlinkWindowsPipeOutputStream;
-typedef FridaWindowsPipeOutputStreamClass MeshlinkWindowsPipeOutputStreamClass;
 typedef FridaWindowsPipeInputStream FRIDA_RUNTIME_TYPE (WindowsPipeInputStream);
 typedef FridaWindowsPipeInputStreamClass FRIDA_RUNTIME_TYPE (WindowsPipeInputStreamClass);
 typedef FridaWindowsPipeOutputStream FRIDA_RUNTIME_TYPE (WindowsPipeOutputStream);
@@ -355,7 +351,7 @@ _frida_windows_pipe_make_output_stream (void * backend)
 }
 
 static void
-frida_windows_pipe_input_stream_class_init (MeshlinkWindowsPipeInputStreamClass * klass)
+frida_windows_pipe_input_stream_class_init (FRIDA_RUNTIME_TYPE (WindowsPipeInputStreamClass) * klass)
 {
   GInputStreamClass * stream_class = G_INPUT_STREAM_CLASS (klass);
 
@@ -364,7 +360,7 @@ frida_windows_pipe_input_stream_class_init (MeshlinkWindowsPipeInputStreamClass 
 }
 
 static void
-frida_windows_pipe_input_stream_init (MeshlinkWindowsPipeInputStream * self)
+frida_windows_pipe_input_stream_init (FRIDA_RUNTIME_TYPE (WindowsPipeInputStream) * self)
 {
 }
 
@@ -416,7 +412,7 @@ frida_windows_pipe_input_stream_close (GInputStream * base, GCancellable * cance
 }
 
 static void
-frida_windows_pipe_output_stream_class_init (MeshlinkWindowsPipeOutputStreamClass * klass)
+frida_windows_pipe_output_stream_class_init (FRIDA_RUNTIME_TYPE (WindowsPipeOutputStreamClass) * klass)
 {
   GOutputStreamClass * stream_class = G_OUTPUT_STREAM_CLASS (klass);
 
@@ -425,7 +421,7 @@ frida_windows_pipe_output_stream_class_init (MeshlinkWindowsPipeOutputStreamClas
 }
 
 static void
-frida_windows_pipe_output_stream_init (MeshlinkWindowsPipeOutputStream * self)
+frida_windows_pipe_output_stream_init (FRIDA_RUNTIME_TYPE (WindowsPipeOutputStream) * self)
 {
 }
 

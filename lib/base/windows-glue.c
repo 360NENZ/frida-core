@@ -17,12 +17,6 @@ typedef struct _FridaWindowsHandleInputStream FridaWindowsHandleInputStream;
 typedef struct _FridaWindowsHandleInputStreamClass FridaWindowsHandleInputStreamClass;
 typedef struct _FridaWindowsHandleOutputStream FridaWindowsHandleOutputStream;
 typedef struct _FridaWindowsHandleOutputStreamClass FridaWindowsHandleOutputStreamClass;
-typedef FridaWindowsHandleStream MeshlinkWindowsHandleStream;
-typedef FridaWindowsHandleStreamClass MeshlinkWindowsHandleStreamClass;
-typedef FridaWindowsHandleInputStream MeshlinkWindowsHandleInputStream;
-typedef FridaWindowsHandleInputStreamClass MeshlinkWindowsHandleInputStreamClass;
-typedef FridaWindowsHandleOutputStream MeshlinkWindowsHandleOutputStream;
-typedef FridaWindowsHandleOutputStreamClass MeshlinkWindowsHandleOutputStreamClass;
 typedef FridaWindowsHandleStream FRIDA_RUNTIME_TYPE (WindowsHandleStream);
 typedef FridaWindowsHandleStreamClass FRIDA_RUNTIME_TYPE (WindowsHandleStreamClass);
 typedef FridaWindowsHandleInputStream FRIDA_RUNTIME_TYPE (WindowsHandleInputStream);
@@ -165,7 +159,7 @@ frida_windows_handle_stream_new (HANDLE handle)
 }
 
 static void
-frida_windows_handle_stream_class_init (MeshlinkWindowsHandleStreamClass * klass)
+frida_windows_handle_stream_class_init (FRIDA_RUNTIME_TYPE (WindowsHandleStreamClass) * klass)
 {
   GObjectClass * object_class = G_OBJECT_CLASS (klass);
   GIOStreamClass * stream_class = G_IO_STREAM_CLASS (klass);
@@ -178,7 +172,7 @@ frida_windows_handle_stream_class_init (MeshlinkWindowsHandleStreamClass * klass
 }
 
 static void
-frida_windows_handle_stream_init (MeshlinkWindowsHandleStream * self)
+frida_windows_handle_stream_init (FRIDA_RUNTIME_TYPE (WindowsHandleStream) * self)
 {
   self->handle = INVALID_HANDLE_VALUE;
 }
@@ -233,7 +227,7 @@ frida_windows_handle_stream_close_fn (GIOStream * stream, GCancellable * cancell
 }
 
 static void
-frida_windows_handle_input_stream_class_init (MeshlinkWindowsHandleInputStreamClass * klass)
+frida_windows_handle_input_stream_class_init (FRIDA_RUNTIME_TYPE (WindowsHandleInputStreamClass) * klass)
 {
   GInputStreamClass * stream_class = G_INPUT_STREAM_CLASS (klass);
 
@@ -242,7 +236,7 @@ frida_windows_handle_input_stream_class_init (MeshlinkWindowsHandleInputStreamCl
 }
 
 static void
-frida_windows_handle_input_stream_init (MeshlinkWindowsHandleInputStream * self)
+frida_windows_handle_input_stream_init (FRIDA_RUNTIME_TYPE (WindowsHandleInputStream) * self)
 {
 }
 
@@ -289,7 +283,7 @@ frida_windows_handle_input_stream_close (GInputStream * base, GCancellable * can
 }
 
 static void
-frida_windows_handle_output_stream_class_init (MeshlinkWindowsHandleOutputStreamClass * klass)
+frida_windows_handle_output_stream_class_init (FRIDA_RUNTIME_TYPE (WindowsHandleOutputStreamClass) * klass)
 {
   GOutputStreamClass * stream_class = G_OUTPUT_STREAM_CLASS (klass);
 
@@ -298,7 +292,7 @@ frida_windows_handle_output_stream_class_init (MeshlinkWindowsHandleOutputStream
 }
 
 static void
-frida_windows_handle_output_stream_init (MeshlinkWindowsHandleOutputStream * self)
+frida_windows_handle_output_stream_init (FRIDA_RUNTIME_TYPE (WindowsHandleOutputStream) * self)
 {
 }
 
