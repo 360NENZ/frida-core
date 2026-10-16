@@ -251,6 +251,9 @@ if asset_path_template == ''
 endif
 
 is_shared = get_option('default_library') == 'shared'
+if host_os_family == 'windows' and not is_shared
+  add_project_arguments('-DVALA_EXTERN=extern', language: 'c')
+endif
 
 assets_mode = get_option('assets')
 if assets_mode == 'auto'
