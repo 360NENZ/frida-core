@@ -51,7 +51,7 @@ static gboolean frida_join_standalone_service (FridaServiceContext * self, HANDL
 static void frida_kill_standalone_service (FridaServiceContext * self, HANDLE handle);
 
 static FridaServiceContext * frida_service_context_new (const gchar * service_basename);
-static void frida_service_context_free (FridaServiceContext * self);
+static void relay_service_context_free (FridaServiceContext * self);
 
 static void frida_rmtree (GFile * file);
 
@@ -83,7 +83,7 @@ frida_helper_manager_start_services (const char * service_basename, gchar ** arc
   {
     if (!frida_spawn_standalone_services (self, archs, archs_length))
     {
-      frida_service_context_free (self);
+      relay_service_context_free (self);
       self = NULL;
     }
   }
@@ -106,7 +106,7 @@ frida_helper_manager_stop_services (void * context)
       frida_kill_standalone_services (self);
   }
 
-  frida_service_context_free (self);
+  relay_service_context_free (self);
 }
 
 char *
@@ -693,7 +693,7 @@ frida_service_context_new (const gchar * service_basename)
 }
 
 static void
-frida_service_context_free (FridaServiceContext * self)
+relay_service_context_free (FridaServiceContext * self)
 {
   g_assert (g_queue_is_empty (&self->system_services));
   g_assert (g_queue_is_empty (&self->standalone_services));
