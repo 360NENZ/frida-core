@@ -2558,7 +2558,7 @@ namespace Frida {
 			Module? backend = null;
 
 			if (MemoryFileDescriptor.is_supported ()) {
-				var fd = MemoryFileDescriptor.from_bytes ("runtime-compiler.so", new Bytes.static (backend_so));
+				var fd = MemoryFileDescriptor.from_bytes (Uuid.string_random () + ".so", new Bytes.static (backend_so));
 				try {
 					backend = new Module ("/proc/self/fd/%d".printf (fd.handle), LOCAL);
 				} catch (ModuleError e) {
