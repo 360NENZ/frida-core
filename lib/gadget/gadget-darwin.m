@@ -16,12 +16,12 @@
 #include <objc/runtime.h>
 #include <pthread.h>
 
-static void frida_on_breakpoints_steal_attempt (GumInvocationContext * ic, gpointer user_data);
+static void relay_on_breakpoints_steal_attempt (GumInvocationContext * ic, gpointer user_data);
 
-static GumInvocationListener * frida_dont_steal_my_breakpoints;
+static GumInvocationListener * relay_dont_steal_my_breakpoints;
 
 gchar *
-frida_gadget_environment_detect_bundle_id (void)
+relay_gadget_environment_detect_bundle_id (void)
 {
   @autoreleasepool
   {
@@ -31,7 +31,7 @@ frida_gadget_environment_detect_bundle_id (void)
 }
 
 gchar *
-frida_gadget_environment_detect_bundle_name (void)
+relay_gadget_environment_detect_bundle_name (void)
 {
   @autoreleasepool
   {
@@ -41,7 +41,7 @@ frida_gadget_environment_detect_bundle_name (void)
 }
 
 gchar *
-frida_gadget_environment_detect_documents_dir (void)
+relay_gadget_environment_detect_documents_dir (void)
 {
 #if defined (HAVE_IOS) || defined (HAVE_TVOS) || defined (HAVE_XROS)
   @autoreleasepool
@@ -56,20 +56,20 @@ frida_gadget_environment_detect_documents_dir (void)
 }
 
 gboolean
-frida_gadget_environment_has_objc_class (const gchar * name)
+relay_gadget_environment_has_objc_class (const gchar * name)
 {
   return objc_getClass (name) != NULL;
 }
 
 void
-frida_gadget_environment_set_thread_name (const gchar * name)
+relay_gadget_environment_set_thread_name (const gchar * name)
 {
   /* For now only implemented on i/macOS as Fruity.Injector relies on it there. */
   pthread_setname_np (name);
 }
 
 void
-frida_gadget_environment_detect_darwin_location_fields (GumAddress our_address, gchar ** executable_name, gchar ** our_path,
+relay_gadget_environment_detect_darwin_location_fields (GumAddress our_address, gchar ** executable_name, gchar ** our_path,
     GumMemoryRange ** our_range)
 {
   mach_port_t task;
@@ -119,7 +119,7 @@ frida_gadget_environment_detect_darwin_location_fields (GumAddress our_address, 
 }
 
 void
-frida_gadget_environment_ensure_debugger_breakpoints_only (void)
+relay_gadget_environment_ensure_debugger_breakpoints_only (void)
 {
   task_set_exception_ports (
       mach_task_self (),
@@ -130,7 +130,7 @@ frida_gadget_environment_ensure_debugger_breakpoints_only (void)
   );
 
   if (gum_process_get_code_signing_policy () == GUM_CODE_SIGNING_OPTIONAL &&
-      frida_dont_steal_my_breakpoints == NULL &&
+      relay_dont_steal_my_breakpoints == NULL &&
       gum_darwin_is_debugger_mapping_enforced ())
   {
     gpointer exceptions_set, exceptions_swap;
@@ -139,38 +139,38 @@ frida_gadget_environment_ensure_debugger_breakpoints_only (void)
     exceptions_set = &task_set_exception_ports;
     exceptions_swap = &task_swap_exception_ports;
 
-    frida_dont_steal_my_breakpoints = gum_make_call_listener (frida_on_breakpoints_steal_attempt,
+    relay_dont_steal_my_breakpoints = gum_make_call_listener (relay_on_breakpoints_steal_attempt,
       NULL, NULL, NULL);
 
     interceptor = gum_interceptor_obtain ();
 
-    gum_interceptor_attach (interceptor, exceptions_set, frida_dont_steal_my_breakpoints, NULL);
-    gum_interceptor_attach (interceptor, exceptions_swap, frida_dont_steal_my_breakpoints, NULL);
+    gum_interceptor_attach (interceptor, exceptions_set, relay_dont_steal_my_breakpoints, NULL);
+    gum_interceptor_attach (interceptor, exceptions_swap, relay_dont_steal_my_breakpoints, NULL);
 
     g_object_unref (interceptor);
   }
 }
 
 void
-frida_gadget_environment_allow_stolen_breakpoints (void)
+relay_gadget_environment_allow_stolen_breakpoints (void)
 {
   GumInterceptor * interceptor;
 
-  if (frida_dont_steal_my_breakpoints == NULL)
+  if (relay_dont_steal_my_breakpoints == NULL)
     return;
 
   interceptor = gum_interceptor_obtain ();
 
-  gum_interceptor_detach (interceptor, frida_dont_steal_my_breakpoints);
+  gum_interceptor_detach (interceptor, relay_dont_steal_my_breakpoints);
 
-  g_object_unref (frida_dont_steal_my_breakpoints);
-  frida_dont_steal_my_breakpoints = NULL;
+  g_object_unref (relay_dont_steal_my_breakpoints);
+  relay_dont_steal_my_breakpoints = NULL;
 
   g_object_unref (interceptor);
 }
 
 static void
-frida_on_breakpoints_steal_attempt (GumInvocationContext * ic, gpointer user_data)
+relay_on_breakpoints_steal_attempt (GumInvocationContext * ic, gpointer user_data)
 {
   exception_mask_t exception_mask;
 
@@ -180,7 +180,7 @@ frida_on_breakpoints_steal_attempt (GumInvocationContext * ic, gpointer user_dat
 }
 
 void
-frida_gadget_environment_break_and_resume (void)
+relay_gadget_environment_break_and_resume (void)
 {
 #ifdef HAVE_ARM64
   asm volatile (
@@ -198,7 +198,7 @@ frida_gadget_environment_break_and_resume (void)
 }
 
 void
-frida_gadget_environment_break_and_detach (void)
+relay_gadget_environment_break_and_detach (void)
 {
 #ifdef HAVE_ARM64
   asm volatile (
