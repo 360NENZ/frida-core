@@ -83,7 +83,7 @@ _frida_simmy_host_session_backend_start (FridaSimmyHostSessionBackendDeviceAdded
   FridaSimmyContext * ctx;
 
   ctx = g_slice_new0 (FridaSimmyContext);
-  ctx->dispatch_queue = dispatch_queue_create ("re.frida.simmy.queue", DISPATCH_QUEUE_SERIAL);
+  ctx->dispatch_queue = dispatch_queue_create ("io.meshlink.simmy.queue", DISPATCH_QUEUE_SERIAL);
 
   ctx->on_device_added = on_device_added;
   ctx->on_device_added_target = on_device_added_target;
