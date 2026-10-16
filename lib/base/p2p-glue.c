@@ -44,7 +44,6 @@ static void frida_der_append_utctime (GByteArray * out, time_t t);
 static void frida_der_append_bit_string (GByteArray * out, const guint8 * bytes, gsize length);
 
 static const guint8 frida_oid_country[] = { 0x55, 0x04, 0x06 };
-static const guint8 frida_oid_organization[] = { 0x55, 0x04, 0x0a };
 static const guint8 frida_oid_common_name[] = { 0x55, 0x04, 0x03 };
 static const guint8 frida_oid_rsa_encryption[] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x01 };
 static const guint8 frida_oid_sha256_with_rsa[] = { 0x2a, 0x86, 0x48, 0x86, 0xf7, 0x0d, 0x01, 0x01, 0x0b };
@@ -201,7 +200,6 @@ frida_build_name (GByteArray * out)
   GByteArray * inner = g_byte_array_new ();
 
   frida_build_rdn (inner, frida_oid_country, sizeof (frida_oid_country), 0x13, "CA");
-  frida_build_rdn (inner, frida_oid_organization, sizeof (frida_oid_organization), 0x0c, "Meshlink");
   frida_build_rdn (inner, frida_oid_common_name, sizeof (frida_oid_common_name), 0x0c, "localhost");
 
   frida_der_append_tlv (out, 0x30, inner->data, inner->len);
@@ -447,7 +445,6 @@ _frida_generate_certificate (guint8 ** cert_der, gint * cert_der_length, gchar *
 
   name = X509_get_subject_name (x509);
   X509_NAME_add_entry_by_txt (name, "C", MBSTRING_ASC, (const unsigned char *) "CA", -1, -1, 0);
-  X509_NAME_add_entry_by_txt (name, "O", MBSTRING_ASC, (const unsigned char *) "Meshlink", -1, -1, 0);
   X509_NAME_add_entry_by_txt (name, "CN", MBSTRING_ASC, (const unsigned char *) "localhost", -1, -1, 0);
   X509_set_issuer_name (x509, name);
 

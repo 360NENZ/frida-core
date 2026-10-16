@@ -4551,7 +4551,6 @@ namespace Frida {
 			dbus_context = yield get_dbus_context ();
 
 			var agent = new Nice.Agent.full (dbus_context, Nice.Compatibility.RFC5245, ICE_TRICKLE);
-			agent.set_software ("Meshlink");
 			agent.controlling_mode = true;
 			agent.ice_tcp = false;
 
