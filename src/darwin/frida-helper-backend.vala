@@ -745,7 +745,7 @@ namespace Frida {
 
 			this.scope = scope;
 
-			string? predicate = Environment.get_variable ("FRIDA_DTRACE_PREDICATE");
+			string? predicate = Environment.get_variable ("MESHLINK_DTRACE_PREDICATE");
 			string predicate_clause;
 			if (predicate != null)
 				predicate_clause = "/" + predicate + "/";

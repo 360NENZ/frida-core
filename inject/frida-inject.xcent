@@ -7,7 +7,7 @@
 	<key>adi-client</key>
 	<string>166430402</string>
 	<key>application-identifier</key>
-	<string>re.frida.Server</string>
+	<string>io.meshlink.Server</string>
 	<key>aps-connection-initiate</key>
 	<true/>
 	<key>auth-key-vault-client</key>

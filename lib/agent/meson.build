@@ -81,7 +81,7 @@ if build_agent
   )
 
   if host_os_family == 'darwin'
-    identity = 'FridaAgent'
+    identity = 'MeshlinkAgent'
   else
     identity = agent_name
   endif

@@ -18,7 +18,7 @@ raw_inject = executable('frida-inject-raw', inject_sources,
 custom_target('frida-inject',
   input: [raw_inject, 'frida-inject.xcent'],
   output: 'frida-inject' + exe_suffix,
-  command: post_process + ['executable', 're.frida.Inject', '@INPUT1@'],
+  command: post_process + ['executable', 'io.meshlink.Inject', '@INPUT1@'],
   install: true,
   install_dir: get_option('bindir'),
 )

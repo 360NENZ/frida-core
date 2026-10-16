@@ -5,11 +5,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleIdentifier</key>
-	<string>re.frida.Helper</string>
+	<string>io.meshlink.Helper</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Frida</string>
+	<string>Meshlink</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
 	<key>SecTaskAccess</key>
